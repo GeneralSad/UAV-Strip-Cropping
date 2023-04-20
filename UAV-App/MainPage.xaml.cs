@@ -32,45 +32,7 @@ namespace DJIWindowsSDKSample
                 {
                     new KeyValuePair<string, Type>("Activating DJIWindowsSDK", typeof(DJISDKInitializing.ActivatingPage)),
                 },
-            },
-            new SDKModuleSampleItems() {
-                header = "FPV", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("FPV", typeof(FPV.FPVPage)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Component Handling", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Component Handling", typeof(ComponentHandling.ComponentHandingPage)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Waypoint", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Using Simulator", typeof(WaypointHandling.SimulatorPage)),
-                    new KeyValuePair<string, Type>("Waypoint Mission", typeof(WaypointHandling.WaypointMissionPage)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Account", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Account Management", typeof(UserAccount.UserAccountPage)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Flysafe", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Flyzone", typeof(Flysafe.FlyzonePage)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Playback", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Playback", typeof(Playback.PlaybackPage)),
-                },
-            },
-
+            }
         };
 
         public MainPage()

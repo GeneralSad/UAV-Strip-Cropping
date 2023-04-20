@@ -98,38 +98,11 @@
     <Compile Include="..\DJISampleSources\Command\RelayCommand.cs">
       <Link>Command\RelayCommand.cs</Link>
     </Compile>
-    <Compile Include="..\DJISampleSources\ComponentHandling\ComponentHandingPage.xaml.cs">
-      <Link>ComponentHandling\ComponentHandingPage.xaml.cs</Link>
-    </Compile>
     <Compile Include="..\DJISampleSources\DJISDKInitializing\ActivatingPage.xaml.cs">
       <Link>DJISDKInitializing\ActivatingPage.xaml.cs</Link>
     </Compile>
-    <Compile Include="..\DJISampleSources\Flysafe\FlyzonePage.xaml.cs">
-      <Link>Flysafe\FlyzonePage.xaml.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\FPV\FPVPage.xaml.cs">
-      <Link>FPV\FPVPage.xaml.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\Playback\Playback.xaml.cs">
-      <Link>Playback\Playback.xaml.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\UserAccount\UserAccountPage.xaml.cs">
-      <Link>UserAccount\UserAccountPage.xaml.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\ViewModels\ComponentViewModel.cs">
-      <Link>ViewModels\ComponentViewModel.cs</Link>
-    </Compile>
     <Compile Include="..\DJISampleSources\ViewModels\ViewModelBase.cs">
       <Link>ViewModels\ViewModelBase.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\ViewModels\WaypointMissionViewModel.cs">
-      <Link>ViewModels\WaypointMissionViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\WaypointHandling\SimulatorPage.xaml.cs">
-      <Link>WaypointHandling\SimulatorPage.xaml.cs</Link>
-    </Compile>
-    <Compile Include="..\DJISampleSources\WaypointHandling\WaypointMissionPage.xaml.cs">
-      <Link>WaypointHandling\WaypointMissionPage.xaml.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -179,43 +152,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="..\DJISampleSources\ComponentHandling\ComponentHandingPage.xaml">
-      <Link>ComponentHandling\ComponentHandingPage.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="..\DJISampleSources\DJISDKInitializing\ActivatingPage.xaml">
       <Link>DJISDKInitializing\ActivatingPage.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\DJISampleSources\Flysafe\FlyzonePage.xaml">
-      <Link>Flysafe\FlyzonePage.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\DJISampleSources\FPV\FPVPage.xaml">
-      <Link>FPV\FPVPage.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\DJISampleSources\Playback\Playback.xaml">
-      <Link>Playback\Playback.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\DJISampleSources\UserAccount\UserAccountPage.xaml">
-      <Link>UserAccount\UserAccountPage.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\DJISampleSources\WaypointHandling\SimulatorPage.xaml">
-      <Link>WaypointHandling\SimulatorPage.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\DJISampleSources\WaypointHandling\WaypointMissionPage.xaml">
-      <Link>WaypointHandling\WaypointMissionPage.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
