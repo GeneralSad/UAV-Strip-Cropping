@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace DJIWindowsSDKSample
+namespace UAV_App
 {
     sealed partial class App : Application
     {

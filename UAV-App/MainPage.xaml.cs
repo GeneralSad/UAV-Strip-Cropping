@@ -15,7 +15,7 @@ using Windows.UI.Xaml.Navigation;
 
 using DJI.WindowsSDK;
 
-namespace DJIWindowsSDKSample
+namespace UAV_App
 {
     public sealed partial class MainPage : Page
     {

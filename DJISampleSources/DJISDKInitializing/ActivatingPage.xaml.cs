@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace DJIWindowsSDKSample.DJISDKInitializing
+namespace UAV_App.DJISDKInitializing
 {
     public sealed partial class ActivatingPage : Page
     {
