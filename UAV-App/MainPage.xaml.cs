@@ -32,7 +32,13 @@ namespace UAV_App
                 {
                     new KeyValuePair<string, Type>("Activating DJIWindowsSDK", typeof(DJISDKInitializing.ActivatingPage)),
                 },
-            }
+            },
+            new SDKModuleSampleItems() {
+                header = "Account", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Account Management", typeof(Pages.LoginView)),
+                },
+            },
         };
 
         public MainPage()
