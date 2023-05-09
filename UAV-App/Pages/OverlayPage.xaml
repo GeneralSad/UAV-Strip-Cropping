@@ -13,6 +13,6 @@
         <Frame x:Name="cs" Content="" Margin="0,161,0,10"/>
 
         <Button Content="EMERGENCY BUTTON" Margin="41,42,0,0" VerticalAlignment="Top" Height="77" Width="167" Background="#33FF0000"/>
-
+        <SwapChainPanel x:Name="swapChainPanel" Visibility="Visible" Margin="752,21,36,1359" />
     </Grid>
 </Page>

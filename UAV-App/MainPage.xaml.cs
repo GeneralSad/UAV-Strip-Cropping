@@ -1,24 +1,14 @@
+using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-
-using DJI.WindowsSDK;
 
 namespace UAV_App
 {
     public sealed partial class MainPage : Page
     {
+        public bool isActivated = false;
         private struct SDKModuleSampleItems
         {
             public String header;
@@ -45,6 +35,12 @@ namespace UAV_App
                     new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
                 },
             },
+            new SDKModuleSampleItems() {
+                header = "Camera", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Video stream", typeof(Pages.FPVPage)),
+                },
+            },
         };
 
         public MainPage()
@@ -63,6 +59,15 @@ namespace UAV_App
             content.Navigate(typeof(DJISDKInitializing.ActivatingPage));
         }
 
+        public bool getActivated()
+        {
+            return isActivated;
+        }
+        public void setActivated(bool isActive)
+        {
+            isActivated = isActive;
+        }
+
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             String invokedName = args.InvokedItem as String;
@@ -78,9 +83,8 @@ namespace UAV_App
                             var grid = a.Content as Grid;
                             var content = grid.Children[0] as Frame;
                             content.Navigate(item.Value);
-
-                            //ContentFrame.Navigate(item.Value);
-                        }
+/*                            content.Navigate(item.Value, isActivated);
+*/                        }
                         return;
                     }
                 }
