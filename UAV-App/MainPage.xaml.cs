@@ -56,6 +56,7 @@ namespace UAV_App
             {
                 NavView.MenuItems.Add(item.Key);
             }
+            ContentFrame.Navigate(typeof(DJISDKInitializing.ActivatingPage));
         }
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
