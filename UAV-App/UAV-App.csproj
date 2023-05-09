@@ -7,8 +7,8 @@
     <ProjectGuid>{927FC7E1-925F-41E4-9F5C-28F82F53578F}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DJIWindowsSDKSample</RootNamespace>
-    <AssemblyName>DJIWindowsSDKSample</AssemblyName>
+    <RootNamespace>UAV_App</RootNamespace>
+    <AssemblyName>UAV-App</AssemblyName>
     <DefaultLanguage>nl-Nl</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22621.0</TargetPlatformVersion>
