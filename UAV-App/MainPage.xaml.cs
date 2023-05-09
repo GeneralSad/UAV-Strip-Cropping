@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,6 +37,12 @@ namespace UAV_App
                 header = "Account", items = new List<KeyValuePair<String, Type>>()
                 {
                     new KeyValuePair<string, Type>("Account Management", typeof(Pages.LoginView)),
+                },
+            },
+            new SDKModuleSampleItems() {
+                header = "Information", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
                 },
             },
         };
