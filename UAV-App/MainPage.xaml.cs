@@ -56,7 +56,11 @@ namespace UAV_App
             {
                 NavView.MenuItems.Add(item.Key);
             }
-            ContentFrame.Navigate(typeof(DJISDKInitializing.ActivatingPage));
+            ContentFrame.Navigate(typeof(Pages.OverlayPage));
+            var a = ContentFrame.Content as Page;
+            var grid = a.Content as Grid;
+            var content = grid.Children[0] as Frame;
+            content.Navigate(typeof(DJISDKInitializing.ActivatingPage));
         }
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -70,7 +74,12 @@ namespace UAV_App
                     {
                         if (ContentFrame.SourcePageType != item.Value)
                         {
-                            ContentFrame.Navigate(item.Value);
+                            var a = ContentFrame.Content as Page;
+                            var grid = a.Content as Grid;
+                            var content = grid.Children[0] as Frame;
+                            content.Navigate(item.Value);
+
+                            //ContentFrame.Navigate(item.Value);
                         }
                         return;
                     }
