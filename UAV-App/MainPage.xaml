@@ -15,5 +15,6 @@
                         Header="UAV App">
             <Frame x:Name="ContentFrame" Margin="24"/>
         </NavigationView>
+
     </Grid>
 </Page>
