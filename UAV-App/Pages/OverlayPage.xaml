@@ -10,9 +10,9 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Frame x:Name="cs" Content="" Margin="0,161,0,10"/>
+        <Frame x:Name="cs" Content="" Margin="0,249,0,10"/>
+        <SwapChainPanel x:Name="swapChainPanel" Visibility="Visible" Margin="754,10,10,1256" />
 
-        <Button Content="EMERGENCY BUTTON" Margin="41,42,0,0" VerticalAlignment="Top" Height="77" Width="167" Background="#33FF0000"/>
-        <SwapChainPanel x:Name="swapChainPanel" Visibility="Visible" Margin="752,21,36,1359" />
+        <Button Content="EMERGENCY BUTTON" Margin="41,42,0,0" VerticalAlignment="Top" Height="77" Width="167" Background="#33FF0000" Click="EmergencyButton_Click"/>
     </Grid>
 </Page>

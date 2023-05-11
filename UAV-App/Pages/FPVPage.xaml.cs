@@ -12,24 +12,16 @@ namespace UAV_App.Pages
         private DJIVideoParser.Parser videoParser;
         private bool isActive;
 
-/*        public FPVPage(bool activeState)
-*/        public FPVPage()
+        public FPVPage()
         {
             this.InitializeComponent();
-/*            isActive = activeState;
-*/        }
+        }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            /*if (isActive)
-            {*/
-                base.OnNavigatedFrom(e);
-                InitializeVideoFeedModule();
-                await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
-           /* } else
-            {
-                Debug.WriteLine("System isn't active: " + isActive);
-            }*/
+            base.OnNavigatedFrom(e);
+            InitializeVideoFeedModule();
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -47,6 +39,7 @@ namespace UAV_App.Pages
                 //Raw data and decoded data listener
                 if (videoParser == null)
                 {
+                    Debug.WriteLine("Creating videoparser...");
                     videoParser = new DJIVideoParser.Parser();
                     videoParser.Initialize(delegate (byte[] data)
                     {
@@ -77,6 +70,7 @@ namespace UAV_App.Pages
         //raw data
         void OnVideoPush(VideoFeed sender, byte[] bytes)
         {
+            //Debug.WriteLine("Entering OnVideoPush method");
             videoParser.PushVideoData(0, 0, bytes, bytes.Length);
         }
 

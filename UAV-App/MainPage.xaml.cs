@@ -1,6 +1,7 @@
 using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -53,19 +54,19 @@ namespace UAV_App
                 NavView.MenuItems.Add(item.Key);
             }
             ContentFrame.Navigate(typeof(Pages.OverlayPage));
-            var a = ContentFrame.Content as Page;
-            var grid = a.Content as Grid;
-            var content = grid.Children[0] as Frame;
-            content.Navigate(typeof(DJISDKInitializing.ActivatingPage));
+            setContentFrameContent(typeof(DJISDKInitializing.ActivatingPage));
         }
 
-        public bool getActivated()
+        private void setContentFrameContent(Type contentType)
         {
-            return isActivated;
-        }
-        public void setActivated(bool isActive)
-        {
-            isActivated = isActive;
+            var overlayPage = ContentFrame.Content as Page;
+            var grid = overlayPage.Content as Grid;
+            var contentFrame = grid.Children[0] as Frame;
+            if (contentFrame.SourcePageType != contentType)
+            {
+                Debug.WriteLine("ContentType navigating to: " + contentType);
+                contentFrame.Navigate(contentType);
+            }
         }
 
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -77,14 +78,7 @@ namespace UAV_App
                 {
                     if (invokedName == item.Key)
                     {
-                        if (ContentFrame.SourcePageType != item.Value)
-                        {
-                            var a = ContentFrame.Content as Page;
-                            var grid = a.Content as Grid;
-                            var content = grid.Children[0] as Frame;
-                            content.Navigate(item.Value);
-/*                            content.Navigate(item.Value, isActivated);
-*/                        }
+                        setContentFrameContent(item.Value);
                         return;
                     }
                 }
