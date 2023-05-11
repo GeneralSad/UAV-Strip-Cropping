@@ -1,28 +1,10 @@
 ﻿using DJI.WindowsSDK.UserAccount;
 using DJI.WindowsSDK;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using System.Diagnostics;
-using Microsoft.Web.WebView2.Core;
 using Microsoft.UI.Xaml.Controls;
-using System.Security.AccessControl;
-using System.Xml;
-
-using Newtonsoft.Json;
-using Windows.UI;
 
 namespace UAV_App.Pages
 {
