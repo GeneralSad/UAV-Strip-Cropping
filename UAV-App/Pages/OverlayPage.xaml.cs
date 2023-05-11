@@ -1,34 +1,28 @@
 ﻿using DJI.WindowsSDK;
 using DJIVideoParser;
 using System;
+using System.Diagnostics;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace UAV_App.Pages
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class OverlayPage : Page
     {
-        //private DJIVideoParser.Parser videoParser;
+        private DJIVideoParser.Parser videoParser;
 
         public OverlayPage()
         {
             this.InitializeComponent();
         }
 
-        /*protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {
-            if (false)
-            {
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {/*
                 base.OnNavigatedFrom(e);
                 InitializeVideoFeedModule();
                 await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
-            }
-        }
+      */  }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
@@ -101,7 +95,15 @@ namespace UAV_App.Pages
                         break;
                 }
 
-            }*/
-        //}
+            }
+        }
+
+        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            Debug.WriteLine("Entering Method EmergencyButton_Click");
+            InitializeVideoFeedModule();
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
+            Debug.WriteLine("Leaving Method EmergencyButton_Click");
+        }
     }
 }
