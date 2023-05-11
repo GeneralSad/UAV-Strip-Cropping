@@ -22,6 +22,7 @@ using System.Security.AccessControl;
 using System.Xml;
 
 using Newtonsoft.Json;
+using Windows.UI;
 
 namespace UAV_App.Pages
 {
@@ -58,33 +59,29 @@ namespace UAV_App.Pages
 
         private void loginButton_Click(object sender, RoutedEventArgs e)
         {
-            var loginWebView2 = DJISDKManager.Instance.UserAccountManager.CreateLoginView(false);
-            var loginWebView = new WebView2();
+            //var loginWebView = DJISDKManager.Instance.UserAccountManager.CreateLoginView(false);
 
-            loginWebView.Source = new Uri("https://account.dji.com/login?showHeader=false&showThirdPart=false&appId=windows_sdk&locale=en_US&callback_url=djilogin%3A%2F%2Fgeologin");
-
-            //Trace.WriteLine(loginWebView.Source.ToString());
+            var loginWebView2 = new WebView2();
+            loginWebView2.Source = new Uri("https://account.dji.com/login?showHeader=false&showThirdPart=false&appId=windows_sdk&locale=en_US&callback_url=djilogin%3A%2F%2Fgeologin");
 
             if (contentGrid.Children.Count < 2)
             {
-                contentGrid.Children.Add(loginWebView);
-                Grid.SetColumn(loginWebView, 1);
+                //contentGrid.Children.Add(loginWebView);
+                //Grid.SetColumn(loginWebView, 1);
+
                 contentGrid.Children.Add(loginWebView2);
                 Grid.SetColumn(loginWebView2, 2);
-                Trace.WriteLine(loginWebView);
             }
             else
             {
-                Grid.SetColumn(loginWebView, 1);
+                Grid.SetColumn(loginWebView2, 1);
             }
         }
 
         private void statusButton_Click(object sender, RoutedEventArgs e)
         {
+            //WebView loginWebView = (WebView)contentGrid.Children[1];
             WebView2 loginWebView = (WebView2)contentGrid.Children[1];
-            WebView loginWebView2 = (WebView)contentGrid.Children[2];
-            //loginWebView.Source = new Uri("https://www.google.com");
-            Trace.WriteLine(loginWebView.IsLoaded);
         }
 
         private async void logoutButton_Click(object sender, RoutedEventArgs e)
