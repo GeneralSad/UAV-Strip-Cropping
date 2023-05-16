@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UAV_App</RootNamespace>
     <AssemblyName>UAV-App</AssemblyName>
-    <DefaultLanguage>en-EN</DefaultLanguage>
+    <DefaultLanguage>en-US</DefaultLanguage>
 	<TargetFramework>net6.0-windows</TargetFramework>
 	<UseWPF>true</UseWPF>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

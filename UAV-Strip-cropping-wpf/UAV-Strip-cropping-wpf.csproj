@@ -2,10 +2,22 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>UAV_Strip_cropping_wpf</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <IsPublishable>True</IsPublishable>
+    <PackageId>com.wsdk.UAV-App</PackageId>
+    <Title>com.wsdk.UAV-App</Title>
+    <Platforms>AnyCPU;x86</Platforms>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <StartupObject></StartupObject>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="DJIWindowsSDK">
+      <HintPath>DJIWindowsSDK\DJIWindowsSDK.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
 </Project>
