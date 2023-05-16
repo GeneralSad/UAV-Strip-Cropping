@@ -11,16 +11,24 @@ namespace UAV_App.Pages
     {
         private DJIVideoParser.Parser videoParser;
 
+        public static OverlayPage Current;
+
+
+
         public OverlayPage()
         {
             this.InitializeComponent();
+
+            if (Current == null)
+            {
+                Current = this;
+            }
+
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            //InitializeVideoFeedModule();
-            //await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -96,12 +104,16 @@ namespace UAV_App.Pages
             }
         }
 
-        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        public async void StartVideoFeed()
         {
-            Debug.WriteLine("Entering Method EmergencyButton_Click");
+            Debug.WriteLine("Start Video Feed");
             InitializeVideoFeedModule();
             await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
-            Debug.WriteLine("Leaving Method EmergencyButton_Click");
+        }
+
+        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+
         }
     }
 }

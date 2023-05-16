@@ -9,7 +9,7 @@ namespace UAV_App
 {
     public sealed partial class MainPage : Page
     {
-        public bool isActivated = false;
+
         private struct SDKModuleSampleItems
         {
             public String header;
@@ -47,6 +47,7 @@ namespace UAV_App
         public MainPage()
         {
             this.InitializeComponent();
+
             var module = navigationModules[0];
             NavView.MenuItems.Add(new NavigationViewItemHeader() { Content = module.header });
             foreach (var item in module.items)
@@ -55,6 +56,7 @@ namespace UAV_App
             }
             ContentFrame.Navigate(typeof(Pages.OverlayPage));
             setContentFrameContent(typeof(DJISDKInitializing.ActivatingPage));
+            
         }
 
         private void setContentFrameContent(Type contentType)
