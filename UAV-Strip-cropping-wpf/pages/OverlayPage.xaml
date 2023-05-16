@@ -1,0 +1,31 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="clr-namespace:Microsoft.Toolkit.Wpf.UI.Controls;assembly=Microsoft.Toolkit.Wpf.UI.Controls"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UAV_App.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Custom="using:Microsoft.UI.Xaml.Controls"
+    x:Class="UAV_App.Pages.OverlayPage"
+    mc:Ignorable="d"
+    Background="White">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Frame Grid.Column="0" Grid.Row="0" x:Name="cs" Content="" Margin="0,249,0,10"/>
+
+        <Button Grid.Column="0" Grid.Row="1" Content="EMERGENCY BUTTON" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="EmergencyButton_Click"/>
+
+        <SwapChainPanel Grid.Column="1" Grid.Row="1" Height="180" Width="320" x:Name="swapChainPanel" Visibility="Visible"/>
+
+        </Grid>
+</Page>
