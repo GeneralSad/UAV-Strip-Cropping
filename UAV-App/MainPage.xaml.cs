@@ -1,24 +1,15 @@
-﻿using System;
+using DJI.WindowsSDK;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-
-using DJI.WindowsSDK;
 
 namespace UAV_App
 {
     public sealed partial class MainPage : Page
     {
+        public bool isActivated = false;
         private struct SDKModuleSampleItems
         {
             public String header;
@@ -39,6 +30,18 @@ namespace UAV_App
                     new KeyValuePair<string, Type>("Account Management", typeof(Pages.LoginView)),
                 },
             },
+            new SDKModuleSampleItems() {
+                header = "Information", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
+                },
+            },
+            new SDKModuleSampleItems() {
+                header = "Camera", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Video stream", typeof(Pages.FPVPage)),
+                },
+            },
         };
 
         public MainPage()
@@ -49,6 +52,20 @@ namespace UAV_App
             foreach (var item in module.items)
             {
                 NavView.MenuItems.Add(item.Key);
+            }
+            ContentFrame.Navigate(typeof(Pages.OverlayPage));
+            setContentFrameContent(typeof(DJISDKInitializing.ActivatingPage));
+        }
+
+        private void setContentFrameContent(Type contentType)
+        {
+            var overlayPage = ContentFrame.Content as Page;
+            var grid = overlayPage.Content as Grid;
+            var contentFrame = grid.Children[0] as Frame;
+            if (contentFrame.SourcePageType != contentType)
+            {
+                Debug.WriteLine("ContentType navigating to: " + contentType);
+                contentFrame.Navigate(contentType);
             }
         }
 
@@ -61,10 +78,7 @@ namespace UAV_App
                 {
                     if (invokedName == item.Key)
                     {
-                        if (ContentFrame.SourcePageType != item.Value)
-                        {
-                            ContentFrame.Navigate(item.Value);
-                        }
+                        setContentFrameContent(item.Value);
                         return;
                     }
                 }

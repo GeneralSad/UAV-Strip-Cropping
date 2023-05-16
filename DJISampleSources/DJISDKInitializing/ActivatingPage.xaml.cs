@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Threading.Tasks;
 
 namespace UAV_App.DJISDKInitializing
 {
@@ -26,10 +27,17 @@ namespace UAV_App.DJISDKInitializing
 
         private async void Instance_SDKRegistrationEvent(SDKRegistrationState state, SDKError resultCode)
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
                activateStateTextBlock.Text = state == SDKRegistrationState.Succeeded ? "Activated." : "Not Activated.";
                activationInformation.Text = resultCode == SDKError.NO_ERROR ? "Register success" : resultCode.ToString();
+                /*if (resultCode == SDKError.NO_ERROR)
+                {
+                    MainPage.setActivated(true);
+                } else
+                {
+                    MainPage.setActivated(false);
+                }*/
             });
         }
 

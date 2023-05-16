@@ -106,8 +106,26 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Drone Movement\DroneMovementStateMachine.cs" />
+    <Compile Include="Drone Movement\IMovementState.cs" />
+    <Compile Include="Drone Movement\MotorCommandHandler.cs" />
+    <Compile Include="Drone Movement\States\MovingState.cs" />
+    <Compile Include="Drone Movement\States\LandingState.cs" />
+    <Compile Include="Drone Movement\States\EmergencyStopState.cs" />
+    <Compile Include="Drone Movement\States\IdleState.cs" />
+    <Compile Include="Drone Movement\States\HoverState.cs" />
+    <Compile Include="Drone Movement\States\PreparingState.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\FPVPage.xaml.cs">
+      <DependentUpon>FPVPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\InformationRapportPage.xaml.cs">
+      <DependentUpon>InformationRapportPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\OverlayPage.xaml.cs">
+      <DependentUpon>OverlayPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pages\LoginView.xaml.cs">
@@ -160,6 +178,18 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\FPVPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\InformationRapportPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\OverlayPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
