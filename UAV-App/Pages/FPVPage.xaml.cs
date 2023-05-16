@@ -10,7 +10,6 @@ namespace UAV_App.Pages
     public sealed partial class FPVPage : Page
     {
         private DJIVideoParser.Parser videoParser;
-        private bool isActive;
 
         public FPVPage()
         {
@@ -30,7 +29,6 @@ namespace UAV_App.Pages
             UninitializeVideoFeedModule();
         }
 
-
         private async void InitializeVideoFeedModule()
         {
             //Must in UI thread
@@ -39,7 +37,6 @@ namespace UAV_App.Pages
                 //Raw data and decoded data listener
                 if (videoParser == null)
                 {
-                    Debug.WriteLine("Creating videoparser...");
                     videoParser = new DJIVideoParser.Parser();
                     videoParser.Initialize(delegate (byte[] data)
                     {
@@ -70,7 +67,6 @@ namespace UAV_App.Pages
         //raw data
         void OnVideoPush(VideoFeed sender, byte[] bytes)
         {
-            //Debug.WriteLine("Entering OnVideoPush method");
             videoParser.PushVideoData(0, 0, bytes, bytes.Length);
         }
 
