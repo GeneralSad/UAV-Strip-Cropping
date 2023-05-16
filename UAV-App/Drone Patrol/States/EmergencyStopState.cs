@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UAV_App.Drone_Movement.States
+namespace UAV_App.Drone_Patrol.States
 {
-    public class LandingState : IMovementState
+    public class EmergencyStopState : IPatrolState
     {
         public ParentState getParent()
         {
@@ -21,7 +21,7 @@ namespace UAV_App.Drone_Movement.States
         {
         }
 
-        public IMovementState run()
+        public IPatrolState run()
         {
             return null;
         }

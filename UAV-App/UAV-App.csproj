@@ -103,9 +103,18 @@
     <Compile Include="..\DJISampleSources\ViewModels\ViewModelBase.cs">
       <Link>ViewModels\ViewModelBase.cs</Link>
     </Compile>
+    <Compile Include="AI\AnimalDetection.cs" />
+    <Compile Include="AI\IAICallback.cs" />
+    <Compile Include="AI\IAIReceiverCallback.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Drone Communication\DroneCommunicationReceiver.cs" />
+    <Compile Include="Drone Communication\DroneCommunicationSender.cs" />
+    <Compile Include="Drone Communication\DroneStreamReceiver.cs" />
+    <Compile Include="Drone Communication\IStreamCommands.cs" />
+    <Compile Include="Drone Manager\IPatrolMessage.cs" />
+    <Compile Include="Drone Manager\PatrolController.cs" />
     <Compile Include="Drone Movement\DroneMovementStateMachine.cs" />
     <Compile Include="Drone Movement\IMovementState.cs" />
     <Compile Include="Drone Movement\MotorCommandHandler.cs" />
@@ -115,6 +124,16 @@
     <Compile Include="Drone Movement\States\IdleState.cs" />
     <Compile Include="Drone Movement\States\HoverState.cs" />
     <Compile Include="Drone Movement\States\PreparingState.cs" />
+    <Compile Include="Drone Patrol\CameraCommandHandler.cs" />
+    <Compile Include="Drone Patrol\IPatrolState.cs" />
+    <Compile Include="Drone Patrol\PatrolStateMachine.cs" />
+    <Compile Include="Drone Patrol\States\ConnectingState.cs" />
+    <Compile Include="Drone Patrol\States\DetectingAnimalsState.cs" />
+    <Compile Include="Drone Patrol\States\EmergencyStopState.cs" />
+    <Compile Include="Drone Patrol\States\ExpelAnimalsState.cs" />
+    <Compile Include="Drone Patrol\States\FollowingRouteState.cs" />
+    <Compile Include="Drone Patrol\States\IdleState.cs" />
+    <Compile Include="Drone Patrol\States\PreparingState.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
