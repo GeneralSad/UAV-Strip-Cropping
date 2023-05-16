@@ -5,7 +5,6 @@ using System.Diagnostics;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-
 namespace UAV_App.Pages
 {
     public sealed partial class OverlayPage : Page
@@ -18,18 +17,17 @@ namespace UAV_App.Pages
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {/*
-                base.OnNavigatedFrom(e);
-                InitializeVideoFeedModule();
-                await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
-      */  }
+        {
+            base.OnNavigatedFrom(e);
+            //InitializeVideoFeedModule();
+            //await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
+        }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             UninitializeVideoFeedModule();
         }
-
 
         private async void InitializeVideoFeedModule()
         {

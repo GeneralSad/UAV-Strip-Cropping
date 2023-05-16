@@ -13,7 +13,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <SwapChainPanel x:Name="swapChainPanel" Visibility="Visible" Grid.Row="1" Margin="0, 10, 0, 0" />
+            <SwapChainPanel x:Name="swapChainPanel" Visibility="Visible" Grid.Row="1" Width="1280" Height="720" />
         </Grid>
     </Grid>
 </Page>
