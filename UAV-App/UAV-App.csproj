@@ -109,6 +109,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Database\DatabaseViewer.cs" />
+    <Compile Include="Database\DatabaseWriter.cs" />
     <Compile Include="Drone Communication\DroneCommunicationReceiver.cs" />
     <Compile Include="Drone Communication\DroneCommunicationSender.cs" />
     <Compile Include="Drone Communication\DroneStreamReceiver.cs" />
