@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -15,9 +15,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+<<<<<<< HEAD
     <Reference Include="DJIWindowsSDK">
       <HintPath>DJIWindowsSDK\DJIWindowsSDK.dll</HintPath>
     </Reference>
+=======
+    <PackageReference Include="Microsoft.Toolkit.Wpf.UI.Controls" Version="6.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Pages\FPVPage.xaml.cs">
+      <DependentUpon>FPVPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\InformationRapportPage.xaml.cs">
+      <DependentUpon>InformationRapportPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\OverlayPage.xaml.cs">
+      <DependentUpon>OverlayPage.xaml</DependentUpon>
+    </Compile>
+>>>>>>> WPFVersion
   </ItemGroup>
 
 </Project>
