@@ -14,8 +14,8 @@ namespace UAV_App.Drone_Movement
     public interface IMovementState
     {
         ParentState getParent();
-        IMovementState Run();
-        void OnEnter();
-        void OnLeave();
+        IMovementState run();
+        void onEnter();
+        void onLeave();
     }
 }

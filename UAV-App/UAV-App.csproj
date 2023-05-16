@@ -108,6 +108,13 @@
     </Compile>
     <Compile Include="Drone Movement\DroneMovementStateMachine.cs" />
     <Compile Include="Drone Movement\IMovementState.cs" />
+    <Compile Include="Drone Movement\MotorCommandHandler.cs" />
+    <Compile Include="Drone Movement\States\MovingState.cs" />
+    <Compile Include="Drone Movement\States\LandingState.cs" />
+    <Compile Include="Drone Movement\States\EmergencyStopState.cs" />
+    <Compile Include="Drone Movement\States\IdleState.cs" />
+    <Compile Include="Drone Movement\States\HoverState.cs" />
+    <Compile Include="Drone Movement\States\PreparingState.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

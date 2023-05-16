@@ -6,7 +6,24 @@ using System.Threading.Tasks;
 
 namespace UAV_App.Drone_Movement.States
 {
-    internal class PreparingState
+    public class MovingState : IMovementState
     {
+        public ParentState getParent()
+        {
+            return ParentState.FOLLOW_ROUTE;
+        }
+
+        public void onEnter()
+        {
+        }
+
+        public void onLeave()
+        {
+        }
+
+        public IMovementState run()
+        {
+
+        }
     }
 }
