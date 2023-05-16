@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace UAV_App.Drone_Communication
 {
-    internal class DroneCommunicationSender
+    public class DroneCommunicationSender
     {
+        public bool sendMessage()
+        {
+            return false;
+        }
     }
 }

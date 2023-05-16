@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace UAV_App.AI
 {
-    internal interface IAICallback
+    public interface IAICallback
     {
+        void startPrediction();
     }
 }

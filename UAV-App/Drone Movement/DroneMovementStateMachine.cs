@@ -8,7 +8,9 @@ namespace UAV_App.Drone_Movement
 {
     public class DroneMovementStateMachine
     {
-        //public List<IPatrolState> parentStateHistory; //from package Drone Patrol
+        public List<IMovementState> parentStateHistory;
+        public IMovementState activeState;
+
         public void switchState(IMovementState state)
         {
 

@@ -8,7 +8,7 @@ namespace UAV_App.Drone_Communication
 {
     public interface IStreamCommands
     {
-        void getLastFrame(); //TODO: returns an image, don't know the data type atm
+        void getLastFrame(); //TODO: change return type to an image, don't know the data type atm
 
         //TODO: Move camera methods from OverlayPage to here
     }
