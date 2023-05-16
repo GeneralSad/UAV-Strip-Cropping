@@ -39,6 +39,12 @@ namespace UAV_App
                     new KeyValuePair<string, Type>("Account Management", typeof(Pages.LoginView)),
                 },
             },
+            new SDKModuleSampleItems() {
+                header = "Map", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Map view", typeof(Pages.MapView)),
+                },
+            },
         };
 
         public MainPage()
