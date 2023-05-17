@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
+using UAV_App.Pages;
 
 namespace UAV_App.DJISDKInitializing
 {
@@ -31,13 +32,10 @@ namespace UAV_App.DJISDKInitializing
             {
                activateStateTextBlock.Text = state == SDKRegistrationState.Succeeded ? "Activated." : "Not Activated.";
                activationInformation.Text = resultCode == SDKError.NO_ERROR ? "Register success" : resultCode.ToString();
-                /*if (resultCode == SDKError.NO_ERROR)
+                if (resultCode == SDKError.NO_ERROR)
                 {
-                    MainPage.setActivated(true);
-                } else
-                {
-                    MainPage.setActivated(false);
-                }*/
+                    OverlayPage.Current?.StartVideoFeed();
+                }
             });
         }
 

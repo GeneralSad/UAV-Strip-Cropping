@@ -24,7 +24,7 @@
 
         <Button Grid.Column="0" Grid.Row="1" Content="EMERGENCY BUTTON" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="EmergencyButton_Click"/>
 
-        <SwapChainPanel Grid.Column="1" Grid.Row="1" Height="180" Width="320" x:Name="swapChainPanel" Visibility="Visible"/>
+        <SwapChainPanel Grid.Column="1" Grid.Row="1"  Width="320" Height="180" x:Name="swapChainPanel" Visibility="Visible"/>
 
         </Grid>
 </Page>
