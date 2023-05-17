@@ -159,8 +159,6 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assests\Wide310x150Logo.scale-200.png" />
-    <Content Include="Assests\Wide310x150Logo.scale-400.png" />
     <Content Include="Assets\phantom.svg" />
     <Content Include="Assets\waypoint.png" />
     <Content Include="avcodec-56.dll">
