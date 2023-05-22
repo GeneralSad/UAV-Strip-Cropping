@@ -2,6 +2,7 @@
 using DJIVideoParser;
 using System;
 using System.Diagnostics;
+using UAV_App.Drone_Patrol;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
@@ -140,6 +141,8 @@ namespace UAV_App.Pages
         private void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             Debug.WriteLine("Emerge ency");
+            CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
+            cameraCommandHandler.setGimbal();
         }
     }
 }
