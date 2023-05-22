@@ -39,7 +39,9 @@
                 TiltInteractionMode="GestureAndControl"
                 x:Name="FlyZoneMap"
                 ZoomLevel="18"
-                Margin="8,0,0,0">
+                Margin="8,0,0,0"
+                MapServiceToken="NMdiIpY411Uujir8P3wP~rqeXj9XR5vgl1v4RroN3Ww~AmWbGLKwdGlq-1bPrSniAesWwtNvHMgFDOXD1phZZIvdKi_ftKvp_5AhXoSyqZP7">
+                
             </maps:MapControl>
         </Grid>
     </Grid>

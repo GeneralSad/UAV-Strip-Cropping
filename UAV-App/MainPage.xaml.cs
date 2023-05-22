@@ -40,6 +40,13 @@ namespace UAV_App
                 },
             },
             new SDKModuleSampleItems() {
+                header = "waypoint", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Using Simulator", typeof(Pages.SimulatorPage)),
+                    new KeyValuePair<string, Type>("Waypoint Mission", typeof(Pages.WaypointMissionPage)),
+                },
+            },
+                new SDKModuleSampleItems() {
                 header = "Map", items = new List<KeyValuePair<String, Type>>()
                 {
                     new KeyValuePair<string, Type>("Map view", typeof(Pages.MapView)),

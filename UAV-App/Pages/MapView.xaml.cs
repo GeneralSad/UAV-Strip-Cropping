@@ -27,7 +27,7 @@ namespace UAV_App.Pages
 
         public sealed partial class MapView : Page
     {
-   private BasicGeoposition simualtionLocation = new BasicGeoposition() { Latitude = 22.6308, Longitude = 113.812 };
+   private BasicGeoposition simualtionLocation = new BasicGeoposition() { Latitude = 51.585616318415674, Longitude =  4.79243532158345 };
 
         public MapView()
         {
