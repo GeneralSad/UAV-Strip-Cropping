@@ -9,11 +9,12 @@ namespace UAV_App.Pages
 {
     public sealed partial class OverlayPage : Page
     {
-        private DJIVideoParser.Parser videoParser;
 
         public static OverlayPage Current;
 
+        public bool IsVideoFeedActive;
 
+        private Parser videoParser;
 
         public OverlayPage()
         {
@@ -23,10 +24,11 @@ namespace UAV_App.Pages
             {
                 Current = this;
             }
+            swapChainPanel.Tapped += OnFeedTapped;
 
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
         }
@@ -34,34 +36,33 @@ namespace UAV_App.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            UninitializeVideoFeedModule();
         }
 
         private async void InitializeVideoFeedModule()
         {
-            //Must in UI thread
+            //Must run in UI thread
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
-                //Raw data and decoded data listener
                 if (videoParser == null)
                 {
-                    videoParser = new DJIVideoParser.Parser();
+                    videoParser = new Parser();
                     videoParser.Initialize(delegate (byte[] data)
                     {
                         //Note: This function must be called because we need DJI Windows SDK to help us to parse frame data.
                         return DJISDKManager.Instance.VideoFeeder.ParseAssitantDecodingInfo(0, data);
                     });
+
                     //Set the swapChainPanel to display and set the decoded data callback.
                     videoParser.SetSurfaceAndVideoCallback(0, 0, swapChainPanel, ReceiveDecodedData);
                     DJISDKManager.Instance.VideoFeeder.GetPrimaryVideoFeed(0).VideoDataUpdated += OnVideoPush;
                 }
+
                 //get the camera type and observe the CameraTypeChanged event.
                 DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).CameraTypeChanged += OnCameraTypeChanged;
                 var type = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).GetCameraTypeAsync();
                 OnCameraTypeChanged(this, type.value);
             });
         }
-
 
         private void UninitializeVideoFeedModule()
         {
@@ -79,7 +80,7 @@ namespace UAV_App.Pages
         }
 
         //Decode data. Do nothing here. This function would return a bytes array with image data in RGBA format.
-        async void ReceiveDecodedData(byte[] data, int width, int height)
+        void ReceiveDecodedData(byte[] data, int width, int height)
         {
         }
 
@@ -106,14 +107,39 @@ namespace UAV_App.Pages
 
         public async void StartVideoFeed()
         {
-            Debug.WriteLine("Start Video Feed");
             InitializeVideoFeedModule();
             await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
+            IsVideoFeedActive = true;
         }
 
-        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        public void StopVideoFeed()
         {
+            UninitializeVideoFeedModule();
+            IsVideoFeedActive = false;
+        }
 
+        public void ToggleFullscreen()
+        {
+            if ((int) swapChainPanelBox.GetValue(Grid.RowProperty) == 1)
+            {
+                swapChainPanelBox.SetValue(Grid.RowProperty, 0);
+                swapChainPanelBox.SetValue(Grid.ColumnProperty, 0);
+            }
+            else
+            {
+                swapChainPanelBox.SetValue(Grid.RowProperty, 1);
+                swapChainPanelBox.SetValue(Grid.ColumnProperty, 1);
+            }
+        }
+
+        private void OnFeedTapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            ToggleFullscreen();
+        }
+
+        private void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            Debug.WriteLine("Emerge ency");
         }
     }
 }

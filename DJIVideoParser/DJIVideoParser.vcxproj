@@ -257,7 +257,9 @@
     <ClCompile Include="VideoWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="..\djiuwpsample\package.appxmanifest" />
+    <AppxManifest Include="..\djiuwpsample\package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

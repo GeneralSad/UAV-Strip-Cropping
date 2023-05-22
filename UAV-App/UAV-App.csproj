@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UAV_App</RootNamespace>
     <AssemblyName>UAV-App</AssemblyName>
-    <DefaultLanguage>nl-Nl</DefaultLanguage>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
@@ -139,9 +139,6 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\FPVPage.xaml.cs">
-      <DependentUpon>FPVPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\InformationRapportPage.xaml.cs">
       <DependentUpon>InformationRapportPage.xaml</DependentUpon>
     </Compile>
@@ -198,10 +195,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\FPVPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

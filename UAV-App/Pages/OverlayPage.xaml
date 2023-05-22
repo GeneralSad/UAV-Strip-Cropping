@@ -11,20 +11,22 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="4*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <Frame Grid.Column="0" Grid.Row="0" x:Name="cs" Content="" Margin="0,249,0,10"/>
+        <Frame Grid.Column="0" Grid.Row="0" x:Name="cs" Content=""/>
 
         <Button Grid.Column="0" Grid.Row="1" Content="EMERGENCY BUTTON" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="EmergencyButton_Click"/>
 
-        <SwapChainPanel Grid.Column="1" Grid.Row="1"  Width="320" Height="180" x:Name="swapChainPanel" Visibility="Visible"/>
+        <Viewbox x:Name="swapChainPanelBox" Stretch="Uniform" Grid.Column="1" Grid.Row="1">
+            <SwapChainPanel Width="1920" Height="1080" x:Name="swapChainPanel" Visibility="Visible"/>
+        </Viewbox>
 
-        </Grid>
+    </Grid>
 </Page>
