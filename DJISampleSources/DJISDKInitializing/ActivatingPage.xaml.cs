@@ -28,13 +28,16 @@ namespace UAV_App.DJISDKInitializing
 
         private async void Instance_SDKRegistrationEvent(SDKRegistrationState state, SDKError resultCode)
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 activateStateTextBlock.Text = state == SDKRegistrationState.Succeeded ? "Activated." : "Not Activated.";
                 activationInformation.Text = resultCode == SDKError.NO_ERROR ? "Register success" : resultCode.ToString();
                 if (resultCode == SDKError.NO_ERROR)
                 {
-                    OverlayPage.Current?.StartVideoFeed();
+                    if (OverlayPage.Current?.IsVideoFeedActive == false)
+                    {
+                        OverlayPage.Current?.StartVideoFeed();
+                    }
                 }
             });
         }

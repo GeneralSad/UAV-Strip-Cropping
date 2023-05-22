@@ -36,12 +36,6 @@ namespace UAV_App
                     new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
                 },
             },
-            new SDKModuleSampleItems() {
-                header = "Camera", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Video stream", typeof(Pages.FPVPage)),
-                },
-            },
         };
 
         public MainPage()
@@ -98,13 +92,16 @@ namespace UAV_App
             {
                 await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    for (int i = 1; i < navigationModules.Count; ++i)
+                    if (navigationModules.Count > NavView.MenuItems.Count)
                     {
-                        var module = navigationModules[i];
-                        NavView.MenuItems.Add(new NavigationViewItemHeader() { Content = module.header });
-                        foreach (var item in module.items)
+                        for (int i = 1; i < navigationModules.Count; ++i)
                         {
-                            NavView.MenuItems.Add(item.Key);
+                            var module = navigationModules[i];
+                            NavView.MenuItems.Add(new NavigationViewItemHeader() { Content = module.header });
+                            foreach (var item in module.items)
+                            {
+                                NavView.MenuItems.Add(item.Key);
+                            }
                         }
                     }
                 });
