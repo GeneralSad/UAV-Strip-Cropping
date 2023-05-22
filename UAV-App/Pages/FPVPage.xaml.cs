@@ -9,7 +9,7 @@ namespace UAV_App.Pages
 {
     public sealed partial class FPVPage : Page
     {
-        private DJIVideoParser.Parser videoParser;
+        private Parser videoParser;
 
         public FPVPage()
         {
@@ -19,6 +19,9 @@ namespace UAV_App.Pages
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+
+            OverlayPage.Current?.StopVideoFeed();
+
             InitializeVideoFeedModule();
             await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
         }
@@ -27,6 +30,8 @@ namespace UAV_App.Pages
         {
             base.OnNavigatedTo(e);
             UninitializeVideoFeedModule();
+
+            OverlayPage.Current?.StartVideoFeed();
         }
 
         private async void InitializeVideoFeedModule()
@@ -37,23 +42,24 @@ namespace UAV_App.Pages
                 //Raw data and decoded data listener
                 if (videoParser == null)
                 {
-                    videoParser = new DJIVideoParser.Parser();
+                    videoParser = new Parser();
                     videoParser.Initialize(delegate (byte[] data)
                     {
                         //Note: This function must be called because we need DJI Windows SDK to help us to parse frame data.
                         return DJISDKManager.Instance.VideoFeeder.ParseAssitantDecodingInfo(0, data);
                     });
+
                     //Set the swapChainPanel to display and set the decoded data callback.
                     videoParser.SetSurfaceAndVideoCallback(0, 0, swapChainPanel, ReceiveDecodedData);
                     DJISDKManager.Instance.VideoFeeder.GetPrimaryVideoFeed(0).VideoDataUpdated += OnVideoPush;
                 }
+
                 //get the camera type and observe the CameraTypeChanged event.
                 DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).CameraTypeChanged += OnCameraTypeChanged;
                 var type = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).GetCameraTypeAsync();
                 OnCameraTypeChanged(this, type.value);
             });
         }
-
 
         private void UninitializeVideoFeedModule()
         {

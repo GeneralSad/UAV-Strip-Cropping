@@ -9,11 +9,10 @@ namespace UAV_App.Pages
 {
     public sealed partial class OverlayPage : Page
     {
-        private DJIVideoParser.Parser videoParser;
 
         public static OverlayPage Current;
 
-
+        private Parser videoParser;
 
         public OverlayPage()
         {
@@ -34,34 +33,30 @@ namespace UAV_App.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            UninitializeVideoFeedModule();
         }
 
         private async void InitializeVideoFeedModule()
         {
-            //Must in UI thread
+            //Must run in UI thread
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
-                //Raw data and decoded data listener
-                if (videoParser == null)
+                videoParser = new Parser();
+                videoParser.Initialize(delegate (byte[] data)
                 {
-                    videoParser = new DJIVideoParser.Parser();
-                    videoParser.Initialize(delegate (byte[] data)
-                    {
-                        //Note: This function must be called because we need DJI Windows SDK to help us to parse frame data.
-                        return DJISDKManager.Instance.VideoFeeder.ParseAssitantDecodingInfo(0, data);
-                    });
-                    //Set the swapChainPanel to display and set the decoded data callback.
-                    videoParser.SetSurfaceAndVideoCallback(0, 0, swapChainPanel, ReceiveDecodedData);
-                    DJISDKManager.Instance.VideoFeeder.GetPrimaryVideoFeed(0).VideoDataUpdated += OnVideoPush;
-                }
+                    //Note: This function must be called because we need DJI Windows SDK to help us to parse frame data.
+                    return DJISDKManager.Instance.VideoFeeder.ParseAssitantDecodingInfo(0, data);
+                });
+
+                //Set the swapChainPanel to display and set the decoded data callback.
+                videoParser.SetSurfaceAndVideoCallback(0, 0, swapChainPanel, ReceiveDecodedData);
+                DJISDKManager.Instance.VideoFeeder.GetPrimaryVideoFeed(0).VideoDataUpdated += OnVideoPush;
+
                 //get the camera type and observe the CameraTypeChanged event.
                 DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).CameraTypeChanged += OnCameraTypeChanged;
                 var type = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).GetCameraTypeAsync();
                 OnCameraTypeChanged(this, type.value);
             });
         }
-
 
         private void UninitializeVideoFeedModule()
         {
@@ -111,9 +106,14 @@ namespace UAV_App.Pages
             await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
         }
 
+        public async void StopVideoFeed()
+        {
+            UninitializeVideoFeedModule();
+        }
+
         private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-
+            Debug.WriteLine("Emerge ency");
         }
     }
 }
