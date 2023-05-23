@@ -133,6 +133,11 @@ namespace UAV_App.Pages
             }
         }
 
+        public SwapChainPanel GetFeed()
+        {
+            return swapChainPanel;
+        }
+
         private void OnFeedTapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             ToggleFullscreen();
@@ -142,7 +147,8 @@ namespace UAV_App.Pages
         {
             Debug.WriteLine("Emerge ency");
             CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
-            cameraCommandHandler.setGimbal();
+            cameraCommandHandler.TakeScreenshot();
+            //GetImageFromByteArray();
         }
     }
 }

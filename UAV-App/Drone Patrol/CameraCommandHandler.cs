@@ -4,14 +4,28 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UAV_App.Pages;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Media.Imaging;
+using DateTime = System.DateTime;
 
 namespace UAV_App.Drone_Patrol
 {
     public class CameraCommandHandler
     {
+
+        private const double defaultPitch = -90;
+        private const double defaultSpeed = 1;
+
+
         public void cameraOn()
         {
 
@@ -22,36 +36,140 @@ namespace UAV_App.Drone_Patrol
             
         }
 
-        public async void setGimbal()
+        public async void SetGimbal(double pitch, double speed = defaultSpeed)
         {
-            Debug.WriteLine("Gimbal");
             GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
 
-            //var hecc = await gimbalHandler.GetGimbalAttitudeRangeAsync();
-            //Debug.WriteLine(hecc.value.Value.pitch.min + " : " + hecc.value.Value.pitch.max);
+            GimbalAngleRotation gimbalAngleRotation = new GimbalAngleRotation
+            {
+                mode = GimbalAngleRotationMode.ABSOLUTE_ANGLE,
 
-            GimbalAngleRotation gimbalAngleRotation = new GimbalAngleRotation();
+                pitch = pitch,
+                pitchIgnored = false,
 
-            gimbalAngleRotation.mode = GimbalAngleRotationMode.ABSOLUTE_ANGLE;
-
-            gimbalAngleRotation.pitch = -45;
-            gimbalAngleRotation.roll = 0;
-            gimbalAngleRotation.yaw = 0;
-
-            gimbalAngleRotation.pitchIgnored = false;
-            gimbalAngleRotation.rollIgnored = false;
-            gimbalAngleRotation.yawIgnored = false;
-
-            gimbalAngleRotation.duration = 1;
+                duration = speed
+            };
 
             await gimbalHandler.RotateByAngleAsync(gimbalAngleRotation);
+        }
 
-            Thread.Sleep(5000);
+        public async void ResetGimbal()
+        {
+            SetGimbal(defaultPitch);
+        }
 
-            gimbalAngleRotation.pitch = 0;
-            await gimbalHandler.RotateByAngleAsync(gimbalAngleRotation);
+        public async void TakePhoto()
+        {
+
+            SetCameraWorkModeToShootPhoto();
+
+            if (DJISDKManager.Instance.ComponentManager != null)
+            {
+                var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).StartShootPhotoAsync();
+                if (retCode != SDKError.NO_ERROR)
+                {
+                    Debug.WriteLine("Failed to shoot photo, result code is " + retCode.ToString());
+                }
+                else
+                {
+                    Debug.WriteLine("Shoot photo successfully");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("SDK hasn't been activated yet.");
+            }
+        }
+
+        private async void SetCameraWorkModeToShootPhoto()
+        {
+            SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
+        }
+
+        private async void SetCameraWorkMode(CameraWorkMode mode)
+        {
+            if (DJISDKManager.Instance.ComponentManager != null)
+            {
+                CameraWorkModeMsg workMode = new CameraWorkModeMsg
+                {
+                    value = mode,
+                };
+                var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(workMode);
+                if (retCode != SDKError.NO_ERROR)
+                {
+                    Debug.WriteLine("Set camera work mode to " + mode.ToString() + "failed, result code is " + retCode.ToString());
+                }
+            }
+            else
+            {
+                Debug.WriteLine("SDK hasn't been activated yet.");
+            }
+        }
+
+        public void getPhoto()
+        {
+            MediaTaskRequest mediaTaskRequest = new MediaTaskRequest
+            {
+                type = MediaTaskType.FILE_LIST,
+                duplicateType = MediaTaskDuplicate.NONE,
+                deferType = MediaTaskDefer.BACK_TO_QUEUE,
+                priority = MediaTaskPriority.DEFAULT
+            };
+
+            MediaFileListRequest mediaFileListRequest = new MediaFileListRequest
+            {
+                isAllList = true,
+                location = MediaFileListLocation.INTERNAL_STORAGE,
+                subType = MediaRequestType.ORIGIN
+            };
+
+            MediaTask mediaTask = new MediaTask(mediaTaskRequest);
+            mediaTask.OnListReqResponse += OnListResponse;
+
+            MediaTaskManager mediaTaskManager = new MediaTaskManager(0, 0);
+            mediaTaskManager.PushFront(mediaTask);
+        }
+
+        public async void TakeScreenshot()
+        {
+            var _bitmap = new RenderTargetBitmap();
+            await _bitmap.RenderAsync(OverlayPage.Current?.GetFeed());
+
+            var savePicker = new FileSavePicker();
+            savePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
+            savePicker.SuggestedFileName = "Card" + DateTime.Now.ToString("yyyyMMddhhmmss");
+            StorageFile savefile = await savePicker.PickSaveFileAsync();
+
+            if (savefile == null)
+            {
+                return;
+            }
+
+            var pixels = await _bitmap.GetPixelsAsync();
+            using (IRandomAccessStream stream = await savefile.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                var encoder = await
+                BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
+                byte[] bytes = pixels.ToArray();
+                encoder.SetPixelData(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Ignore,
+                    (uint)_bitmap.PixelWidth,
+                    (uint)_bitmap.PixelHeight,
+                    200,
+                    200,
+                    bytes
+                );
+
+                await encoder.FlushAsync();
+            }
+        }
 
 
+        private void OnListResponse(MediaTask sender, List<MediaFile> files)
+        {
+            Debug.WriteLine(files.Count);
         }
     }
 }
