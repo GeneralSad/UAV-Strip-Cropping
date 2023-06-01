@@ -2,6 +2,7 @@
 using DJI.WindowsSDK.Components;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -13,6 +14,7 @@ using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Imaging;
 using DateTime = System.DateTime;
@@ -25,16 +27,11 @@ namespace UAV_App.Drone_Patrol
         private const double defaultPitch = -90;
         private const double defaultSpeed = 1;
 
+        private const int downloadTimeout = 1;
 
-        public void cameraOn()
-        {
-
-        }
-    
-        public void cameraOff() 
-        {
-            
-        }
+        public ObservableCollection<MediaFile> files = new ObservableCollection<MediaFile>();
+        private readonly CameraHandler cameraHandler = DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0);
+        private readonly MediaTaskManager taskManager = new MediaTaskManager(0, 0);
 
         public async void SetGimbal(double pitch, double speed = defaultSpeed)
         {
@@ -53,7 +50,7 @@ namespace UAV_App.Drone_Patrol
             await gimbalHandler.RotateByAngleAsync(gimbalAngleRotation);
         }
 
-        public async void ResetGimbal()
+        public void ResetGimbal()
         {
             SetGimbal(defaultPitch);
         }
@@ -61,7 +58,7 @@ namespace UAV_App.Drone_Patrol
         public async void TakePhoto()
         {
 
-            SetCameraWorkModeToShootPhoto();
+            await SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
 
             if (DJISDKManager.Instance.ComponentManager != null)
             {
@@ -81,12 +78,7 @@ namespace UAV_App.Drone_Patrol
             }
         }
 
-        private async void SetCameraWorkModeToShootPhoto()
-        {
-            SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
-        }
-
-        private async void SetCameraWorkMode(CameraWorkMode mode)
+        private async Task<bool> SetCameraWorkMode(CameraWorkMode mode)
         {
             if (DJISDKManager.Instance.ComponentManager != null)
             {
@@ -98,52 +90,141 @@ namespace UAV_App.Drone_Patrol
                 if (retCode != SDKError.NO_ERROR)
                 {
                     Debug.WriteLine("Set camera work mode to " + mode.ToString() + "failed, result code is " + retCode.ToString());
+                    return false;
                 }
+                return true;
             }
             else
             {
                 Debug.WriteLine("SDK hasn't been activated yet.");
+                return false;
             }
         }
 
-        public void GetPhoto()
+        public async void GetMostRecentPhoto()
         {
-            MediaFileListRequest mediaFileListRequest = new MediaFileListRequest
+            await LoadFiles(MediaFileListLocation.SD_CARD);
+
+            DateTime time = DateTime.Now;
+            while (files.Count == 0)
             {
+                if (DateTime.Now >= time.AddSeconds(downloadTimeout))
+                {
+                    Debug.WriteLine("Photo load timeout");
+                    return;
+                }
+            }
+
+            DownloadRecentFile();
+        }
+
+        public async void GetPhotos()
+        {
+            await LoadFiles(MediaFileListLocation.SD_CARD);
+
+            DateTime time = DateTime.Now;
+            while (files.Count == 0)
+            {
+                if (DateTime.Now >= time.AddSeconds(downloadTimeout))
+                {
+                    Debug.WriteLine("Photo load timeout");
+                    return;
+                }
+            }
+
+            DownloadAllFiles();
+        }
+
+        private void DownloadAllFiles()
+        {
+            foreach (var file in files)
+            {
+                this.DownloadSingle(file);
+            }
+        }
+
+        private void DownloadRecentFile()
+        {
+            MediaFile file = files.Last();
+            this.DownloadSingle(file);
+        }
+
+        private async Task<bool> LoadFiles(MediaFileListLocation fileLocation)
+        {
+            var result = await cameraHandler.GetCameraWorkModeAsync();
+
+            if (result.value == null)
+            {
+                Debug.WriteLine("No result from workmode");
+                return false;
+            }
+
+            var mode = result.value?.value;
+            if (mode != CameraWorkMode.TRANSCODE && mode != CameraWorkMode.PLAYBACK)
+            {
+                Debug.WriteLine("Set mode");
+                await SetCameraWorkMode(CameraWorkMode.TRANSCODE);
+            }
+
+            this.files.Clear();
+
+            var fileListTask = MediaTask.FromRequest(new MediaFileListRequest
+            {
+                count = -1,
+                index = 1,
+                subType = MediaRequestType.ORIGIN,
                 isAllList = true,
-                location = MediaFileListLocation.INTERNAL_STORAGE
-                
-            };
+                location = fileLocation,
+            });
 
-            List<MediaFileListRequest> list = new List<MediaFileListRequest>
+            fileListTask.OnListReqResponse += (fileSender, files) =>
             {
-                mediaFileListRequest
+                files.ForEach(obj => this.files.Add(obj));
             };
 
-            MediaTaskRequest mediaTaskRequest = new MediaTaskRequest()
+            fileListTask.OnRequestTearDown += (fileSender, retCode, response) =>
             {
-                type = MediaTaskType.FILE_LIST,
-                listReq = list
+                if (retCode == SDKError.NO_ERROR)
+                {
+                    return;
+                }
             };
 
-            MediaTask mediaTask = new MediaTask(mediaTaskRequest);
-            mediaTask.OnListReqResponse += OnListResponse;
-            mediaTask.OnListReqForward += OnListReqFwd;
-            mediaTask.OnRequestTearDown += OnRqTdwn;
+            taskManager.PushBack(fileListTask);
 
-            MediaTaskManager mediaTaskManager = new MediaTaskManager(0, 0);
-            Debug.WriteLine("Push to front");
-            mediaTaskManager.PushFront(mediaTask);
+            return true;
         }
 
-        private void OnRqTdwn(MediaTask sender, SDKError retCode, MediaTaskResponse? response)
+        private async void DownloadSingle(MediaFile file)
         {
-            Debug.WriteLine("code " + retCode.ToString() + " : response " + response.Value.fileList.files.Count + " : Sender " + sender.Request.listReq.Count);
-        }
+            var request = new MediaFileDownloadRequest
+            {
+                index = file.fileIndex,
+                count = 1,
+                dataSize = -1,
+                offSet = 0,
+                segSubIndex = 0,
+                subIndex = 0,
+                type = MediaRequestType.ORIGIN
+            };
 
-        private void OnListReqFwd(MediaTask sender, MediaFileListRequest? request, int offset, int count)
-        {
-            throw new NotImplementedException();
+            var task = MediaTask.FromRequest(request);
+            var storageFile = await DownloadsFolder.CreateFileAsync(file.fileName, CreationCollisionOption.GenerateUniqueName);
+            var stream = await storageFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
+            var outputStream = stream.GetOutputStreamAt(0);
+            var fileWriter = new DataWriter(outputStream);
+            task.OnDataReqResponse += async (sender, req, data, speed) =>
+            {
+                fileWriter.WriteBytes(data);
+                await fileWriter.StoreAsync();
+                await outputStream.FlushAsync();
+            };
+
+            task.OnRequestTearDown += (sender, retCode, res) =>
+            {
+            };
+
+            taskManager.PushBack(task);
         }
 
         public async void TakeScreenshot()
@@ -151,8 +232,10 @@ namespace UAV_App.Drone_Patrol
             var _bitmap = new RenderTargetBitmap();
             await _bitmap.RenderAsync(OverlayPage.Current?.GetFeed());
 
-            var savePicker = new FileSavePicker();
-            savePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            var savePicker = new FileSavePicker
+            {
+                SuggestedStartLocation = PickerLocationId.Downloads
+            };
             savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
             savePicker.SuggestedFileName = "Card" + DateTime.Now.ToString("yyyyMMddhhmmss");
             StorageFile savefile = await savePicker.PickSaveFileAsync();
@@ -180,11 +263,6 @@ namespace UAV_App.Drone_Patrol
 
                 await encoder.FlushAsync();
             }
-        }
-
-        private void OnListResponse(MediaTask sender, List<MediaFile> files)
-        {
-            Debug.WriteLine($"Response: {files.Count}");
         }
     }
 }

@@ -147,14 +147,11 @@ namespace UAV_App.Pages
 
         private void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            Debug.WriteLine("Emerge ency");
-            CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
-            cameraCommandHandler.GetPhoto();
+            Debug.WriteLine("Emergency");
         }
 
         private async void TakeOffButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            Debug.WriteLine("Take it off");
             var shouldTakeOff = false;
             var shouldTakeOffMessageDialog = new MessageDialog("Are you sure you wish to take off?");
 
@@ -172,7 +169,6 @@ namespace UAV_App.Pages
         }
         private async void LandButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            Debug.WriteLine("L and");
             var shouldLand = false;
             var shouldLandMessageDialog = new MessageDialog("Are you sure you wish to land?");
 
