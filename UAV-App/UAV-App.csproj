@@ -139,6 +139,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Playback.xaml.cs">
+      <DependentUpon>Playback.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\InformationRapportPage.xaml.cs">
       <DependentUpon>InformationRapportPage.xaml</DependentUpon>
     </Compile>
@@ -197,6 +200,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\Playback.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\InformationRapportPage.xaml">
       <Generator>MSBuild:Compile</Generator>

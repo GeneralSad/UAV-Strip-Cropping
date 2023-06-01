@@ -106,28 +106,44 @@ namespace UAV_App.Drone_Patrol
             }
         }
 
-        public void getPhoto()
+        public void GetPhoto()
         {
-            MediaTaskRequest mediaTaskRequest = new MediaTaskRequest
-            {
-                type = MediaTaskType.FILE_LIST,
-                duplicateType = MediaTaskDuplicate.NONE,
-                deferType = MediaTaskDefer.BACK_TO_QUEUE,
-                priority = MediaTaskPriority.DEFAULT
-            };
-
             MediaFileListRequest mediaFileListRequest = new MediaFileListRequest
             {
                 isAllList = true,
-                location = MediaFileListLocation.INTERNAL_STORAGE,
-                subType = MediaRequestType.ORIGIN
+                location = MediaFileListLocation.INTERNAL_STORAGE
+                
+            };
+
+            List<MediaFileListRequest> list = new List<MediaFileListRequest>
+            {
+                mediaFileListRequest
+            };
+
+            MediaTaskRequest mediaTaskRequest = new MediaTaskRequest()
+            {
+                type = MediaTaskType.FILE_LIST,
+                listReq = list
             };
 
             MediaTask mediaTask = new MediaTask(mediaTaskRequest);
             mediaTask.OnListReqResponse += OnListResponse;
+            mediaTask.OnListReqForward += OnListReqFwd;
+            mediaTask.OnRequestTearDown += OnRqTdwn;
 
             MediaTaskManager mediaTaskManager = new MediaTaskManager(0, 0);
+            Debug.WriteLine("Push to front");
             mediaTaskManager.PushFront(mediaTask);
+        }
+
+        private void OnRqTdwn(MediaTask sender, SDKError retCode, MediaTaskResponse? response)
+        {
+            Debug.WriteLine("code " + retCode.ToString() + " : response " + response.Value.fileList.files.Count + " : Sender " + sender.Request.listReq.Count);
+        }
+
+        private void OnListReqFwd(MediaTask sender, MediaFileListRequest? request, int offset, int count)
+        {
+            throw new NotImplementedException();
         }
 
         public async void TakeScreenshot()
@@ -166,10 +182,9 @@ namespace UAV_App.Drone_Patrol
             }
         }
 
-
         private void OnListResponse(MediaTask sender, List<MediaFile> files)
         {
-            Debug.WriteLine(files.Count);
+            Debug.WriteLine($"Response: {files.Count}");
         }
     }
 }

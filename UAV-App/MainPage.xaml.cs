@@ -36,6 +36,12 @@ namespace UAV_App
                     new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
                 },
             },
+            new SDKModuleSampleItems() {
+                header = "Playback", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Playback", typeof(Pages.Playback)),
+                },
+            },
         };
 
         public MainPage()
