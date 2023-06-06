@@ -1,7 +1,6 @@
 ﻿<Page
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:UAV_App.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Custom="using:Microsoft.UI.Xaml.Controls"
@@ -22,7 +21,7 @@
         
         <Frame Grid.Column="0" Grid.Row="0" x:Name="cs" Content=""/>
 
-        <Button Grid.Column="0" Grid.Row="1" Content="EMERGENCY BUTTON" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="EmergencyButton_Click"/>
+        <Button Grid.Column="0" Grid.Row="1" Content="EMERGENCY BUTTON" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Command="{Binding EmergencyStop}"/>
 
         <Viewbox x:Name="swapChainPanelBox" Stretch="Uniform" Grid.Column="1" Grid.Row="1">
             <SwapChainPanel Width="1920" Height="1080" x:Name="swapChainPanel" Visibility="Visible"/>
