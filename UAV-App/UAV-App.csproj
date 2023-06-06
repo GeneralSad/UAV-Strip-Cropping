@@ -145,10 +145,14 @@
     <Compile Include="Pages\OverlayPage.xaml.cs">
       <DependentUpon>OverlayPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\RoutePage.xaml.cs">
+      <DependentUpon>RoutePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pages\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\WaypointMissionViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -207,6 +211,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\LoginView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\RoutePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
