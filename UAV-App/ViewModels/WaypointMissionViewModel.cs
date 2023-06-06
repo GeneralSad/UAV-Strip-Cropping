@@ -1,4 +1,4 @@
-using DJI.WindowsSDK;
+﻿using DJI.WindowsSDK;
 using DJI.WindowsSDK.Mission.Waypoint;
 using DJIUWPSample.Commands;
 using DJIUWPSample.ViewModels;
@@ -242,6 +242,41 @@ namespace UAV_App.Pages
             }
         }
 
+
+        bool switchBool = false;
+
+        public ICommand _emergencyStop;
+        public ICommand EmergencyStop
+        {
+            get
+            {
+                if (_emergencyStop == null)
+                {
+                    _emergencyStop = new RelayCommand(async delegate ()
+                    {
+
+                        if (switchBool)
+                        {
+                            var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).PauseMission();
+                            var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
+                            await messageDialog.ShowAsync();
+                        }
+                        else
+                        {
+                            var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ResumeMission();
+                            var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
+                            await messageDialog.ShowAsync();
+                        }
+                        switchBool = !switchBool;
+
+
+
+                    }, delegate () { return true; });
+                }
+                return _emergencyStop;
+            }
+        }
+
         private WaypointMission _waypointMission;
         public WaypointMission WaypointMission
         {
@@ -353,6 +388,7 @@ namespace UAV_App.Pages
                 return _uploadMission;
             }
         }
+
         public ICommand _startMission;
         public ICommand StartMission
         {
