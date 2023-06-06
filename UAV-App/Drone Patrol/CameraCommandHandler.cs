@@ -27,7 +27,11 @@ namespace UAV_App.Drone_Patrol
         private const double defaultPitch = -90;
         private const double defaultSpeed = 1;
 
-        private const int downloadTimeout = 1;
+        private const double downloadTimeout = 1;
+        private const double gimbalTimeout = 1.5;
+
+        private const double gimbalAccuracy = 2.5;
+
 
         public ObservableCollection<MediaFile> files = new ObservableCollection<MediaFile>();
         private readonly CameraHandler cameraHandler = DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0);
@@ -50,6 +54,13 @@ namespace UAV_App.Drone_Patrol
             await gimbalHandler.RotateByAngleAsync(gimbalAngleRotation);
         }
 
+        public async Task<double> GetGimbal()
+        {
+            GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
+            var attitude = await gimbalHandler.GetGimbalAttitudeAsync();
+            return attitude.value.Value.pitch;
+        }
+
         public void ResetGimbal()
         {
             SetGimbal(defaultPitch);
@@ -59,6 +70,48 @@ namespace UAV_App.Drone_Patrol
         {
 
             await SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
+
+            PhotoRatioMsg photoRatioMsg = new PhotoRatioMsg
+            {
+                value = PhotoRatio.RATIO_16COLON9
+            };
+
+            CameraISOMsg cameraISOMsg = new CameraISOMsg
+            {
+                value = CameraISO.ISO_AUTO
+            };
+
+            PhotoStorageFormatMsg photoStorageFormatMsg = new PhotoStorageFormatMsg
+            {
+                value = PhotoStorageFormat.JPEG
+            };
+
+            CameraStorageLocationMsg cameraStorageLocationMsg = new CameraStorageLocationMsg
+            {
+                value = CameraStorageLocation.SDCARD
+            };
+
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).ResetCameraSettingAsync();
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetPhotoRatioAsync(photoRatioMsg);
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetISOAsync(cameraISOMsg);
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetPhotoStorageFormatAsync(photoStorageFormatMsg);
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraStorageLocationAsync(cameraStorageLocationMsg);
+
+            ResetGimbal();
+
+            double gimbalPitch = await GetGimbal();
+
+            DateTime time = DateTime.Now;
+            while (gimbalPitch - defaultPitch > gimbalAccuracy)
+            {
+                if (DateTime.Now >= time.AddSeconds(gimbalTimeout))
+                {
+                    Debug.WriteLine("Gimbal move timeout");
+                    return;
+                }
+                gimbalPitch = await GetGimbal();
+                Debug.WriteLine(gimbalPitch - defaultPitch);
+            }
 
             if (DJISDKManager.Instance.ComponentManager != null)
             {

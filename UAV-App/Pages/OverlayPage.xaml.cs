@@ -145,9 +145,23 @@ namespace UAV_App.Pages
             ToggleFullscreen();
         }
 
-        private void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             Debug.WriteLine("Emergency");
+            CameraCommandHandler handler = new CameraCommandHandler();
+            handler.TakePhoto();
+        }
+
+        public async void BatteryPercentageChanged(object sender, IntMsg? value)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                Debug.WriteLine("Set battery");
+                if (value.HasValue)
+                {
+                    BatteryLevelTextBlock.Text = value.Value.value + "%";
+                }
+            });
         }
 
         private async void TakeOffButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
@@ -181,6 +195,10 @@ namespace UAV_App.Pages
                 var res = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync();
                 Debug.WriteLine("Start send landing command: {0}", res.ToString());
                 Debug.WriteLine("Land");
+            } else
+            {
+                CameraCommandHandler handler = new CameraCommandHandler();
+                handler.SetGimbal(0);
             }
         }
 
