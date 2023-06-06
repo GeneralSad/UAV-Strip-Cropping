@@ -48,6 +48,14 @@ namespace UAV_App.Pages
             WaypointMap.Layers.Add(waypointLayer);
             WaypointMap.Layers.Add(locationLayer);
             WaypointMissionViewModel.Instance.PropertyChanged += ViewModel_PropertyChanged;
+
+            WaypointMap.MapTapped += (MapControl sender, MapInputEventArgs args) => {
+            var loc = args.Location;
+
+
+                 WaypointMissionViewModel.Instance.AddWaypoint(loc.Position.Latitude, loc.Position.Longitude);
+            //Add code to add your pin.
+            };
         }
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -92,9 +100,9 @@ namespace UAV_App.Pages
         private void GetIfInSimulation()
         {
    
-                var aircraftLocaton = new LocationCoordinate2D();
-                WaypointMap.Center = new Geopoint((new BasicGeoposition() { Latitude = aircraftLocaton.latitude, Longitude = aircraftLocaton.longitude }));
-                AircraftLocationChange(aircraftLocaton);
+           var aircraftLocaton = new LocationCoordinate2D();
+           WaypointMap.Center = new Geopoint((new BasicGeoposition() { Latitude = aircraftLocaton.latitude, Longitude = aircraftLocaton.longitude }));
+           AircraftLocationChange(aircraftLocaton);
         }
 
        
@@ -131,8 +139,10 @@ namespace UAV_App.Pages
             }
             else
             {
+                if (routeLayer.MapElements.Count != 0) {
                 var waypointPolyline = routeLayer.MapElements[0] as MapPolyline;
                 waypointPolyline.Path = new Geopath(waypointPositions);
+                }
             }
 
         }
