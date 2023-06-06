@@ -2,6 +2,9 @@
 using DJIVideoParser;
 using System;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using UAV_App.Drone_Patrol;
+using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
@@ -132,14 +135,72 @@ namespace UAV_App.Pages
             }
         }
 
+        public SwapChainPanel GetFeed()
+        {
+            return swapChainPanel;
+        }
+
         private void OnFeedTapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             ToggleFullscreen();
         }
 
-        private void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            Debug.WriteLine("Emerge ency");
+            Debug.WriteLine("Emergency");
+            CameraCommandHandler handler = new CameraCommandHandler();
+            handler.TakePhoto();
         }
+
+        public async void BatteryPercentageChanged(object sender, IntMsg? value)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                Debug.WriteLine("Set battery");
+                if (value.HasValue)
+                {
+                    BatteryLevelTextBlock.Text = value.Value.value + "%";
+                }
+            });
+        }
+
+        private async void TakeOffButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            var shouldTakeOff = false;
+            var shouldTakeOffMessageDialog = new MessageDialog("Are you sure you wish to take off?");
+
+            shouldTakeOffMessageDialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler((IUICommand _) => shouldTakeOff = true)));
+            shouldTakeOffMessageDialog.Commands.Add(new UICommand("No", new UICommandInvokedHandler((IUICommand _) => shouldTakeOff = false)));
+            await shouldTakeOffMessageDialog.ShowAsync();
+
+            if (shouldTakeOff)
+            {
+                var res = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartTakeoffAsync();
+                Debug.WriteLine("Start send takeoff command: {0}", res.ToString());
+                Debug.WriteLine("Take off");
+            }
+
+        }
+        private async void LandButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            var shouldLand = false;
+            var shouldLandMessageDialog = new MessageDialog("Are you sure you wish to land?");
+
+            shouldLandMessageDialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler((IUICommand _) => shouldLand = true)));
+            shouldLandMessageDialog.Commands.Add(new UICommand("No", new UICommandInvokedHandler((IUICommand _) => shouldLand = false)));
+            await shouldLandMessageDialog.ShowAsync();
+
+            if (shouldLand)
+            {
+                var res = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync();
+                Debug.WriteLine("Start send landing command: {0}", res.ToString());
+                Debug.WriteLine("Land");
+            } else
+            {
+                CameraCommandHandler handler = new CameraCommandHandler();
+                handler.SetGimbal(0);
+            }
+        }
+
     }
 }

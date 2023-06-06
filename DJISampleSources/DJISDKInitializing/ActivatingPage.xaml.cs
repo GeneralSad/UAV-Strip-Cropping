@@ -38,6 +38,7 @@ namespace UAV_App.DJISDKInitializing
                     {
                         OverlayPage.Current?.StartVideoFeed();
                     }
+                    DJISDKManager.Instance.ComponentManager.GetBatteryHandler(0, 0).ChargeRemainingInPercentChanged += OverlayPage.Current.BatteryPercentageChanged;
                 }
             });
         }
