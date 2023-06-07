@@ -47,6 +47,15 @@
                 <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="20"  Name="AircraftLongitudeTextBlock">Lat: 0</TextBlock>
                 <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="20"  Name="AircraftLatitudeTextBlock">Lon: 0</TextBlock>
             </Grid>
+            <Grid Grid.Column="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="20"  Name="AircraftHorizontalSpeedTextBlock">H.S: 0</TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="20"  Name="AircraftVerticalSpeedTextBlock">V.S: 0</TextBlock>
+            </Grid>
         </Grid>
 
         
