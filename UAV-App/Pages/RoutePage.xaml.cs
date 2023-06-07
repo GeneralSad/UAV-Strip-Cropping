@@ -18,6 +18,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -53,8 +54,17 @@ namespace UAV_App.Pages
             var loc = args.Location;
 
 
-                 WaypointMissionViewModel.Instance.AddWaypoint(loc.Position.Latitude, loc.Position.Longitude);
-            //Add code to add your pin.
+            WaypointMissionViewModel.Instance.AddWaypoint(loc.Position.Latitude, loc.Position.Longitude);
+            };
+
+            WaypointMap.MapRightTapped  += (MapControl sender, MapRightTappedEventArgs args) => {
+            //var loc = args.Location;
+
+            WaypointMissionViewModel.Instance.RemoveLastWaypoint();
+                RedrawWaypoint();
+            
+               // routeLayer.MapElements.RemoveAt(routeLayer.MapElements.Count-1);
+                
             };
         }
 
@@ -100,7 +110,8 @@ namespace UAV_App.Pages
         private void GetIfInSimulation()
         {
    
-           var aircraftLocaton = new LocationCoordinate2D();
+           var aircraftLocaton = new LocationCoordinate2D() { latitude = 51.6077955, longitude = 4.7625830};
+            
            WaypointMap.Center = new Geopoint((new BasicGeoposition() { Latitude = aircraftLocaton.latitude, Longitude = aircraftLocaton.longitude }));
            AircraftLocationChange(aircraftLocaton);
         }
@@ -112,6 +123,7 @@ namespace UAV_App.Pages
             WaypointMission mission = WaypointMissionViewModel.Instance.WaypointMission;
             for (int i= 0; i < mission.waypoints.Count(); ++i)
             {
+
                 if (waypointLayer.MapElements.Count == i)
                 {
                     MapIcon waypointIcon = new MapIcon()
@@ -127,6 +139,16 @@ namespace UAV_App.Pages
                 (waypointLayer.MapElements[i] as MapIcon).Location = new Geopoint(geolocation);
                 waypointPositions.Add(geolocation);
             }
+
+            if (waypointPositions.Count < waypointLayer.MapElements.Count)
+            {
+                for (int i = waypointLayer.MapElements.Count; i > mission.waypointCount; i--)
+                {
+                    waypointLayer.MapElements.RemoveAt(i -1);
+                }
+
+            }
+
             if (routeLayer.MapElements.Count == 0 && waypointPositions.Count >= 2)
             {
                 var polyline = new MapPolyline
@@ -140,6 +162,12 @@ namespace UAV_App.Pages
             else
             {
                 if (routeLayer.MapElements.Count != 0) {
+                    if (waypointPositions.Count == 0)
+                    {
+                        routeLayer.MapElements.RemoveAt(0);
+                        return;
+                    }
+
                 var waypointPolyline = routeLayer.MapElements[0] as MapPolyline;
                 waypointPolyline.Path = new Geopath(waypointPositions);
                 }
