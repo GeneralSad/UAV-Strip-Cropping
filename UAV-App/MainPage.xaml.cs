@@ -35,6 +35,13 @@ namespace UAV_App
                 {
                     new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
                 },
+                               },
+            new SDKModuleSampleItems() {
+                header = "Route page", items = new List<KeyValuePair<String, Type>>()
+                {
+                    new KeyValuePair<string, Type>("Route page", typeof(Pages.RoutePage)),
+                },
+
             },
         };
 
@@ -50,7 +57,7 @@ namespace UAV_App
             }
             ContentFrame.Navigate(typeof(Pages.OverlayPage));
             setContentFrameContent(typeof(DJISDKInitializing.ActivatingPage));
-            
+
         }
 
         private void setContentFrameContent(Type contentType)
