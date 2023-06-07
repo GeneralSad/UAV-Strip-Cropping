@@ -31,13 +31,22 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="EMERGENCY BUTTON" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="EmergencyButton_Click"/>
-            <Button Grid.Column="1" Content="Take off" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#332BFF00" Click="TakeOffButton_Click"/>
-            <Button Grid.Column="2" Content="Land" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="LandButton_Click"/>
-            <TextBlock Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"  Name="BatteryLevelTextBlock">0%</TextBlock>
+            <Button Grid.Column="0" Content="Emergency" VerticalAlignment="Center" HorizontalAlignment="Center" Background="#33FF0000" Click="EmergencyButton_Click"/>
+            <Button Grid.Column="1" Content="Set Home" VerticalAlignment="Center" HorizontalAlignment="Center"  Background="#33FF0000" Name="SetHomeButton"  Click="SetHomeButton_Click"/>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"  Name="BatteryLevelTextBlock">0%</TextBlock>
+            <TextBlock Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"  Name="SatelliteCountTextBlock">0</TextBlock>
+            <TextBlock Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"  Name="AircraftAltitudeTextBlock">0m</TextBlock>
+            <Grid Grid.Column="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" FontSize="20"  Name="AircraftLongitudeTextBlock">Lat: 0</TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" FontSize="20"  Name="AircraftLatitudeTextBlock">Lon: 0</TextBlock>
+            </Grid>
         </Grid>
 
         

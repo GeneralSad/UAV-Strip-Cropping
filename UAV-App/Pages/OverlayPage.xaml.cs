@@ -2,10 +2,13 @@
 using DJIVideoParser;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Security.Cryptography;
 using UAV_App.Drone_Patrol;
+using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace UAV_App.Pages
@@ -148,15 +151,12 @@ namespace UAV_App.Pages
         private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             Debug.WriteLine("Emergency");
-            CameraCommandHandler handler = new CameraCommandHandler();
-            handler.TakePhoto();
         }
 
         public async void BatteryPercentageChanged(object sender, IntMsg? value)
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                Debug.WriteLine("Set battery");
                 if (value.HasValue)
                 {
                     BatteryLevelTextBlock.Text = value.Value.value + "%";
@@ -164,42 +164,66 @@ namespace UAV_App.Pages
             });
         }
 
-        private async void TakeOffButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        public async void SatelliteCountChanged(object sender, IntMsg? value)
         {
-            var shouldTakeOff = false;
-            var shouldTakeOffMessageDialog = new MessageDialog("Are you sure you wish to take off?");
-
-            shouldTakeOffMessageDialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler((IUICommand _) => shouldTakeOff = true)));
-            shouldTakeOffMessageDialog.Commands.Add(new UICommand("No", new UICommandInvokedHandler((IUICommand _) => shouldTakeOff = false)));
-            await shouldTakeOffMessageDialog.ShowAsync();
-
-            if (shouldTakeOff)
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                var res = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartTakeoffAsync();
-                Debug.WriteLine("Start send takeoff command: {0}", res.ToString());
-                Debug.WriteLine("Take off");
-            }
-
+                if (value.HasValue)
+                {
+                    SatelliteCountTextBlock.Text = value.Value.value.ToString();
+                }
+            });
         }
-        private async void LandButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+
+        public async void AircraftAltitudeChanged(object sender, DoubleMsg? value)
         {
-            var shouldLand = false;
-            var shouldLandMessageDialog = new MessageDialog("Are you sure you wish to land?");
-
-            shouldLandMessageDialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler((IUICommand _) => shouldLand = true)));
-            shouldLandMessageDialog.Commands.Add(new UICommand("No", new UICommandInvokedHandler((IUICommand _) => shouldLand = false)));
-            await shouldLandMessageDialog.ShowAsync();
-
-            if (shouldLand)
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                var res = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync();
-                Debug.WriteLine("Start send landing command: {0}", res.ToString());
-                Debug.WriteLine("Land");
-            } else
+                if (value.HasValue)
+                {
+                    AircraftAltitudeTextBlock.Text = value.Value.value + "m";
+                }
+            });
+        }
+
+        public async void AircraftLocationChanged(object sender, LocationCoordinate2D? value)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                CameraCommandHandler handler = new CameraCommandHandler();
-                handler.SetGimbal(0);
-            }
+                if (value.HasValue)
+                {
+                    AircraftLongitudeTextBlock.Text =  "Lon: " + Math.Round(value.Value.longitude, 6);
+                    AircraftLatitudeTextBlock.Text = "Lat: " + Math.Round(value.Value.latitude, 6);
+                }
+            });
+        }
+
+        public async void AircraftHomeLocationChanged(object sender, BoolMsg? value)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                if (value.HasValue)
+                {
+                    Windows.UI.Color color;
+                    if (value.Value.value)
+                    {
+                        color = Colors.Green;
+                    }
+                    else
+                    {
+                        color = Colors.Red;
+                    }
+                    color.A = 100;
+                    SetHomeButton.Background = new SolidColorBrush(color);
+                }
+            });
+        }
+
+        private async void SetHomeButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            var value = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).GetAircraftLocationAsync();
+            LocationCoordinate2D location = value.value.Value;
+            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetHomeLocationAsync(location);
         }
 
     }
