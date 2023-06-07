@@ -38,7 +38,13 @@ namespace UAV_App.DJISDKInitializing
                     {
                         OverlayPage.Current?.StartVideoFeed();
                     }
+
                     DJISDKManager.Instance.ComponentManager.GetBatteryHandler(0, 0).ChargeRemainingInPercentChanged += OverlayPage.Current.BatteryPercentageChanged;
+                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SatelliteCountChanged += OverlayPage.Current.SatelliteCountChanged;
+                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AltitudeChanged += OverlayPage.Current.AircraftAltitudeChanged;
+                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += OverlayPage.Current.AircraftLocationChanged;
+                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).IsHomeLocationSetChanged += OverlayPage.Current.AircraftHomeLocationChanged;
+
                 }
             });
         }
