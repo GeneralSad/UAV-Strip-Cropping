@@ -37,7 +37,7 @@ namespace UAV_App.Pages
                 waypointCount = 0,
                 maxFlightSpeed = 15,
                 autoFlightSpeed = 10,
-                finishedAction = WaypointMissionFinishedAction.NO_ACTION,
+                finishedAction = WaypointMissionFinishedAction.NO_ACTION, //TODO set go home
                 headingMode = WaypointMissionHeadingMode.AUTO,
                 flightPathMode = WaypointMissionFlightPathMode.NORMAL,
                 gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
@@ -167,7 +167,7 @@ namespace UAV_App.Pages
                                 longitude = longitude,
                                 satelliteCount = satelliteCount
                             });
-                            var messageDialog = new MessageDialog(String.Format("Start Simulator Result: {0}.", err.ToString()));
+                            var messageDialog = new MessageDialog(String.Format("Start Result: {0}.", err.ToString()));
                             await messageDialog.ShowAsync();
                         }
                         catch
@@ -235,7 +235,7 @@ namespace UAV_App.Pages
                     _stopSimulator = new RelayCommand(async delegate ()
                     {
                         var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StopSimulatorAsync();
-                        var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
+                        var messageDialog = new MessageDialog(String.Format("Stop Result: {0}.", err.ToString()));
                         await messageDialog.ShowAsync();
                     }, delegate () { return true; });
                 }
@@ -259,13 +259,13 @@ namespace UAV_App.Pages
                         if (switchBool)
                         {
                             var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).PauseMission();
-                            var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
+                            var messageDialog = new MessageDialog(String.Format("Pause Result: {0}.", err.ToString()));
                             await messageDialog.ShowAsync();
                         }
                         else
                         {
                             var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ResumeMission();
-                            var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
+                            var messageDialog = new MessageDialog(String.Format("Resume Result: {0}.", err.ToString()));
                             await messageDialog.ShowAsync();
                         }
                         switchBool = !switchBool;
@@ -288,7 +288,9 @@ namespace UAV_App.Pages
                     _emergencyStop = new RelayCommand(async delegate ()
                     {
 
-                        var err1 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();  
+                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();  
+                        var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err.ToString()));
+                        await messageDialog.ShowAsync();
  
 
                     }, delegate () { return true; });
@@ -309,6 +311,30 @@ namespace UAV_App.Pages
                         var err1 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGoHomeHeightAsync(new IntMsg() { value = 40});
              
                         var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();;  
+
+                        var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err1.ToString() + " go home async result" + err2.ToString()));
+                        await messageDialog.ShowAsync();
+
+
+                    }, delegate () { return true; });
+                }
+                return _goHome;
+            }
+        }
+
+        public ICommand _startLanding;
+        public ICommand StartLanding
+        {
+            get
+            {
+                if (_goHome == null)
+                {
+                    _goHome = new RelayCommand(async delegate ()
+                    {
+                        var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync();;  
+
+                        var messageDialog = new MessageDialog(String.Format("Start auto landing: {0}.", err.ToString()));
+                        await messageDialog.ShowAsync();
 
 
                     }, delegate () { return true; });
@@ -347,8 +373,8 @@ namespace UAV_App.Pages
             Waypoint waypoint = new Waypoint()
             {
                 location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
-                altitude = 40,
-                gimbalPitch = -30,
+                altitude = 10,
+                gimbalPitch = -90,
                 turnMode = WaypointTurnMode.CLOCKWISE,
                 heading = 0,
                 actionRepeatTimes = 1,
@@ -357,7 +383,7 @@ namespace UAV_App.Pages
                 speed = 0,
                 shootPhotoTimeInterval = -1,
                 shootPhotoDistanceInterval = -1,
-                waypointActions = new List<WaypointAction>()
+                waypointActions = new List<WaypointAction>() { new WaypointAction() {actionType = WaypointActionType.STAY, actionParam = 5000} }
             };
             return waypoint;
         }
