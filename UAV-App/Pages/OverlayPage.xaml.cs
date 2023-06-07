@@ -235,9 +235,7 @@ namespace UAV_App.Pages
 
         private async void SetHomeButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            var value = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).GetAircraftLocationAsync();
-            LocationCoordinate2D location = value.value.Value;
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetHomeLocationAsync(location);
+            await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetHomeLocationUsingAircraftCurrentLocationAsync();
         }
 
     }

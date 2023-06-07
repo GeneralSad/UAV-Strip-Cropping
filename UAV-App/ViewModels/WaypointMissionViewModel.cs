@@ -37,7 +37,7 @@ namespace UAV_App.Pages
                 waypointCount = 0,
                 maxFlightSpeed = 15,
                 autoFlightSpeed = 10,
-                finishedAction = WaypointMissionFinishedAction.NO_ACTION,
+                finishedAction = WaypointMissionFinishedAction.NO_ACTION, //TODO set go home
                 headingMode = WaypointMissionHeadingMode.AUTO,
                 flightPathMode = WaypointMissionFlightPathMode.NORMAL,
                 gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
@@ -56,7 +56,7 @@ namespace UAV_App.Pages
             };
         }
 
-        private async void WaypointMission_AircraftLocationChanged(object sender, LocationCoordinate2D? value)
+        public async void WaypointMission_AircraftLocationChanged(object sender, LocationCoordinate2D? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -146,40 +146,6 @@ namespace UAV_App.Pages
                 OnPropertyChanged(nameof(AircraftAltitude));
             }
         }
-        public ICommand _startSimulator;
-        public ICommand StartSimulator
-        {
-            get
-            {
-                if (_startSimulator == null)
-                {
-                    _startSimulator = new RelayCommand(async delegate ()
-                    {
-                        try
-                        {
-                            var latitude = Convert.ToDouble(SimulatorLatitude);
-                            var longitude = Convert.ToDouble(SimulatorLongitude);
-                            var satelliteCount = Convert.ToInt32(SimulatorSatelliteCount);
-
-                            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartSimulatorAsync(new SimulatorInitializationSettings
-                            {
-                                latitude = latitude,
-                                longitude = longitude,
-                                satelliteCount = satelliteCount
-                            });
-                            var messageDialog = new MessageDialog(String.Format("Start Simulator Result: {0}.", err.ToString()));
-                            await messageDialog.ShowAsync();
-                        }
-                        catch
-                        {
-                            var messageDialog = new MessageDialog("Format error!");
-                            await messageDialog.ShowAsync();
-                        }
-                    }, delegate () { return true; });
-                }
-                return _startSimulator;
-            }
-        }
 
         public ICommand _initWaypointMission;
         public ICommand InitWaypointMission
@@ -235,7 +201,7 @@ namespace UAV_App.Pages
                     _stopSimulator = new RelayCommand(async delegate ()
                     {
                         var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StopSimulatorAsync();
-                        var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
+                        var messageDialog = new MessageDialog(String.Format("Stop Result: {0}.", err.ToString()));
                         await messageDialog.ShowAsync();
                     }, delegate () { return true; });
                 }
@@ -244,9 +210,41 @@ namespace UAV_App.Pages
         }
 
 
-        bool switchBool = false;
+        bool ShouldPause = true;
 
-        public ICommand _emergencyStop;
+        public ICommand _pauseResumeMission;
+        public ICommand PauseResumeMission
+        {
+            get
+            {
+                if (_pauseResumeMission == null)
+                {
+                    _pauseResumeMission = new RelayCommand(async delegate ()
+                    {
+
+                        if (ShouldPause)
+                        {
+                            var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).PauseMission();
+                            var messageDialog = new MessageDialog(String.Format("Pause Result: {0}.", err.ToString()));
+                            await messageDialog.ShowAsync();
+                        }
+                        else
+                        {
+                            var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ResumeMission();
+                            var messageDialog = new MessageDialog(String.Format("Resume Result: {0}.", err.ToString()));
+                            await messageDialog.ShowAsync();
+                        }
+                        ShouldPause = !ShouldPause;
+
+
+
+                    }, delegate () { return true; });
+                }
+                return _pauseResumeMission;
+            }
+        }
+
+         public ICommand _emergencyStop;
         public ICommand EmergencyStop
         {
             get
@@ -256,25 +254,58 @@ namespace UAV_App.Pages
                     _emergencyStop = new RelayCommand(async delegate ()
                     {
 
-                        if (switchBool)
-                        {
-                            var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).PauseMission();
-                            var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
-                            await messageDialog.ShowAsync();
-                        }
-                        else
-                        {
-                            var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ResumeMission();
-                            var messageDialog = new MessageDialog(String.Format("Stop Simulator Result: {0}.", err.ToString()));
-                            await messageDialog.ShowAsync();
-                        }
-                        switchBool = !switchBool;
-
-
+                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();  
+                        var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err.ToString()));
+                        await messageDialog.ShowAsync();
+ 
 
                     }, delegate () { return true; });
                 }
                 return _emergencyStop;
+            }
+        }
+
+        public ICommand _goHome;
+        public ICommand GoHome
+        {
+            get
+            {
+                if (_goHome == null)
+                {
+                    _goHome = new RelayCommand(async delegate ()
+                    {
+                        var err1 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGoHomeHeightAsync(new IntMsg() { value = 40});
+             
+                        var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();;  
+
+                        var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err1.ToString() + " go home async result" + err2.ToString()));
+                        await messageDialog.ShowAsync();
+
+
+                    }, delegate () { return true; });
+                }
+                return _goHome;
+            }
+        }
+
+        public ICommand _startLanding;
+        public ICommand StartLanding
+        {
+            get
+            {
+                if (_goHome == null)
+                {
+                    _goHome = new RelayCommand(async delegate ()
+                    {
+                        var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync();;  
+
+                        var messageDialog = new MessageDialog(String.Format("Start auto landing: {0}.", err.ToString()));
+                        await messageDialog.ShowAsync();
+
+
+                    }, delegate () { return true; });
+                }
+                return _goHome;
             }
         }
 
@@ -308,8 +339,8 @@ namespace UAV_App.Pages
             Waypoint waypoint = new Waypoint()
             {
                 location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
-                altitude = 20,
-                gimbalPitch = -30,
+                altitude = 10,
+                gimbalPitch = -90,
                 turnMode = WaypointTurnMode.CLOCKWISE,
                 heading = 0,
                 actionRepeatTimes = 1,
@@ -318,7 +349,7 @@ namespace UAV_App.Pages
                 speed = 0,
                 shootPhotoTimeInterval = -1,
                 shootPhotoDistanceInterval = -1,
-                waypointActions = new List<WaypointAction>()
+                waypointActions = new List<WaypointAction>() { new WaypointAction() {actionType = WaypointActionType.STAY, actionParam = 5000} }
             };
             return waypoint;
         }
@@ -359,8 +390,10 @@ namespace UAV_App.Pages
             {
                 _loadMission = new RelayCommand(async delegate ()
                 {
-                    SDKError err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
-                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}", err.ToString()));
+                    SDKError err1 = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
+                    SDKError err2 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+                    
+                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}, upload mission result",  err1.ToString(), err2.ToString()));
                     await messageDialog.ShowAsync();
                 }, delegate () { return true; });
             }

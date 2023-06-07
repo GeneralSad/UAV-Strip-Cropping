@@ -43,6 +43,7 @@ namespace UAV_App.DJISDKInitializing
                     DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SatelliteCountChanged += OverlayPage.Current.SatelliteCountChanged;
                     DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AltitudeChanged += OverlayPage.Current.AircraftAltitudeChanged;
                     DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += OverlayPage.Current.AircraftLocationChanged;
+                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMissionViewModel.Instance.WaypointMission_AircraftLocationChanged;
                     DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).IsHomeLocationSetChanged += OverlayPage.Current.AircraftHomeLocationChanged;
                     DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).VelocityChanged += OverlayPage.Current.AircraftVelocityChanged;
 

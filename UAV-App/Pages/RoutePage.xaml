@@ -58,7 +58,7 @@
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> We could add some actions to the waypoint like staying. Press the button to add 'STAY' action to the second waypoint.</TextBlock>
                         <Button Margin="0,6,0,0" Command="{Binding AddAction}">Add Action</Button>
 
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> SDK Load Mission</TextBlock>
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> SDK Load and upload Mission</TextBlock>
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> DJI Windows SDK would storage a cache copy of mission. Before we upload the mission to the aircraft, we need to get the misson loaded by DJI Windows SDK.</TextBlock>
                         <Button Margin="0,6,0,0" Command="{Binding LoadMission}" >SDK Load Mission</Button>
 
@@ -71,8 +71,16 @@
                         <Button Margin="0,6,0,0" Command="{Binding StartMission}" >Start Mission</Button>
 
                         <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Pause/Resume Mission</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Start your waypoint mission and see what would happen on the map.</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding EmergencyStop}" >Pause/Resume Mission</Button>
+                        <Button Margin="0,6,0,0" Command="{Binding PauseResumeMission}" >Pause/Resume Mission</Button>
+
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Emergency Stop</TextBlock>
+                        <Button Margin="0,6,0,0" Command="{Binding EmergencyStop}" >Emergency Stop</Button>
+
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Go home</TextBlock>
+                        <Button Margin="0,6,0,0" Command="{Binding GoHome}" >go home</Button>
+                        
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> start landing</TextBlock>
+                        <Button Margin="0,6,0,0" Command="{Binding StartLanding}" >Start landing</Button>
 
                         <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Others Features</TextBlock>
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> There are some others feature like pausing mission or downloading mission to SDK from the aircraft. See the document of DJI Windows SDK</TextBlock>
