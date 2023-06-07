@@ -203,7 +203,7 @@ namespace UAV_App.Pages
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 if (value.HasValue)
-                {
+                {  
                     Windows.UI.Color color;
                     if (value.Value.value)
                     {
@@ -215,6 +215,20 @@ namespace UAV_App.Pages
                     }
                     color.A = 100;
                     SetHomeButton.Background = new SolidColorBrush(color);
+                }
+            });
+        }
+
+        public async void AircraftVelocityChanged(object sender, Velocity3D? value)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                if (value.HasValue)
+                {
+                    double horizontalSpeed = Math.Abs(value.Value.x) + Math.Abs(value.Value.y);
+                    double verticalSpeed = Math.Abs(value.Value.z);  
+                    AircraftHorizontalSpeedTextBlock.Text = "H.S: " + Math.Round(horizontalSpeed, 1);
+                    AircraftVerticalSpeedTextBlock.Text = "V.S: " + Math.Round(verticalSpeed, 1);
                 }
             });
         }
