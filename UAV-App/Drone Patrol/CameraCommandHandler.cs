@@ -66,9 +66,8 @@ namespace UAV_App.Drone_Patrol
             SetGimbal(defaultPitch);
         }
 
-        public async void TakePhoto()
+        public async Task ResetCamera()
         {
-
             await SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
 
             PhotoRatioMsg photoRatioMsg = new PhotoRatioMsg
@@ -112,6 +111,11 @@ namespace UAV_App.Drone_Patrol
                 gimbalPitch = await GetGimbal();
                 Debug.WriteLine(gimbalPitch - defaultPitch);
             }
+        }
+
+        public async void TakePhoto()
+        {
+            await ResetCamera();
 
             if (DJISDKManager.Instance.ComponentManager != null)
             {
