@@ -56,7 +56,7 @@ namespace UAV_App.Pages
             };
         }
 
-        private async void WaypointMission_AircraftLocationChanged(object sender, LocationCoordinate2D? value)
+        public async void WaypointMission_AircraftLocationChanged(object sender, LocationCoordinate2D? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -246,14 +246,14 @@ namespace UAV_App.Pages
 
         bool switchBool = false;
 
-        public ICommand _emergencyStop;
-        public ICommand EmergencyStop
+        public ICommand _pauseResumeMission;
+        public ICommand PauseResumeMission
         {
             get
             {
-                if (_emergencyStop == null)
+                if (_pauseResumeMission == null)
                 {
-                    _emergencyStop = new RelayCommand(async delegate ()
+                    _pauseResumeMission = new RelayCommand(async delegate ()
                     {
 
                         if (switchBool)
@@ -274,7 +274,46 @@ namespace UAV_App.Pages
 
                     }, delegate () { return true; });
                 }
+                return _pauseResumeMission;
+            }
+        }
+
+         public ICommand _emergencyStop;
+        public ICommand EmergencyStop
+        {
+            get
+            {
+                if (_emergencyStop == null)
+                {
+                    _emergencyStop = new RelayCommand(async delegate ()
+                    {
+
+                        var err1 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();  
+ 
+
+                    }, delegate () { return true; });
+                }
                 return _emergencyStop;
+            }
+        }
+
+                 public ICommand _goHome;
+        public ICommand GoHome
+        {
+            get
+            {
+                if (_goHome == null)
+                {
+                    _goHome = new RelayCommand(async delegate ()
+                    {
+                        var err1 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGoHomeHeightAsync(new IntMsg() { value = 40});
+             
+                        var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();;  
+
+
+                    }, delegate () { return true; });
+                }
+                return _goHome;
             }
         }
 
@@ -308,7 +347,7 @@ namespace UAV_App.Pages
             Waypoint waypoint = new Waypoint()
             {
                 location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
-                altitude = 20,
+                altitude = 40,
                 gimbalPitch = -30,
                 turnMode = WaypointTurnMode.CLOCKWISE,
                 heading = 0,
