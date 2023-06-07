@@ -58,7 +58,7 @@
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> We could add some actions to the waypoint like staying. Press the button to add 'STAY' action to the second waypoint.</TextBlock>
                         <Button Margin="0,6,0,0" Command="{Binding AddAction}">Add Action</Button>
 
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> SDK Load Mission</TextBlock>
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> SDK Load and upload Mission</TextBlock>
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> DJI Windows SDK would storage a cache copy of mission. Before we upload the mission to the aircraft, we need to get the misson loaded by DJI Windows SDK.</TextBlock>
                         <Button Margin="0,6,0,0" Command="{Binding LoadMission}" >SDK Load Mission</Button>
 

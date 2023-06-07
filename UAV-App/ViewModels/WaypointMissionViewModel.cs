@@ -146,40 +146,6 @@ namespace UAV_App.Pages
                 OnPropertyChanged(nameof(AircraftAltitude));
             }
         }
-        public ICommand _startSimulator;
-        public ICommand StartSimulator
-        {
-            get
-            {
-                if (_startSimulator == null)
-                {
-                    _startSimulator = new RelayCommand(async delegate ()
-                    {
-                        try
-                        {
-                            var latitude = Convert.ToDouble(SimulatorLatitude);
-                            var longitude = Convert.ToDouble(SimulatorLongitude);
-                            var satelliteCount = Convert.ToInt32(SimulatorSatelliteCount);
-
-                            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartSimulatorAsync(new SimulatorInitializationSettings
-                            {
-                                latitude = latitude,
-                                longitude = longitude,
-                                satelliteCount = satelliteCount
-                            });
-                            var messageDialog = new MessageDialog(String.Format("Start Result: {0}.", err.ToString()));
-                            await messageDialog.ShowAsync();
-                        }
-                        catch
-                        {
-                            var messageDialog = new MessageDialog("Format error!");
-                            await messageDialog.ShowAsync();
-                        }
-                    }, delegate () { return true; });
-                }
-                return _startSimulator;
-            }
-        }
 
         public ICommand _initWaypointMission;
         public ICommand InitWaypointMission
@@ -244,7 +210,7 @@ namespace UAV_App.Pages
         }
 
 
-        bool switchBool = false;
+        bool ShouldPause = true;
 
         public ICommand _pauseResumeMission;
         public ICommand PauseResumeMission
@@ -256,7 +222,7 @@ namespace UAV_App.Pages
                     _pauseResumeMission = new RelayCommand(async delegate ()
                     {
 
-                        if (switchBool)
+                        if (ShouldPause)
                         {
                             var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).PauseMission();
                             var messageDialog = new MessageDialog(String.Format("Pause Result: {0}.", err.ToString()));
@@ -268,7 +234,7 @@ namespace UAV_App.Pages
                             var messageDialog = new MessageDialog(String.Format("Resume Result: {0}.", err.ToString()));
                             await messageDialog.ShowAsync();
                         }
-                        switchBool = !switchBool;
+                        ShouldPause = !ShouldPause;
 
 
 
@@ -299,7 +265,7 @@ namespace UAV_App.Pages
             }
         }
 
-                 public ICommand _goHome;
+        public ICommand _goHome;
         public ICommand GoHome
         {
             get
@@ -424,8 +390,10 @@ namespace UAV_App.Pages
             {
                 _loadMission = new RelayCommand(async delegate ()
                 {
-                    SDKError err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
-                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}", err.ToString()));
+                    SDKError err1 = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
+                    SDKError err2 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+                    
+                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}, upload mission result",  err1.ToString(), err2.ToString()));
                     await messageDialog.ShowAsync();
                 }, delegate () { return true; });
             }
