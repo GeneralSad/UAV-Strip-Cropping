@@ -82,6 +82,12 @@
                         <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> start landing</TextBlock>
                         <Button Margin="0,6,0,0" Command="{Binding StartLanding}" >Start landing</Button>
 
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Go down 0.5 secs</TextBlock>
+                        <Button Margin="0,6,0,0" Command="{Binding MoveDown}" >Start landing</Button>
+
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> download foto</TextBlock>
+                        <Button Margin="0,6,0,0" Command="{Binding DownloadPics}" >download foto</Button>
+
                         <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Others Features</TextBlock>
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> There are some others feature like pausing mission or downloading mission to SDK from the aircraft. See the document of DJI Windows SDK</TextBlock>
 

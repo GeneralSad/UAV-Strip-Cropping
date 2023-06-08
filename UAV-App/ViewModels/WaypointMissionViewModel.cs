@@ -6,7 +6,9 @@ using DJIUWPSample.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.Drone_Patrol;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -349,7 +351,7 @@ namespace UAV_App.Pages
                 speed = 0,
                 shootPhotoTimeInterval = -1,
                 shootPhotoDistanceInterval = -1,
-                waypointActions = new List<WaypointAction>() { new WaypointAction() {actionType = WaypointActionType.STAY, actionParam = 5000} }
+                waypointActions = new List<WaypointAction>() { new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO},  new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 20000},  }
             };
             return waypoint;
         }
@@ -393,7 +395,7 @@ namespace UAV_App.Pages
                     SDKError err1 = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
                     SDKError err2 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
                     
-                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}, upload mission result",  err1.ToString(), err2.ToString()));
+                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}, upload mission result {1}",  err1.ToString(), err2.ToString()));
                     await messageDialog.ShowAsync();
                 }, delegate () { return true; });
             }
@@ -442,6 +444,9 @@ namespace UAV_App.Pages
         {
             if (_startMission == null)
             {
+                CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
+                cameraCommandHandler.ResetCamera();
+
                 _startMission = new RelayCommand(async delegate ()
                 {
                     var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
@@ -452,5 +457,46 @@ namespace UAV_App.Pages
             return _startMission;
         }
     }
+
+    public ICommand _moveDown;
+    public ICommand MoveDown
+    {
+        get
+        {
+            if (_moveDown == null)
+            {
+                _moveDown = new RelayCommand(async delegate ()
+                {
+                    DJISDKManager.Instance.VirtualRemoteController.UpdateJoystickValue(-0.25f,0,0,0);
+
+                    await Task.Delay(500).ConfigureAwait(false);
+
+                    DJISDKManager.Instance.VirtualRemoteController.UpdateJoystickValue(0,0,0,0);
+
+                }, delegate () { return true; });
+            }
+            return _moveDown;
+        }
+    }
+
+    public ICommand _downloadPics;
+    public ICommand DownloadPics
+    {
+        get
+        {
+            if (_downloadPics == null)
+            {
+                _downloadPics = new RelayCommand(async delegate ()
+                {
+                    CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
+                    cameraCommandHandler.GetMostRecentPhoto();
+
+                }, delegate () { return true; });
+            }
+            return _downloadPics;
+        }
+    }
+
+
 }
 }
