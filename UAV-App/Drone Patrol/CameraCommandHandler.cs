@@ -287,7 +287,7 @@ namespace UAV_App.Drone_Patrol
         public async void TakeScreenshot()
         {
             var _bitmap = new RenderTargetBitmap();
-            await _bitmap.RenderAsync(OverlayPage.Current?.GetFeed());
+            await _bitmap.RenderAsync(OverlayPage.Instance?.GetFeed());
 
             var savePicker = new FileSavePicker
             {

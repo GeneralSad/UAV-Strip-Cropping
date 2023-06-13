@@ -1,10 +1,14 @@
 ﻿using DJI.WindowsSDK;
 using DJIVideoParser;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
+using System.ServiceModel.Channels;
 using UAV_App.Drone_Patrol;
+using UAV_App.ViewModels;
 using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
@@ -16,7 +20,7 @@ namespace UAV_App.Pages
     public sealed partial class OverlayPage : Page
     {
 
-        public static OverlayPage Current;
+        public static OverlayPage Instance;
 
         public bool IsVideoFeedActive;
 
@@ -26,16 +30,22 @@ namespace UAV_App.Pages
         {
             this.InitializeComponent();
 
-            if (Current == null)
+            if (Instance == null)
             {
-                Current = this;
+                Instance = this;
             }
             swapChainPanel.Tapped += OnFeedTapped;
+            OverlayViewModel.Instance.PropertyChanged += ViewModel_PropertyChanged;
 
+        }
+
+        private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            DataContext = OverlayViewModel.Instance;
             base.OnNavigatedFrom(e);
         }
 
@@ -146,96 +156,6 @@ namespace UAV_App.Pages
         private void OnFeedTapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             ToggleFullscreen();
-        }
-
-        private async void EmergencyButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            Debug.WriteLine("Emergency");
-        }
-
-        public async void BatteryPercentageChanged(object sender, IntMsg? value)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {
-                    BatteryLevelTextBlock.Text = value.Value.value + "%";
-                }
-            });
-        }
-
-        public async void SatelliteCountChanged(object sender, IntMsg? value)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {
-                    SatelliteCountTextBlock.Text = value.Value.value.ToString();
-                }
-            });
-        }
-
-        public async void AircraftAltitudeChanged(object sender, DoubleMsg? value)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {
-                    AircraftAltitudeTextBlock.Text = value.Value.value + "m";
-                }
-            });
-        }
-
-        public async void AircraftLocationChanged(object sender, LocationCoordinate2D? value)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {
-                    AircraftLongitudeTextBlock.Text =  "Lon: " + Math.Round(value.Value.longitude, 6);
-                    AircraftLatitudeTextBlock.Text = "Lat: " + Math.Round(value.Value.latitude, 6);
-                }
-            });
-        }
-
-        public async void AircraftHomeLocationChanged(object sender, BoolMsg? value)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {  
-                    Windows.UI.Color color;
-                    if (value.Value.value)
-                    {
-                        color = Colors.Green;
-                    }
-                    else
-                    {
-                        color = Colors.Red;
-                    }
-                    color.A = 100;
-                    SetHomeButton.Background = new SolidColorBrush(color);
-                }
-            });
-        }
-
-        public async void AircraftVelocityChanged(object sender, Velocity3D? value)
-        {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {
-                    double horizontalSpeed = Math.Abs(value.Value.x) + Math.Abs(value.Value.y);
-                    double verticalSpeed = Math.Abs(value.Value.z);  
-                    AircraftHorizontalSpeedTextBlock.Text = "H.S: " + Math.Round(horizontalSpeed, 1);
-                    AircraftVerticalSpeedTextBlock.Text = "V.S: " + Math.Round(verticalSpeed, 1);
-                }
-            });
-        }
-
-        private async void SetHomeButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetHomeLocationUsingAircraftCurrentLocationAsync();
         }
 
     }

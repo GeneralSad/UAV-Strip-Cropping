@@ -152,6 +152,7 @@
     <Compile Include="Pages\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\OverlayViewModel.cs" />
     <Compile Include="ViewModels\WaypointMissionViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

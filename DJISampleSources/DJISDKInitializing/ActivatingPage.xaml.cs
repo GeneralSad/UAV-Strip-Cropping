@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using UAV_App.Pages;
+using UAV_App.ViewModels;
 
 namespace UAV_App.DJISDKInitializing
 {
@@ -34,19 +35,11 @@ namespace UAV_App.DJISDKInitializing
                 activationInformation.Text = resultCode == SDKError.NO_ERROR ? "Register success" : resultCode.ToString();
                 if (resultCode == SDKError.NO_ERROR)
                 {
-                    if (OverlayPage.Current?.IsVideoFeedActive == false)
+                    OverlayViewModel.Instance.StartOverlay();
+                    if (OverlayPage.Instance?.IsVideoFeedActive == false)
                     {
-                        OverlayPage.Current?.StartVideoFeed();
+                        OverlayPage.Instance?.StartVideoFeed();
                     }
-
-                    DJISDKManager.Instance.ComponentManager.GetBatteryHandler(0, 0).ChargeRemainingInPercentChanged += OverlayPage.Current.BatteryPercentageChanged;
-                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SatelliteCountChanged += OverlayPage.Current.SatelliteCountChanged;
-                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AltitudeChanged += OverlayPage.Current.AircraftAltitudeChanged;
-                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += OverlayPage.Current.AircraftLocationChanged;
-                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMissionViewModel.Instance.WaypointMission_AircraftLocationChanged;
-                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).IsHomeLocationSetChanged += OverlayPage.Current.AircraftHomeLocationChanged;
-                    DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).VelocityChanged += OverlayPage.Current.AircraftVelocityChanged;
-
                 }
             });
         }
