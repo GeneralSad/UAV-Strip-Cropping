@@ -26,10 +26,9 @@ namespace UAV_App.Pages
 
         private WaypointMissionViewModel()
         {
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).IsSimulatorStartedChanged += WaypointMission_IsSimulatorStartedChanged;
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StateChanged += WaypointMission_StateChanged;
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AltitudeChanged += WaypointMission_AltitudeChanged; ;
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged; ;
+            DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ExecutionStateChanged += WaypointMission_ExecuteStateChanged;
+            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged;
             WaypointMissionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 
             this.WaypointMission = new WaypointMission()
@@ -67,17 +66,6 @@ namespace UAV_App.Pages
             });
         }
 
-        private async void WaypointMission_AltitudeChanged(object sender, DoubleMsg? value)
-        {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                if (value.HasValue)
-                {
-                    AircraftAltitude = value.Value.value;
-                }
-            });
-        }
-
         private async void WaypointMission_StateChanged(WaypointMissionHandler sender, WaypointMissionStateTransition? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -86,38 +74,14 @@ namespace UAV_App.Pages
             });
         }
 
-        private async void WaypointMission_IsSimulatorStartedChanged(object sender, BoolMsg? value)
+        private async void WaypointMission_ExecuteStateChanged(WaypointMissionHandler sender, WaypointMissionExecutionState? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                IsSimulatorStart = value.HasValue && value.Value.value;
+                WaypointMissionExecuteState = value.HasValue ? value.Value.state : WaypointMissionExecuteState.UNKNOWN;
             });
         }
 
-        public String SimulatorLatitude { set; get; }
-        public String SimulatorLongitude { set; get; }
-        public String SimulatorSatelliteCount { set; get; }
-        bool _isSimulatorStart = false;
-        public bool IsSimulatorStart
-        {
-            get
-            {
-                return _isSimulatorStart;
-            }
-            set
-            {
-                _isSimulatorStart = value;
-                OnPropertyChanged(nameof(IsSimulatorStart));
-                OnPropertyChanged(nameof(SimulatorState));
-            }
-        }
-        public String SimulatorState
-        {
-            get
-            {
-                return _isSimulatorStart ? "Open" : "Close";
-            }
-        }
         private WaypointMissionState _waypointMissionState;
         public WaypointMissionState WaypointMissionState
         {
@@ -132,18 +96,17 @@ namespace UAV_App.Pages
             }
         }
 
-
-        private double _aircraftAltitude = 0;
-        public double AircraftAltitude
+        private WaypointMissionExecuteState _waypointMissionExecuteState;
+        public WaypointMissionExecuteState WaypointMissionExecuteState
         {
             get
             {
-                return _aircraftAltitude;
+                return _waypointMissionExecuteState;
             }
             set
             {
-                _aircraftAltitude = value;
-                OnPropertyChanged(nameof(AircraftAltitude));
+                _waypointMissionExecuteState = value;
+                OnPropertyChanged(nameof(WaypointMissionExecuteState));
             }
         }
 
@@ -190,25 +153,6 @@ namespace UAV_App.Pages
                 return _initWaypointMission;
             }
         }
-
-        public ICommand _stopSimulator;
-        public ICommand StopSimulator
-        {
-            get
-            {
-                if (_stopSimulator == null)
-                {
-                    _stopSimulator = new RelayCommand(async delegate ()
-                    {
-                        var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StopSimulatorAsync();
-                        var messageDialog = new MessageDialog(String.Format("Stop Result: {0}.", err.ToString()));
-                        await messageDialog.ShowAsync();
-                    }, delegate () { return true; });
-                }
-                return _stopSimulator;
-            }
-        }
-
 
         bool ShouldPause = true;
 
@@ -353,8 +297,6 @@ namespace UAV_App.Pages
             };
             return waypoint;
         }
-
-
 
         public void AddWaypoint(double lat, double lon)
         {
