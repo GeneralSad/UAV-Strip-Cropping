@@ -44,12 +44,14 @@ namespace UAV_App.Pages
         public RoutePage()
         {
             this.InitializeComponent();
+
             //init map layer
             WaypointMap.Layers.Add(routeLayer);
             WaypointMap.Layers.Add(waypointLayer);
             WaypointMap.Layers.Add(locationLayer);
             WaypointMissionViewModel.Instance.PropertyChanged += ViewModel_PropertyChanged;
 
+            WaypointMap.Style = MapStyle.Terrain;
             WaypointMap.MapTapped += (MapControl sender, MapInputEventArgs args) => {
             var loc = args.Location;
 
@@ -66,6 +68,17 @@ namespace UAV_App.Pages
                // routeLayer.MapElements.RemoveAt(routeLayer.MapElements.Count-1);
                 
             };
+        }
+
+        private void ChangeMapTypeClick(object sender, RoutedEventArgs e)
+        {
+            if ( WaypointMap.Style == MapStyle.Aerial)
+            {
+                WaypointMap.Style = MapStyle.Terrain;
+            } else
+            {
+                WaypointMap.Style = MapStyle.Aerial;
+            }
         }
 
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -109,7 +122,7 @@ namespace UAV_App.Pages
 
         private void GetIfInSimulation()
         {
-   
+
            var aircraftLocaton = new LocationCoordinate2D() { latitude = 51.6077955, longitude = 4.7625830};
             
            WaypointMap.Center = new Geopoint((new BasicGeoposition() { Latitude = aircraftLocaton.latitude, Longitude = aircraftLocaton.longitude }));
