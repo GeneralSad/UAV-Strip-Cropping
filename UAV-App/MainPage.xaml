@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:UAV_App"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Windows10version1809="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract, 7)"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -12,6 +12,8 @@
                         ItemInvoked="NavView_ItemInvoked"
                         IsSettingsVisible="False"
                         Loaded="NavView_Loaded"
+                        Windows10version1809:PaneDisplayMode="Top"
+                        IsBackButtonVisible="Collapsed"
                         Header="UAV App">
             <Frame x:Name="ContentFrame" Margin="24"/>
         </NavigationView>

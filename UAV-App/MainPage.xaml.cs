@@ -2,6 +2,15 @@ using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using UAV_App.Database;
+using UAV_App.Dialogs;
+using UAV_App.Pages;
+using UAV_App.ViewModels;
+using Windows.ApplicationModel.Core;
+using Windows.Storage;
+using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -10,54 +19,27 @@ namespace UAV_App
     public sealed partial class MainPage : Page
     {
 
-        private struct SDKModuleSampleItems
+        private List<KeyValuePair<String, Type>> menuItems = new List<KeyValuePair<String, Type>>()
         {
-            public String header;
-            public List<KeyValuePair<String, Type>> items;
-        }
-
-        private List<SDKModuleSampleItems> navigationModules = new List<SDKModuleSampleItems>
-        {
-            new SDKModuleSampleItems() {
-                header = "Activation", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Activating DJIWindowsSDK", typeof(DJISDKInitializing.ActivatingPage)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Account", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Account Management", typeof(Pages.LoginView)),
-                },
-            },
-            new SDKModuleSampleItems() {
-                header = "Information", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
-                },
-                               },
-            new SDKModuleSampleItems() {
-                header = "Route page", items = new List<KeyValuePair<String, Type>>()
-                {
-                    new KeyValuePair<string, Type>("Route page", typeof(Pages.RoutePage)),
-                },
-
-            },
+             new KeyValuePair<string, Type>("SDK Registration", typeof(Pages.SDKPage)),
+             new KeyValuePair<string, Type>("Patrol Control", typeof(Pages.RoutePage)),
+             //new KeyValuePair<string, Type>("Information rapport", typeof(Pages.InformationRapportPage)),
         };
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            var module = navigationModules[0];
-            NavView.MenuItems.Add(new NavigationViewItemHeader() { Content = module.header });
-            foreach (var item in module.items)
-            {
-                NavView.MenuItems.Add(item.Key);
-            }
-            ContentFrame.Navigate(typeof(Pages.OverlayPage));
-            setContentFrameContent(typeof(DJISDKInitializing.ActivatingPage));
+            DJISDKManager.Instance.SDKRegistrationStateChanged += Instance_SDKRegistrationEvent;
 
+            ApplicationSettings applicationSettings = new ApplicationSettings();
+            applicationSettings.LoadSettingsAsync();
+
+            var item = menuItems[0];
+            NavView.MenuItems.Add(item.Key);
+
+            ContentFrame.Navigate(typeof(Pages.OverlayPage));
+            setContentFrameContent(typeof(Pages.SDKPage));
         }
 
         private void setContentFrameContent(Type contentType)
@@ -75,43 +57,54 @@ namespace UAV_App
         private void NavView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             String invokedName = args.InvokedItem as String;
-            foreach (var module in navigationModules)
+            foreach (var item in menuItems)
             {
-                foreach (var item in module.items)
+                if (invokedName == item.Key)
                 {
-                    if (invokedName == item.Key)
-                    {
-                        setContentFrameContent(item.Value);
-                        return;
-                    }
+                    setContentFrameContent(item.Value);
+                    return;
                 }
             }
         }
 
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
-            DJISDKManager.Instance.SDKRegistrationStateChanged += Instance_SDKRegistrationEvent;
         }
 
         private async void Instance_SDKRegistrationEvent(SDKRegistrationState state, SDKError resultCode)
         {
             if (resultCode == SDKError.NO_ERROR)
             {
+
+                ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+
+                string storedTempAppKey = localSettings.Values["TempAppKey"] as string;
+
+                if (storedTempAppKey != null)
+                {
+                    // Save a setting locally on the device
+                    localSettings.Values["AppKey"] = storedTempAppKey;
+                }
+
                 await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    if (navigationModules.Count > NavView.MenuItems.Count)
+                    OverlayViewModel.Instance.StartOverlay();
+                    if (OverlayPage.Instance.IsVideoFeedActive == false)
                     {
-                        for (int i = 1; i < navigationModules.Count; ++i)
-                        {
-                            var module = navigationModules[i];
-                            NavView.MenuItems.Add(new NavigationViewItemHeader() { Content = module.header });
-                            foreach (var item in module.items)
-                            {
-                                NavView.MenuItems.Add(item.Key);
-                            }
-                        }
+                        OverlayPage.Instance.StartVideoFeed();
                     }
+
+                    NavView.MenuItems.RemoveAt(0);
+
+                    for (int i = 1; i < menuItems.Count; ++i)
+                    {
+                        var item = menuItems[i];
+                        NavView.MenuItems.Add(item.Key);
+                    }
+
+                    setContentFrameContent(typeof(Pages.RoutePage));
                 });
+
             }
         }
     }

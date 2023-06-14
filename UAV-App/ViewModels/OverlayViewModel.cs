@@ -184,11 +184,13 @@ namespace UAV_App.ViewModels
                         {
                             SwapChainRow = 0;
                             SwapChainColumn = 0;
+                            SwapChainWidth = 2;
                         }
                         else
                         {
                             SwapChainRow = 1;
                             SwapChainColumn = 1;
+                            SwapChainWidth = 1;
                         }
                     }, delegate () { return true; });
                 }
@@ -196,7 +198,7 @@ namespace UAV_App.ViewModels
             }
         }
 
-        private SolidColorBrush _setHomeColor = new SolidColorBrush(Colors.Red);
+        private SolidColorBrush _setHomeColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 204, 204));
         public SolidColorBrush SetHomeColor
         {
             get
@@ -335,6 +337,20 @@ namespace UAV_App.ViewModels
                 OnPropertyChanged(nameof(SwapChainColumn));
             }
         }
-        
+
+        private int _swapChainWidth = 1;
+        public int SwapChainWidth
+        {
+            get
+            {
+                return _swapChainWidth;
+            }
+            set
+            {
+                _swapChainWidth = value;
+                OnPropertyChanged(nameof(SwapChainWidth));
+            }
+        }
+
     }
 }
