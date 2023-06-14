@@ -50,9 +50,9 @@
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Ensure GroundStationMode Enabled .</TextBlock>
                         <Button Margin="0,6,0,0" Command="{Binding SetGroundStationModeEnabled}" >Set GroundStationMode Enabled</Button>
 
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Init a ready-made mission</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Init a ready-made waypoint mission with 4 waypoints.</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding InitWaypointMission}" >Init mission</Button>
+                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}">switches maptype</TextBlock>
+                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Changes between satelite view and normal map mode. sateliteview cant be used offline</TextBlock>
+                        <Button Margin="0,6,0,0" Click="ChangeMapTypeClick" >change map type</Button>
 
                         <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Add add 'STAY' action to a waypoint</TextBlock>
                         <TextBlock Style="{StaticResource BodyTextBlockStyle}"> We could add some actions to the waypoint like staying. Press the button to add 'STAY' action to the second waypoint.</TextBlock>
@@ -97,6 +97,7 @@
                 ZoomLevel="18"
                 Grid.Column="1"
                 Margin="8,0,0,0"
+                Style="Aerial"
                 MapServiceToken="NMdiIpY411Uujir8P3wP~rqeXj9XR5vgl1v4RroN3Ww~AmWbGLKwdGlq-1bPrSniAesWwtNvHMgFDOXD1phZZIvdKi_ftKvp_5AhXoSyqZP7"
                 />
         </Grid>
