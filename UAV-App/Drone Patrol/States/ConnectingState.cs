@@ -21,7 +21,7 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState run()
+        public IPatrolState run(PatrolEvent patrolEvent)
         {
             return null;
         }

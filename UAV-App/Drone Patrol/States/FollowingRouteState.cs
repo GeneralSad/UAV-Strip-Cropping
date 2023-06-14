@@ -21,8 +21,16 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState run()
+        public IPatrolState run(PatrolEvent patrolEvent)
         {
+            if (PatrolEvent.ArrivedAtPoint == patrolEvent)
+            {
+                return new DetectingAnimalsState();
+            } else if (PatrolEvent.PatrolDone == patrolEvent)
+            {
+                return new IdleState();
+            }
+
             return null;
         }
     }

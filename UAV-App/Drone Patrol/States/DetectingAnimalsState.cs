@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UAV_App.Drone_Patrol.States
 {
-    public class DetectingAnimalsState
+    public class DetectingAnimalsState : IPatrolState
     {
         public ParentState getParent()
         {
@@ -21,8 +21,18 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState run()
+        public IPatrolState run(PatrolEvent patrolEvent)
         {
+            if (PatrolEvent.HarmfullAnimalsFound == patrolEvent)
+            {
+                return new ExpelAnimalsState();
+
+            } else if (PatrolEvent.NoHarmfullAnimalsFound == patrolEvent)
+            {
+                return new FollowingRouteState();
+
+            }
+
             return null;
         }
     }

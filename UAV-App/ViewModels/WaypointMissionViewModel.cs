@@ -1,4 +1,4 @@
-﻿using DJI.WindowsSDK;
+using DJI.WindowsSDK;
 using DJI.WindowsSDK.Mission.Waypoint;
 using DJIUWPSample.Commands;
 using DJIUWPSample.ViewModels;
@@ -27,8 +27,9 @@ namespace UAV_App.Pages
         private WaypointMissionViewModel()
         {
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StateChanged += WaypointMission_StateChanged;
+            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged; 
+            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AltitudeChanged += WaypointMission_AltitudeChanged; ;
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ExecutionStateChanged += WaypointMission_ExecuteStateChanged;
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged;
             WaypointMissionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 
             this.WaypointMission = new WaypointMission()
