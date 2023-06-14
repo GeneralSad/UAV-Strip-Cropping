@@ -12,12 +12,15 @@ using System.Windows.Input;
 using UAV_App.Pages;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
 namespace UAV_App.ViewModels
 {
     internal class OverlayViewModel : ViewModelBase
     {
+
+        //Singleton to acces public viewmodel
         private static readonly OverlayViewModel _singleton = new OverlayViewModel();
         public static OverlayViewModel Instance
         {
@@ -27,10 +30,12 @@ namespace UAV_App.ViewModels
             }
         }
 
+        //Empty, can't add listeners when SDK hasn't started yet.
         private OverlayViewModel()
         {
         }
 
+        //Add listeners to SDK events
         public void StartOverlay()
         {
             DJISDKManager.Instance.ComponentManager.GetBatteryHandler(0, 0).ChargeRemainingInPercentChanged += BatteryPercentageChanged;
@@ -75,6 +80,7 @@ namespace UAV_App.ViewModels
             });
         }
 
+        //Update UI, limit decimals to a maximum of 6
         public async void AircraftLocationChanged(object sender, LocationCoordinate2D? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -87,6 +93,7 @@ namespace UAV_App.ViewModels
             });
         }
 
+        //Update Set Home button color to signify if a home point has been set
         public async void AircraftHomeLocationChanged(object sender, BoolMsg? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -108,6 +115,10 @@ namespace UAV_App.ViewModels
             });
         }
 
+        //Update UI speed values
+        //SDK returns speeds in North, East, Down
+        //To display horizontal speed take absolute of north and east value and add them together
+        //For vertical take absolute value of down
         public async void AircraftVelocityChanged(object sender, Velocity3D? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -122,6 +133,7 @@ namespace UAV_App.ViewModels
             });
         }
 
+        //Emergency stop logic
         public ICommand _emergencyStop;
         public ICommand EmergencyStop
         {
@@ -129,7 +141,7 @@ namespace UAV_App.ViewModels
             {
                 if (_emergencyStop == null)
                 {
-                    _emergencyStop = new RelayCommand(async delegate ()
+                    _emergencyStop = new RelayCommand(delegate ()
                     {
                         Debug.WriteLine("Emergency");
                     }, delegate () { return true; });
@@ -138,6 +150,7 @@ namespace UAV_App.ViewModels
             }
         }
 
+        //Make the flight controller update the home location
         public ICommand _setHomePoint;
         public ICommand SetHomePoint
         {
@@ -156,7 +169,33 @@ namespace UAV_App.ViewModels
                 return _setHomePoint;
             }
         }
-        
+
+        //Swap location of the live feed
+        public ICommand _feedTapped;
+        public ICommand FeedTapped
+        {
+            get
+            {
+                if (_feedTapped == null)
+                {
+                    _feedTapped = new RelayCommand(delegate ()
+                    {
+                        if (SwapChainRow == 1)
+                        {
+                            SwapChainRow = 0;
+                            SwapChainColumn = 0;
+                        }
+                        else
+                        {
+                            SwapChainRow = 1;
+                            SwapChainColumn = 1;
+                        }
+                    }, delegate () { return true; });
+                }
+                return _feedTapped;
+            }
+        }
+
         private SolidColorBrush _setHomeColor = new SolidColorBrush(Colors.Red);
         public SolidColorBrush SetHomeColor
         {
@@ -268,5 +307,34 @@ namespace UAV_App.ViewModels
                 OnPropertyChanged(nameof(AircraftVerticalSpeed));
             }
         }
+
+        private int _swapChainRow = 1;
+        public int SwapChainRow
+        {
+            get
+            {
+                return _swapChainRow;
+            }
+            set
+            {
+                _swapChainRow = value;
+                OnPropertyChanged(nameof(SwapChainRow));
+            }
+        }
+
+        private int _swapChainColumn = 1;
+        public int SwapChainColumn
+        {
+            get
+            {
+                return _swapChainColumn;
+            }
+            set
+            {
+                _swapChainColumn = value;
+                OnPropertyChanged(nameof(SwapChainColumn));
+            }
+        }
+        
     }
 }
