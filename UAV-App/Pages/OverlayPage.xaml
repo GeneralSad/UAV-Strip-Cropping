@@ -87,7 +87,7 @@
             </Grid>
         </Grid>
 
-        <Viewbox Grid.Row="{Binding SwapChainRow}" Grid.Column="{Binding SwapChainColumn}" x:Name="swapChainPanelBox" Stretch="Uniform">
+        <Viewbox Grid.Row="{Binding SwapChainRow}" Grid.Column="{Binding SwapChainColumn}" Grid.ColumnSpan="{Binding SwapChainWidth}" x:Name="swapChainPanelBox" Stretch="Uniform">
             <SwapChainPanel Width="1920" Height="1080" x:Name="swapChainPanel" Visibility="Visible">
                 <i:Interaction.Behaviors>
                     <core:EventTriggerBehavior EventName="Tapped">
