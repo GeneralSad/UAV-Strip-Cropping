@@ -117,10 +117,10 @@ namespace UAV_App.Pages
         {
             DataContext = WaypointMissionViewModel.Instance;
             base.OnNavigatedTo(e);
-            GetIfInSimulation();
+            InitMap();
         }
 
-        private void GetIfInSimulation()
+        private void InitMap()
         {
 
            var aircraftLocaton = new LocationCoordinate2D() { latitude = 51.6077955, longitude = 4.7625830};
