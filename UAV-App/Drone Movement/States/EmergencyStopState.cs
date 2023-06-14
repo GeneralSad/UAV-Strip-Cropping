@@ -21,8 +21,17 @@ namespace UAV_App.Drone_Movement.States
         {
         }
 
-        public IMovementState run()
+        public IMovementState run(MovementEvent movementEvent)
         {
+            if (MovementEvent.EmergencyReturn == movementEvent)
+            {
+                return new HoverState();
+            } else if (MovementEvent.EmergencyLand == movementEvent)
+            {
+                return new LandingState();
+            }
+
+
             return null;
         }
     }

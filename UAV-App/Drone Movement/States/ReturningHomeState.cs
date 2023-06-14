@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UAV_App.Drone_Movement.States
 {
-    public class IdleState : IMovementState
+    internal class ReturningHomeState : IMovementState
     {
         public ParentState getParent()
         {
@@ -23,12 +23,14 @@ namespace UAV_App.Drone_Movement.States
 
         public IMovementState run(MovementEvent movementEvent)
         {
-            if (MovementEvent.Prepare == movementEvent)
+            if (MovementEvent.ReturnedHome == movementEvent)
             {
-                return new PreparingState();
+                return new IdleState();
             }
 
             return null;
         }
+
+    
     }
 }

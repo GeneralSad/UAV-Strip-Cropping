@@ -21,8 +21,13 @@ namespace UAV_App.Drone_Movement.States
         {
         }
 
-        public IMovementState run()
+        public IMovementState run(MovementEvent movementEvent)
         {
+            if (MovementEvent.LandingDone == movementEvent)
+            {
+                return new IdleState();
+            }
+
             return null;
         }
     }
