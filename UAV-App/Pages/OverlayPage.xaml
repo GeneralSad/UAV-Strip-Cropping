@@ -3,7 +3,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:Custom="using:Microsoft.UI.Xaml.Controls"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:Custom="using:Microsoft.UI.Xaml.Controls" 
+    xmlns:viewmodels="using:UAV_App.ViewModels" 
+    d:DataContext="{d:DesignInstance Type=viewmodels:OverlayViewModel}"
     x:Class="UAV_App.Pages.OverlayPage"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -83,8 +87,14 @@
             </Grid>
         </Grid>
 
-        <Viewbox Grid.Row="1" Grid.Column="1" x:Name="swapChainPanelBox" Stretch="Uniform">
-            <SwapChainPanel Width="1920" Height="1080" x:Name="swapChainPanel" Visibility="Visible"/>
+        <Viewbox Grid.Row="{Binding SwapChainRow}" Grid.Column="{Binding SwapChainColumn}" x:Name="swapChainPanelBox" Stretch="Uniform">
+            <SwapChainPanel Width="1920" Height="1080" x:Name="swapChainPanel" Visibility="Visible">
+                <i:Interaction.Behaviors>
+                    <core:EventTriggerBehavior EventName="Tapped">
+                        <core:InvokeCommandAction Command="{Binding FeedTapped}"></core:InvokeCommandAction>
+                    </core:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </SwapChainPanel>
         </Viewbox>
 
     </Grid>

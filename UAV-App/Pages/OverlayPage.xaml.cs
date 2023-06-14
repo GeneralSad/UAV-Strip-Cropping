@@ -20,38 +20,64 @@ namespace UAV_App.Pages
     public sealed partial class OverlayPage : Page
     {
 
-        public static OverlayPage Instance;
+        //Singleton to acces public methods
+        private static OverlayPage _singleton;
+        public static OverlayPage Instance
+        {
+            get
+            {
+                return _singleton;
+            }
+        }
 
-        public bool IsVideoFeedActive;
+        public bool IsVideoFeedActive = false;
 
         private Parser videoParser;
 
+        //Connect event handlers
         public OverlayPage()
         {
             this.InitializeComponent();
 
             if (Instance == null)
             {
-                Instance = this;
+                _singleton = this;
             }
-            swapChainPanel.Tapped += OnFeedTapped;
-            OverlayViewModel.Instance.PropertyChanged += ViewModel_PropertyChanged;
 
+            OverlayViewModel.Instance.PropertyChanged += ViewModel_PropertyChanged;
         }
 
+        //Event handler for when properties change in viewmodel
         private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
         }
 
+        //Event handler for when overlay opens
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             DataContext = OverlayViewModel.Instance;
             base.OnNavigatedFrom(e);
         }
 
+        //Event handler for when overlay closes
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+        }
+
+        //Start live video overlay for overlay initialization
+        public async void StartVideoFeed()
+        {
+            InitializeVideoFeedModule();
+            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
+            IsVideoFeedActive = true;
+        }
+
+        //Stop video overlay when needed
+        public void StopVideoFeed()
+        {
+            UninitializeVideoFeedModule();
+            IsVideoFeedActive = false;
         }
 
         private async void InitializeVideoFeedModule()
@@ -80,6 +106,7 @@ namespace UAV_App.Pages
             });
         }
 
+        //Remove event handlers from events to stop video feed
         private void UninitializeVideoFeedModule()
         {
             if (DJISDKManager.Instance.SDKRegistrationResultCode == SDKError.NO_ERROR)
@@ -87,17 +114,6 @@ namespace UAV_App.Pages
                 videoParser.SetSurfaceAndVideoCallback(0, 0, null, null);
                 DJISDKManager.Instance.VideoFeeder.GetPrimaryVideoFeed(0).VideoDataUpdated -= OnVideoPush;
             }
-        }
-
-        //raw data
-        void OnVideoPush(VideoFeed sender, byte[] bytes)
-        {
-            videoParser.PushVideoData(0, 0, bytes, bytes.Length);
-        }
-
-        //Decode data. Do nothing here. This function would return a bytes array with image data in RGBA format.
-        void ReceiveDecodedData(byte[] data, int width, int height)
-        {
         }
 
         //We need to set the camera type of the aircraft to the DJIVideoParser. After setting camera type, DJIVideoParser would correct the distortion of the video automatically.
@@ -117,45 +133,18 @@ namespace UAV_App.Pages
                         this.videoParser.SetCameraSensor(AircraftCameraType.Others);
                         break;
                 }
-
             }
         }
 
-        public async void StartVideoFeed()
+        //Handle raw data
+        void OnVideoPush(VideoFeed sender, byte[] bytes)
         {
-            InitializeVideoFeedModule();
-            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(new CameraWorkModeMsg { value = CameraWorkMode.SHOOT_PHOTO });
-            IsVideoFeedActive = true;
+            videoParser.PushVideoData(0, 0, bytes, bytes.Length);
         }
 
-        public void StopVideoFeed()
+        //Decode data. This function receives a byte array with image data in RGBA format.
+        void ReceiveDecodedData(byte[] data, int width, int height)
         {
-            UninitializeVideoFeedModule();
-            IsVideoFeedActive = false;
-        }
-
-        public void ToggleFullscreen()
-        {
-            if ((int) swapChainPanelBox.GetValue(Grid.RowProperty) == 1)
-            {
-                swapChainPanelBox.SetValue(Grid.RowProperty, 0);
-                swapChainPanelBox.SetValue(Grid.ColumnProperty, 0);
-            }
-            else
-            {
-                swapChainPanelBox.SetValue(Grid.RowProperty, 1);
-                swapChainPanelBox.SetValue(Grid.ColumnProperty, 1);
-            }
-        }
-
-        public SwapChainPanel GetFeed()
-        {
-            return swapChainPanel;
-        }
-
-        private void OnFeedTapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
-        {
-            ToggleFullscreen();
         }
 
     }

@@ -16,6 +16,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 using DateTime = System.DateTime;
 
@@ -24,19 +25,24 @@ namespace UAV_App.Drone_Patrol
     public class CameraCommandHandler
     {
 
+        //Default values for camera
         private const double defaultPitch = -90;
         private const double defaultSpeed = 1;
 
+        //Amount of seconds to wait on receiving the list of images from the drone
         private const double downloadTimeout = 1;
+
+        //Amount of seconds to wait on the movement of the gimval
         private const double gimbalTimeout = 1.5;
 
+        //Amount of degrees of accuracy for the gimbal to take a photo
         private const double gimbalAccuracy = 2.5;
-
 
         public ObservableCollection<MediaFile> files = new ObservableCollection<MediaFile>();
         private readonly CameraHandler cameraHandler = DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0);
         private readonly MediaTaskManager taskManager = new MediaTaskManager(0, 0);
 
+        //Make the gimbal rotate a certain amount of degrees
         public async void SetGimbal(double pitch, double speed = defaultSpeed)
         {
             GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
@@ -54,18 +60,21 @@ namespace UAV_App.Drone_Patrol
             await gimbalHandler.RotateByAngleAsync(gimbalAngleRotation);
         }
 
-        public async Task<double> GetGimbal()
+        //Get the pitch value of the gimbal
+        public async Task<double> GetGimbalPitch()
         {
             GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
             var attitude = await gimbalHandler.GetGimbalAttitudeAsync();
             return attitude.value.Value.pitch;
         }
 
+        //Set gimbal to default gimbal postion
         public void ResetGimbal()
         {
             SetGimbal(defaultPitch);
         }
 
+        //Reset camera settings and rotate gimbal to default position
         public async Task ResetCamera()
         {
             await SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
@@ -98,7 +107,7 @@ namespace UAV_App.Drone_Patrol
 
             ResetGimbal();
 
-            double gimbalPitch = await GetGimbal();
+            double gimbalPitch = await GetGimbalPitch();
 
             DateTime time = DateTime.Now;
             while (gimbalPitch - defaultPitch > gimbalAccuracy)
@@ -108,56 +117,45 @@ namespace UAV_App.Drone_Patrol
                     Debug.WriteLine("Gimbal move timeout");
                     return;
                 }
-                gimbalPitch = await GetGimbal();
+                gimbalPitch = await GetGimbalPitch();
                 Debug.WriteLine(gimbalPitch - defaultPitch);
             }
         }
 
+        //Make the drone take a photo and 
         public async void TakePhoto()
         {
             await ResetCamera();
 
-            if (DJISDKManager.Instance.ComponentManager != null)
+            var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).StartShootPhotoAsync();
+            if (retCode != SDKError.NO_ERROR)
             {
-                var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).StartShootPhotoAsync();
-                if (retCode != SDKError.NO_ERROR)
-                {
-                    Debug.WriteLine("Failed to shoot photo, result code is " + retCode.ToString());
-                }
-                else
-                {
-                    Debug.WriteLine("Shoot photo successfully");
-                }
+                Debug.WriteLine("Failed to shoot photo, result code is " + retCode.ToString());
             }
             else
             {
-                Debug.WriteLine("SDK hasn't been activated yet.");
+                Debug.WriteLine("Shoot photo successfully");
             }
+
         }
 
         private async Task<bool> SetCameraWorkMode(CameraWorkMode mode)
         {
-            if (DJISDKManager.Instance.ComponentManager != null)
+            CameraWorkModeMsg workMode = new CameraWorkModeMsg
             {
-                CameraWorkModeMsg workMode = new CameraWorkModeMsg
-                {
-                    value = mode,
-                };
-                var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(workMode);
-                if (retCode != SDKError.NO_ERROR)
-                {
-                    Debug.WriteLine("Set camera work mode to " + mode.ToString() + "failed, result code is " + retCode.ToString());
-                    return false;
-                }
-                return true;
-            }
-            else
+                value = mode,
+            };
+            var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraWorkModeAsync(workMode);
+            if (retCode != SDKError.NO_ERROR)
             {
-                Debug.WriteLine("SDK hasn't been activated yet.");
+                Debug.WriteLine("Set camera work mode to " + mode.ToString() + "failed, result code is " + retCode.ToString());
                 return false;
             }
+            return true;
         }
 
+        //Request list of downloadable items from drone.
+        //Wait for response, then download most recent files
         public async void GetMostRecentPhoto()
         {
             await LoadFiles(MediaFileListLocation.SD_CARD);
@@ -175,6 +173,8 @@ namespace UAV_App.Drone_Patrol
             DownloadRecentFile();
         }
 
+        //Request list of downloadable items from drone.
+        //Wait for response, then download all files
         public async void GetPhotos()
         {
             await LoadFiles(MediaFileListLocation.SD_CARD);
@@ -192,6 +192,7 @@ namespace UAV_App.Drone_Patrol
             DownloadAllFiles();
         }
 
+        //Download all files from the list
         private void DownloadAllFiles()
         {
             foreach (var file in files)
@@ -200,12 +201,14 @@ namespace UAV_App.Drone_Patrol
             }
         }
 
+        //Download most recent file
         private void DownloadRecentFile()
         {
             MediaFile file = files.Last();
             this.DownloadSingle(file);
         }
 
+        //Request files from drone
         private async Task<bool> LoadFiles(MediaFileListLocation fileLocation)
         {
             var result = await cameraHandler.GetCameraWorkModeAsync();
@@ -252,6 +255,8 @@ namespace UAV_App.Drone_Patrol
             return true;
         }
 
+
+        //Download a single file
         private async void DownloadSingle(MediaFile file)
         {
             var request = new MediaFileDownloadRequest
@@ -284,10 +289,12 @@ namespace UAV_App.Drone_Patrol
             taskManager.PushBack(task);
         }
 
-        public async void TakeScreenshot()
+        //Take a screenshot of the live feed
+        //Faster method of getting photos, resolution is lower than downloading
+        public async void TakeScreenshot(SwapChainPanel swapChainPanel)
         {
             var _bitmap = new RenderTargetBitmap();
-            await _bitmap.RenderAsync(OverlayPage.Instance?.GetFeed());
+            await _bitmap.RenderAsync(swapChainPanel);
 
             var savePicker = new FileSavePicker
             {

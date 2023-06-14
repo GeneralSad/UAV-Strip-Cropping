@@ -36,9 +36,9 @@ namespace UAV_App.DJISDKInitializing
                 if (resultCode == SDKError.NO_ERROR)
                 {
                     OverlayViewModel.Instance.StartOverlay();
-                    if (OverlayPage.Instance?.IsVideoFeedActive == false)
+                    if (OverlayPage.Instance.IsVideoFeedActive == false)
                     {
-                        OverlayPage.Instance?.StartVideoFeed();
+                        OverlayPage.Instance.StartVideoFeed();
                     }
                 }
             });
