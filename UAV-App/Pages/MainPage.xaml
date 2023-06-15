@@ -14,8 +14,8 @@
                         Loaded="NavView_Loaded"
                         Windows10version1809:PaneDisplayMode="Top"
                         IsBackButtonVisible="Collapsed"
-                        Header="UAV App">
-            <Frame x:Name="ContentFrame" Margin="24"/>
+                        >
+            <Frame x:Name="ContentFrame"/>
         </NavigationView>
     </Grid>
 </Page>
