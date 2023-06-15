@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="UAV_App.Pages.RoutePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -36,6 +36,7 @@
                 <Button Command="{Binding EmergencyStop}" >Emergency</Button>
                 <Button Command="{Binding GoHome}" >Go Home</Button>
                 <Button Command="{Binding StartLanding}" >Land</Button>
+                                <Button Command="{Binding StartAttackMission}" >attackMission</Button>
                 <Button Click="ChangeMapTypeClick" >Change Map</Button>
             
             </StackPanel>
@@ -56,6 +57,8 @@
                 <TextBlock> Waypoint State:</TextBlock>
                 <TextBlock Text="{Binding WaypointMissionState}"></TextBlock>
             </StackPanel>
+        </StackPanel>
+        
         </StackPanel>
 
         <maps:MapControl

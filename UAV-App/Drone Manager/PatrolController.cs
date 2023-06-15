@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UAV_App.Drone_Movement;
 using UAV_App.Drone_Patrol;
+using UAV_App.Pages;
 
 namespace UAV_App.Drone_Manager
 {
@@ -14,7 +15,16 @@ namespace UAV_App.Drone_Manager
         private PatrolStateMachine patrolStateMachine;
         private DroneMovementStateMachine droneMovementStateMachine;
 
-        public PatrolController() 
+        private static readonly PatrolController _singleton = new PatrolController();
+        public static PatrolController Instance
+        {
+            get
+            {
+                return _singleton;
+            }
+        }
+
+        private PatrolController() 
         {
             init();
 
@@ -76,7 +86,7 @@ namespace UAV_App.Drone_Manager
 
         public void startRouteEvent()
         {
-            throw new NotImplementedException();
+            this.patrolStateMachine.PatrouilleStarted();
         }
     }
 }

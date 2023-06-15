@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.Drone_Manager;
 using UAV_App.Pages;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
@@ -143,6 +144,7 @@ namespace UAV_App.ViewModels
                 {
                     _emergencyStop = new RelayCommand(delegate ()
                     {
+                        PatrolController.Instance.emergencyStopEvent();
                         Debug.WriteLine("Emergency");
                     }, delegate () { return true; });
                 }

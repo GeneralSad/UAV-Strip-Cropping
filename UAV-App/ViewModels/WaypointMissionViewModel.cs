@@ -6,7 +6,9 @@ using DJIUWPSample.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.Drone_Manager;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -27,8 +29,7 @@ namespace UAV_App.Pages
         private WaypointMissionViewModel()
         {
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StateChanged += WaypointMission_StateChanged;
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged; 
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AltitudeChanged += WaypointMission_AltitudeChanged; ;
+            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged;
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ExecutionStateChanged += WaypointMission_ExecuteStateChanged;
             WaypointMissionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 
@@ -72,6 +73,8 @@ namespace UAV_App.Pages
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 WaypointMissionState = value.HasValue ? value.Value.current : WaypointMissionState.UNKNOWN;
+
+                // if (WaypointMissionState.Equals(WaypointMissionState.))
             });
         }
 
@@ -189,7 +192,7 @@ namespace UAV_App.Pages
             }
         }
 
-         public ICommand _emergencyStop;
+        public ICommand _emergencyStop;
         public ICommand EmergencyStop
         {
             get
@@ -199,10 +202,10 @@ namespace UAV_App.Pages
                     _emergencyStop = new RelayCommand(async delegate ()
                     {
 
-                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();  
+                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
                         var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err.ToString()));
                         await messageDialog.ShowAsync();
- 
+
 
                     }, delegate () { return true; });
                 }
@@ -219,9 +222,9 @@ namespace UAV_App.Pages
                 {
                     _goHome = new RelayCommand(async delegate ()
                     {
-                        var err1 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGoHomeHeightAsync(new IntMsg() { value = 40});
-             
-                        var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();;  
+                        var err1 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGoHomeHeightAsync(new IntMsg() { value = 40 });
+
+                        var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync(); ;
 
                         var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err1.ToString() + " go home async result" + err2.ToString()));
                         await messageDialog.ShowAsync();
@@ -242,7 +245,7 @@ namespace UAV_App.Pages
                 {
                     _goHome = new RelayCommand(async delegate ()
                     {
-                        var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync();;  
+                        var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartAutoLandingAsync(); ;
 
                         var messageDialog = new MessageDialog(String.Format("Start auto landing: {0}.", err.ToString()));
                         await messageDialog.ShowAsync();
@@ -284,6 +287,26 @@ namespace UAV_App.Pages
             Waypoint waypoint = new Waypoint()
             {
                 location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
+                altitude = 40,
+                gimbalPitch = -90,
+                turnMode = WaypointTurnMode.CLOCKWISE,
+                heading = 0,
+                actionRepeatTimes = 1,
+                actionTimeoutInSeconds = 60,
+                cornerRadiusInMeters = 0.2,
+                speed = 0,
+                shootPhotoTimeInterval = -1,
+                shootPhotoDistanceInterval = -1,
+                waypointActions = new List<WaypointAction>() { new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 5000 }, new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO } }
+            };
+            return waypoint;
+        }
+
+        private Waypoint InitDumpAttackWaypoint(double latitude, double longitude)
+        {
+            Waypoint waypoint = new Waypoint()
+            {
+                location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
                 altitude = 10,
                 gimbalPitch = -90,
                 turnMode = WaypointTurnMode.CLOCKWISE,
@@ -294,7 +317,7 @@ namespace UAV_App.Pages
                 speed = 0,
                 shootPhotoTimeInterval = -1,
                 shootPhotoDistanceInterval = -1,
-                waypointActions = new List<WaypointAction>() { new WaypointAction() {actionType = WaypointActionType.STAY, actionParam = 5000} }
+                waypointActions = new List<WaypointAction>() { new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 5000 }, new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO } }
             };
             return waypoint;
         }
@@ -323,77 +346,157 @@ namespace UAV_App.Pages
             }
         }
 
+        public List<Waypoint> getFoundAnimalPoints()
+        {
+            //TESTCODE
+            WaypointMission waypoints = WaypointMission;
+            return waypoints.waypoints;
 
-    public ICommand _loadMission;
-    public ICommand LoadMission
-    {
-        get
-        {
-            if (_loadMission == null)
-            {
-                _loadMission = new RelayCommand(async delegate ()
-                {
-                    SDKError err1 = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
-                    SDKError err2 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
-                    
-                    var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}, upload mission result",  err1.ToString(), err2.ToString()));
-                    await messageDialog.ShowAsync();
-                }, delegate () { return true; });
-            }
-            return _loadMission;
         }
-    }
-    public ICommand _setGroundStationModeEnabled;
-    public ICommand SetGroundStationModeEnabled
-    {
-        get
-        {
-            if (_setGroundStationModeEnabled == null)
-            {
-                _setGroundStationModeEnabled = new RelayCommand(async delegate ()
-                {
-                    SDKError err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGroundStationModeEnabledAsync(new BoolMsg() { value = true });
-                    var messageDialog = new MessageDialog(String.Format("Set GroundStationMode Enabled: {0}", err.ToString()));
-                    await messageDialog.ShowAsync();
-                }, delegate () { return true; });
-            }
-            return _setGroundStationModeEnabled;
-        }
-    }
-    public ICommand _uploadMission;
-    public ICommand UploadMission
-    {
-        get
-        {
-            if (_uploadMission == null)
-            {
-                _uploadMission = new RelayCommand(async delegate ()
-                {
-                    SDKError err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
-                    var messageDialog = new MessageDialog(String.Format("Upload mission to aircraft: {0}", err.ToString()));
-                    await messageDialog.ShowAsync();
-                }, delegate () { return true; });
-            }
-            return _uploadMission;
-        }
-    }
 
-    public ICommand _startMission;
-    public ICommand StartMission
-    {
-        get
+        public async Task<bool> startAttackMission(List<Waypoint> waypoints)
         {
-            if (_startMission == null)
+            WaypointMission attackMission = new WaypointMission();
+            List<Waypoint> attackMissionWaypoints = new List<Waypoint>();
+            foreach (Waypoint waypoint in waypoints)
             {
-                _startMission = new RelayCommand(async delegate ()
-                {
-                    var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
-                    var messageDialog = new MessageDialog(String.Format("Start mission: {0}", err.ToString()));
-                    await messageDialog.ShowAsync();
-                }, delegate () { return true; });
+                attackMissionWaypoints.Add(waypoint);
+                LocationCoordinate2D loc = waypoint.location;
+
+                attackMissionWaypoints.Add(InitDumpAttackWaypoint(loc.latitude, loc.longitude)); ;
             }
-            return _startMission;
+
+            attackMission.waypoints = attackMissionWaypoints;
+            SDKError err = SDKError.UNKNOWN;
+
+            for (int i = 0; i < 10; i++)
+            {
+                err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(attackMission);
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+            }
+
+            if (err != SDKError.NO_ERROR) return false;
+
+
+            for (int i = 0; i < 10; i++)
+            {
+                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+
+            }
+
+            if (err != SDKError.NO_ERROR) return false;
+
+            for (int i = 0; i < 10; i++)
+            {
+                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public ICommand _loadMission;
+        public ICommand LoadMission
+        {
+            get
+            {
+                if (_loadMission == null)
+                {
+                    _loadMission = new RelayCommand(async delegate ()
+                    {
+                        SDKError err1 = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(this.WaypointMission);
+                        SDKError err2 = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+
+                        var messageDialog = new MessageDialog(String.Format("SDK load mission: {0}, upload mission result", err1.ToString(), err2.ToString()));
+                        await messageDialog.ShowAsync();
+                    }, delegate () { return true; });
+                }
+                return _loadMission;
+            }
+        }
+        public ICommand _setGroundStationModeEnabled;
+        public ICommand SetGroundStationModeEnabled
+        {
+            get
+            {
+                if (_setGroundStationModeEnabled == null)
+                {
+                    _setGroundStationModeEnabled = new RelayCommand(async delegate ()
+                    {
+                        SDKError err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGroundStationModeEnabledAsync(new BoolMsg() { value = true });
+                        var messageDialog = new MessageDialog(String.Format("Set GroundStationMode Enabled: {0}", err.ToString()));
+                        await messageDialog.ShowAsync();
+                    }, delegate () { return true; });
+                }
+                return _setGroundStationModeEnabled;
+            }
+        }
+        public ICommand _uploadMission;
+        public ICommand UploadMission
+        {
+            get
+            {
+                if (_uploadMission == null)
+                {
+                    _uploadMission = new RelayCommand(async delegate ()
+                    {
+                        SDKError err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+                        var messageDialog = new MessageDialog(String.Format("Upload mission to aircraft: {0}", err.ToString()));
+                        await messageDialog.ShowAsync();
+                    }, delegate () { return true; });
+                }
+                return _uploadMission;
+            }
+        }
+
+        public ICommand _startMission;
+        public ICommand StartMission
+        {
+            get
+            {
+                if (_startMission == null)
+                {
+                    _startMission = new RelayCommand(async delegate ()
+                    {
+                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
+                        var messageDialog = new MessageDialog(String.Format("Start mission: {0}", err.ToString()));
+
+                        await messageDialog.ShowAsync();
+
+                        PatrolController.Instance.startRouteEvent();
+                    }, delegate () { return true; });
+                }
+                return _startMission;
+            }
+        }
+
+          public ICommand _startAttackMission;
+        public ICommand StartAttackMission
+        {
+            get
+            {
+                if (_startAttackMission == null)
+                {
+                    _startAttackMission = new RelayCommand(async delegate ()
+                    {
+                        await startAttackMission(WaypointMission.waypoints);
+                    }, delegate () { return true; });
+                }
+                return _startAttackMission;
+            }
         }
     }
-}
 }

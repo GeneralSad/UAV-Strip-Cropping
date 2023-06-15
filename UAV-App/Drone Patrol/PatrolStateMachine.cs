@@ -40,6 +40,8 @@ namespace UAV_App.Drone_Patrol
                         break;
                 }
             }
+
+            Console.WriteLine($"state changed frone {this.activeState} to {state}");
             activeState = state;
             activeState.onEnter(); // On enter
         }
