@@ -356,7 +356,6 @@ namespace UAV_App.Pages
 
         public async Task<bool> startAttackMission(List<Waypoint> waypoints)
         {
-            WaypointMission attackMission = new WaypointMission();
             List<Waypoint> attackMissionWaypoints = new List<Waypoint>();
             foreach (Waypoint waypoint in waypoints)
             {
@@ -365,6 +364,27 @@ namespace UAV_App.Pages
 
                 attackMissionWaypoints.Add(InitDumpAttackWaypoint(loc.latitude, loc.longitude)); ;
             }
+
+            WaypointMission attackMission = new WaypointMission()
+            {
+                waypointCount = 0,
+                maxFlightSpeed = 15,
+                autoFlightSpeed = 10,
+                finishedAction = WaypointMissionFinishedAction.NO_ACTION, //TODO set go home
+                headingMode = WaypointMissionHeadingMode.AUTO,
+                flightPathMode = WaypointMissionFlightPathMode.NORMAL,
+                gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
+                exitMissionOnRCSignalLostEnabled = false,
+                pointOfInterest = new LocationCoordinate2D()
+                {
+                    latitude = 0,
+                    longitude = 0
+                },
+                gimbalPitchRotationEnabled = true,
+                repeatTimes = 0,
+                missionID = 0,
+                waypoints = attackMissionWaypoints
+            };
 
             attackMission.waypoints = attackMissionWaypoints;
             SDKError err = SDKError.UNKNOWN;
