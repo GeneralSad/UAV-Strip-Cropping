@@ -46,6 +46,7 @@ namespace UAV_App.ViewModels
 
             DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).IsHomeLocationSetChanged += AircraftHomeLocationChanged;
             DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).VelocityChanged += AircraftVelocityChanged;
+            DJISDKManager.Instance.EnableDebugLogSystem();
         }
 
         public async void BatteryPercentageChanged(object sender, IntMsg? value)
