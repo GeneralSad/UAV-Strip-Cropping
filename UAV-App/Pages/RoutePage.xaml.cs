@@ -133,8 +133,8 @@ namespace UAV_App.Pages
         private void RedrawWaypoint()
         {
             List<BasicGeoposition> waypointPositions = new List<BasicGeoposition>();
-            WaypointMission mission = WaypointMissionViewModel.Instance.WaypointMission;
-            for (int i= 0; i < mission.waypoints.Count(); ++i)
+            List<LocationCoordinate2D> geoPoints = WaypointMissionViewModel.Instance.geoPoints;
+            for (int i= 0; i < geoPoints.Count(); ++i)
             {
 
                 if (waypointLayer.MapElements.Count == i)
@@ -148,14 +148,14 @@ namespace UAV_App.Pages
                     waypointLayer.MapElements.Add(waypointIcon);
                 }
 
-                var geolocation = new BasicGeoposition() { Latitude = mission.waypoints[i].location.latitude, Longitude = mission.waypoints[i].location.longitude };
+                var geolocation = new BasicGeoposition() { Latitude = geoPoints[i].latitude, Longitude = geoPoints[i].longitude };
                 (waypointLayer.MapElements[i] as MapIcon).Location = new Geopoint(geolocation);
                 waypointPositions.Add(geolocation);
             }
 
             if (waypointPositions.Count < waypointLayer.MapElements.Count)
             {
-                for (int i = waypointLayer.MapElements.Count; i > mission.waypointCount; i--)
+                for (int i = waypointLayer.MapElements.Count; i > geoPoints.Count; i--)
                 {
                     waypointLayer.MapElements.RemoveAt(i -1);
                 }

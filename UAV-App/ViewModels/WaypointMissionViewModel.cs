@@ -27,7 +27,7 @@ namespace UAV_App.Pages
             }
         }
 
-        private List<LocationCoordinate2D> geoPoints;
+        public List<LocationCoordinate2D> geoPoints { get; set;}
 
         private WaypointMissionViewModel()
         {
