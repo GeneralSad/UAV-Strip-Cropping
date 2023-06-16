@@ -55,8 +55,8 @@ namespace UAV_App.Pages
             WaypointMap.MapTapped += (MapControl sender, MapInputEventArgs args) => {
             var loc = args.Location;
 
-
             WaypointMissionViewModel.Instance.AddWaypoint(loc.Position.Latitude, loc.Position.Longitude);
+                RedrawWaypoint();
             };
 
             WaypointMap.MapRightTapped  += (MapControl sender, MapRightTappedEventArgs args) => {
