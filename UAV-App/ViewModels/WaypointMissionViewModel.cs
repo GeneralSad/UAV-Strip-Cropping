@@ -370,7 +370,7 @@ namespace UAV_App.Pages
                 waypointCount = 0,
                 maxFlightSpeed = 15,
                 autoFlightSpeed = 10,
-                finishedAction = WaypointMissionFinishedAction.NO_ACTION, //TODO set go home
+                finishedAction = WaypointMissionFinishedAction.NO_ACTION, 
                 headingMode = WaypointMissionHeadingMode.AUTO,
                 flightPathMode = WaypointMissionFlightPathMode.NORMAL,
                 gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
@@ -397,6 +397,8 @@ namespace UAV_App.Pages
                 {
                     break;
                 }
+
+                await Task.Delay(1000);
             }
 
             if (err != SDKError.NO_ERROR) return false;
@@ -411,7 +413,7 @@ namespace UAV_App.Pages
                     break;
                 }
 
-
+                await Task.Delay(1000);
             }
 
             if (err != SDKError.NO_ERROR) return false;
@@ -424,6 +426,8 @@ namespace UAV_App.Pages
                 {
                     return true;
                 }
+
+                await Task.Delay(1000);
             }
             return false;
         }
