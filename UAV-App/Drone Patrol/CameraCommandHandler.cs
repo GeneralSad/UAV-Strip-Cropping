@@ -158,6 +158,7 @@ namespace UAV_App.Drone_Patrol
         //Wait for response, then download most recent files
         public async void GetMostRecentPhoto()
         {
+            Debug.WriteLine("Loading");
             await LoadFiles(MediaFileListLocation.SD_CARD);
 
             DateTime time = DateTime.Now;
@@ -170,6 +171,7 @@ namespace UAV_App.Drone_Patrol
                 }
             }
 
+            Debug.WriteLine("Downloading");
             DownloadRecentFile();
         }
 

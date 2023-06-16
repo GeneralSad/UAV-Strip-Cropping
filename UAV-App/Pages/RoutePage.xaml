@@ -34,6 +34,7 @@
                 <Button Command="{Binding GoHome}" >Go Home</Button>
                 <Button Command="{Binding StartLanding}" >Land</Button>
                 <Button Command="{Binding StartAttackMission}" >attackMission</Button>
+                <Button Command="{Binding DownloadMedia}" >Download</Button>
                 <Button Click="ChangeMapTypeClick" >Change Map</Button>
 
             </StackPanel>

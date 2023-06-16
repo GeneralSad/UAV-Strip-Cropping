@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using UAV_App.Drone_Manager;
+using UAV_App.Drone_Patrol;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -118,7 +119,22 @@ namespace UAV_App.Pages
             }
         }
 
-
+        private ICommand _downloadMedia;
+        public ICommand DownloadMedia
+        {
+            get
+            {
+                if (_downloadMedia == null)
+                {
+                    _downloadMedia = new RelayCommand(delegate ()
+                    {
+                        CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
+                        cameraCommandHandler.GetMostRecentPhoto();
+                    }, delegate () { return true; });
+                }
+                return _downloadMedia;
+            }
+        }
 
         bool ShouldPause = true;
 
