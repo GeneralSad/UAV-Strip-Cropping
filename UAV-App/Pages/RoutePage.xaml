@@ -12,91 +12,65 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel>
-            <TextBlock FontSize="36" Style="{StaticResource TitleTextBlockStyle}"> Waypoint Mission</TextBlock>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3.5*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" VerticalScrollMode="Disabled" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Horizontal">
+
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="5"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <Button Command="{Binding SetGroundStationModeEnabled}" >Set Mode</Button>
+                <Button Command="{Binding AddAction}">Add Action</Button>
+                <Button Command="{Binding LoadMission}" >Load Mission</Button>
+                <Button Command="{Binding UploadMission}" >Upload Mission</Button>
+                <Button Command="{Binding StartMission}" >Start Mission</Button>
+                <Button Command="{Binding PauseResumeMission}" >(Un)pause Mission</Button>
+                <Button Command="{Binding EmergencyStop}" >Emergency</Button>
+                <Button Command="{Binding GoHome}" >Go Home</Button>
+                <Button Command="{Binding StartLanding}" >Land</Button>
+                <Button Click="ChangeMapTypeClick" >Change Map</Button>
+            
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Margin" Value="5"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock> Action State:</TextBlock>
+                <TextBlock Text="RETURN_TO_FIRST_POINT"></TextBlock>
+                <!--<TextBlock Text="{Binding WaypointMissionExecuteState}">RETURN_TO_FIRST_POINT</TextBlock>-->
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock> Waypoint State:</TextBlock>
+                <TextBlock Text="READY_TO_EXECUTE"></TextBlock>
+                <!--<TextBlock Text="{Binding WaypointMissionState}">READY_TO_EXECUTE</TextBlock>-->
+            </StackPanel>
         </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid Width="335" Margin="0,10,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
 
-                <StackPanel Margin="0,0,0,10">
-                    <TextBlock FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Aircraft State:</TextBlock>
-                    <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Action State:</TextBlock>
-                        <TextBlock Margin="6,0,0,0" Style="{StaticResource BodyTextBlockStyle}" Text="{Binding WaypointMissionExecuteState}"></TextBlock>
-                    </StackPanel>
-                    <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Waypoint State:</TextBlock>
-                        <TextBlock Margin="6,0,0,0" Style="{StaticResource BodyTextBlockStyle}" Text="{Binding WaypointMissionState}"></TextBlock>
-                    </StackPanel>
-                </StackPanel>
-
-
-                <ScrollViewer Grid.Row="1">
-                    <StackPanel>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Set GroundStationMode Enabled</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Ensure GroundStationMode Enabled .</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding SetGroundStationModeEnabled}" >Set GroundStationMode Enabled</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}">switches maptype</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Changes between satelite view and normal map mode. sateliteview cant be used offline</TextBlock>
-                        <Button Margin="0,6,0,0" Click="ChangeMapTypeClick" >change map type</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Add add 'STAY' action to a waypoint</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> We could add some actions to the waypoint like staying. Press the button to add 'STAY' action to the second waypoint.</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding AddAction}">Add Action</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> SDK Load and upload Mission</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> DJI Windows SDK would storage a cache copy of mission. Before we upload the mission to the aircraft, we need to get the misson loaded by DJI Windows SDK.</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding LoadMission}" >SDK Load Mission</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Upload Mission To Aircraft</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Upload your mission to aircraft by which the aircraft is able to fly as you plan after starting mission.</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding UploadMission}" >Upload To Aircraft</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Start Mission</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> Start your waypoint mission and see what would happen on the map.</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding StartMission}" >Start Mission</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Pause/Resume Mission</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding PauseResumeMission}" >Pause/Resume Mission</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Emergency Stop</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding EmergencyStop}" >Emergency Stop</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Go home</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding GoHome}" >go home</Button>
-                        
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> start landing</TextBlock>
-                        <Button Margin="0,6,0,0" Command="{Binding StartLanding}" >Start landing</Button>
-
-                        <TextBlock Margin="0,10,0,0" FontSize="30" Style="{StaticResource TitleTextBlockStyle}"> Others Features</TextBlock>
-                        <TextBlock Style="{StaticResource BodyTextBlockStyle}"> There are some others feature like pausing mission or downloading mission to SDK from the aircraft. See the document of DJI Windows SDK</TextBlock>
-
-
-                    </StackPanel>
-                </ScrollViewer>
-
-            </Grid>
-            <maps:MapControl 
-                ZoomInteractionMode="GestureAndControl"
-                TiltInteractionMode="GestureAndControl"
-                x:Name="WaypointMap"
-                ZoomLevel="18"
-                Grid.Column="1"
-                Margin="8,0,0,0"
-                Style="Aerial"
-                MapServiceToken="NMdiIpY411Uujir8P3wP~rqeXj9XR5vgl1v4RroN3Ww~AmWbGLKwdGlq-1bPrSniAesWwtNvHMgFDOXD1phZZIvdKi_ftKvp_5AhXoSyqZP7"
-                />
+        <maps:MapControl
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            ZoomInteractionMode="GestureAndControl"
+            TiltInteractionMode="GestureAndControl"
+            x:Name="WaypointMap"
+            ZoomLevel="18"
+            Style="Aerial"
+            MapServiceToken="NMdiIpY411Uujir8P3wP~rqeXj9XR5vgl1v4RroN3Ww~AmWbGLKwdGlq-1bPrSniAesWwtNvHMgFDOXD1phZZIvdKi_ftKvp_5AhXoSyqZP7"
+            />
         </Grid>
-    </Grid>
 </Page>
 
