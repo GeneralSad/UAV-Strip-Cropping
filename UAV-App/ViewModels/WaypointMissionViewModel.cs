@@ -26,12 +26,16 @@ namespace UAV_App.Pages
             }
         }
 
+        private List<LocationCoordinate2D> geoPoints;
+
         private WaypointMissionViewModel()
         {
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StateChanged += WaypointMission_StateChanged;
             DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).AircraftLocationChanged += WaypointMission_AircraftLocationChanged;
             DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).ExecutionStateChanged += WaypointMission_ExecuteStateChanged;
             WaypointMissionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
+
+            geoPoints  = new List<LocationCoordinate2D>();
 
             this.WaypointMission = new WaypointMission()
             {
@@ -114,49 +118,7 @@ namespace UAV_App.Pages
             }
         }
 
-        public ICommand _initWaypointMission;
-        public ICommand InitWaypointMission
-        {
-            get
-            {
-                if (_initWaypointMission == null)
-                {
-                    _initWaypointMission = new RelayCommand(delegate ()
-                    {
-                        double nowLat = AircraftLocation.latitude;
-                        double nowLng = AircraftLocation.longitude;
-                        WaypointMission mission = new WaypointMission()
-                        {
-                            waypointCount = 0,
-                            maxFlightSpeed = 15,
-                            autoFlightSpeed = 10,
-                            finishedAction = WaypointMissionFinishedAction.NO_ACTION,
-                            headingMode = WaypointMissionHeadingMode.AUTO,
-                            flightPathMode = WaypointMissionFlightPathMode.NORMAL,
-                            gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
-                            exitMissionOnRCSignalLostEnabled = false,
-                            pointOfInterest = new LocationCoordinate2D()
-                            {
-                                latitude = 0,
-                                longitude = 0
-                            },
-                            gimbalPitchRotationEnabled = true,
-                            repeatTimes = 0,
-                            missionID = 0,
-                            waypoints = new List<Waypoint>()
-                            {
-                                InitDumpWaypoint(nowLat+0.0001, nowLng+0.00015),
-                                InitDumpWaypoint(nowLat+0.0001, nowLng-0.00015),
-                                InitDumpWaypoint(nowLat-0.0001, nowLng-0.00015),
-                                InitDumpWaypoint(nowLat-0.0001, nowLng+0.00015),
-                            }
-                        };
-                        WaypointMission = mission;
-                    }, delegate () { return true; });
-                }
-                return _initWaypointMission;
-            }
-        }
+
 
         bool ShouldPause = true;
 
@@ -282,12 +244,17 @@ namespace UAV_App.Pages
             }
         }
 
-        private Waypoint InitDumpWaypoint(double latitude, double longitude)
+        private Waypoint InitDumpWaypoint(double latitude, double longitude, double altitude, List<WaypointAction> waypointActions = null)
         {
+            if (waypointActions == null)
+            {
+                waypointActions = new List<WaypointAction>();  
+            }
+
             Waypoint waypoint = new Waypoint()
             {
                 location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
-                altitude = 40,
+                altitude = altitude,
                 gimbalPitch = -90,
                 turnMode = WaypointTurnMode.CLOCKWISE,
                 heading = 0,
@@ -297,7 +264,7 @@ namespace UAV_App.Pages
                 speed = 0,
                 shootPhotoTimeInterval = -1,
                 shootPhotoDistanceInterval = -1,
-                waypointActions = new List<WaypointAction>() { new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 5000 }, new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO } }
+                waypointActions = waypointActions 
             };
             return waypoint;
         }
@@ -324,25 +291,17 @@ namespace UAV_App.Pages
 
         public void AddWaypoint(double lat, double lon)
         {
-            double nowLat = AircraftLocation.latitude;
-            double nowLng = AircraftLocation.longitude;
-            WaypointMission waypoints = WaypointMission;
 
-            waypoints.waypoints.Add(InitDumpWaypoint(lat, lon));
-
-            WaypointMission = waypoints;
+            geoPoints.Add(new LocationCoordinate2D() {latitude = lat, longitude = lon });
 
         }
 
         public void RemoveLastWaypoint()
         {
-            WaypointMission waypoints = WaypointMission;
 
-            if (waypoints.waypoints.Count > 0)
+            if (geoPoints.Count > 0)
             {
-                waypoints.waypoints.RemoveAt(waypoints.waypoints.Count - 1);
-
-                WaypointMission = waypoints;
+                geoPoints.RemoveAt(geoPoints.Count - 1);
             }
         }
 
@@ -354,15 +313,89 @@ namespace UAV_App.Pages
 
         }
 
-        public async Task<bool> startAttackMission(List<Waypoint> waypoints)
+        public async Task<bool> startScoutMission(List<LocationCoordinate2D> geoPoints)
+        {
+            List<Waypoint> scoutMissionWaypoints = new List<Waypoint>();
+            List<WaypointAction> actions = new List<WaypointAction>() { 
+                new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO }, 
+                new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 5000 }, 
+            };
+
+
+            foreach (LocationCoordinate2D loc in geoPoints)
+            {
+                scoutMissionWaypoints.Add(InitDumpWaypoint(loc.latitude, loc.longitude, 40, actions)); 
+            }
+
+            WaypointMission scoutMission = new WaypointMission()
+            {
+                waypointCount = 0,
+                maxFlightSpeed = 15,
+                autoFlightSpeed = 10,
+                finishedAction = WaypointMissionFinishedAction.NO_ACTION, 
+                headingMode = WaypointMissionHeadingMode.AUTO,
+                flightPathMode = WaypointMissionFlightPathMode.NORMAL,
+                gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
+                exitMissionOnRCSignalLostEnabled = false,
+                gimbalPitchRotationEnabled = true,
+                repeatTimes = 0,
+                missionID = 0,
+                waypoints = scoutMissionWaypoints
+            };
+
+            SDKError err = SDKError.UNKNOWN;
+
+            for (int i = 0; i < 10; i++)
+            {
+                err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(scoutMission);
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err != SDKError.NO_ERROR) return false;
+
+
+            for (int i = 0; i < 10; i++)
+            {
+                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err != SDKError.NO_ERROR) return false;
+
+            for (int i = 0; i < 10; i++)
+            {
+                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    return true;
+                }
+
+                await Task.Delay(500);
+            }
+            return false;
+        }
+
+        public async Task<bool> startAttackMission(List<LocationCoordinate2D> geoPoints)
         {
             List<Waypoint> attackMissionWaypoints = new List<Waypoint>();
-            foreach (Waypoint waypoint in waypoints)
+            foreach (LocationCoordinate2D loc in geoPoints)
             {
-                attackMissionWaypoints.Add(waypoint);
-                LocationCoordinate2D loc = waypoint.location;
-
-                attackMissionWaypoints.Add(InitDumpAttackWaypoint(loc.latitude, loc.longitude)); ;
+                attackMissionWaypoints.Add(InitDumpWaypoint(loc.latitude, loc.longitude, 40)); 
+                attackMissionWaypoints.Add(InitDumpWaypoint(loc.latitude, loc.longitude, 10)); 
+                attackMissionWaypoints.Add(InitDumpWaypoint(loc.latitude, loc.longitude, 40)); 
             }
 
             WaypointMission attackMission = new WaypointMission()
@@ -386,7 +419,6 @@ namespace UAV_App.Pages
                 waypoints = attackMissionWaypoints
             };
 
-            attackMission.waypoints = attackMissionWaypoints;
             SDKError err = SDKError.UNKNOWN;
 
             for (int i = 0; i < 10; i++)
@@ -398,7 +430,7 @@ namespace UAV_App.Pages
                     break;
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(500);
             }
 
             if (err != SDKError.NO_ERROR) return false;
@@ -413,7 +445,7 @@ namespace UAV_App.Pages
                     break;
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(500);
             }
 
             if (err != SDKError.NO_ERROR) return false;
@@ -427,7 +459,7 @@ namespace UAV_App.Pages
                     return true;
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(500);
             }
             return false;
         }
@@ -468,23 +500,6 @@ namespace UAV_App.Pages
                 return _setGroundStationModeEnabled;
             }
         }
-        public ICommand _uploadMission;
-        public ICommand UploadMission
-        {
-            get
-            {
-                if (_uploadMission == null)
-                {
-                    _uploadMission = new RelayCommand(async delegate ()
-                    {
-                        SDKError err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
-                        var messageDialog = new MessageDialog(String.Format("Upload mission to aircraft: {0}", err.ToString()));
-                        await messageDialog.ShowAsync();
-                    }, delegate () { return true; });
-                }
-                return _uploadMission;
-            }
-        }
 
         public ICommand _startMission;
         public ICommand StartMission
@@ -495,12 +510,11 @@ namespace UAV_App.Pages
                 {
                     _startMission = new RelayCommand(async delegate ()
                     {
-                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
-                        var messageDialog = new MessageDialog(String.Format("Start mission: {0}", err.ToString()));
+                        bool succes = await startScoutMission(geoPoints);
 
-                        await messageDialog.ShowAsync();
-
-                        PatrolController.Instance.startRouteEvent();
+                        if (succes) {
+                            PatrolController.Instance.startRouteEvent();
+                        }
                     }, delegate () { return true; });
                 }
                 return _startMission;
