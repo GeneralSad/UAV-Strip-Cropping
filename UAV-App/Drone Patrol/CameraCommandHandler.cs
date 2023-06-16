@@ -30,7 +30,7 @@ namespace UAV_App.Drone_Patrol
         private const double defaultSpeed = 1;
 
         //Amount of seconds to wait on receiving the list of images from the drone
-        private const double downloadTimeout = 1;
+        private const double downloadTimeout = 10;
 
         //Amount of seconds to wait on the movement of the gimval
         private const double gimbalTimeout = 1.5;
