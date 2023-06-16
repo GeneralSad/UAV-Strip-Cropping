@@ -305,11 +305,10 @@ namespace UAV_App.Pages
             }
         }
 
-        public List<Waypoint> getFoundAnimalPoints()
+        public List<LocationCoordinate2D> getFoundAnimalPoints()
         {
             //TESTCODE
-            WaypointMission waypoints = WaypointMission;
-            return waypoints.waypoints;
+            return geoPoints;
 
         }
 
@@ -530,7 +529,7 @@ namespace UAV_App.Pages
                 {
                     _startAttackMission = new RelayCommand(async delegate ()
                     {
-                        await startAttackMission(WaypointMission.waypoints);
+                        await startAttackMission(geoPoints);
                     }, delegate () { return true; });
                 }
                 return _startAttackMission;

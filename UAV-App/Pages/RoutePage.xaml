@@ -28,9 +28,6 @@
                 </StackPanel.Resources>
 
                 <Button Command="{Binding SetGroundStationModeEnabled}" >Set Mode</Button>
-                <Button Command="{Binding AddAction}">Add Action</Button>
-                <Button Command="{Binding LoadMission}" >Load Mission</Button>
-                <Button Command="{Binding UploadMission}" >Upload Mission</Button>
                 <Button Command="{Binding StartMission}" >Start Mission</Button>
                 <Button Command="{Binding PauseResumeMission}" >(Un)pause Mission</Button>
                 <Button Command="{Binding EmergencyStop}" >Emergency</Button>

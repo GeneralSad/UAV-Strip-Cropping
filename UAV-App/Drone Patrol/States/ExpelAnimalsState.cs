@@ -17,7 +17,7 @@ namespace UAV_App.Drone_Patrol.States
 
         public void onEnter()
         {
-            List<Waypoint> harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
+            List<LocationCoordinate2D> harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
 
             WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots).Wait();
         }
