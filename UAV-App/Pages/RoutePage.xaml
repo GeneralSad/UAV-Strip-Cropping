@@ -50,13 +50,11 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock> Action State:</TextBlock>
-                <TextBlock Text="RETURN_TO_FIRST_POINT"></TextBlock>
-                <!--<TextBlock Text="{Binding WaypointMissionExecuteState}">RETURN_TO_FIRST_POINT</TextBlock>-->
+                <TextBlock Text="{Binding WaypointMissionExecuteState}"></TextBlock>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock> Waypoint State:</TextBlock>
-                <TextBlock Text="READY_TO_EXECUTE"></TextBlock>
-                <!--<TextBlock Text="{Binding WaypointMissionState}">READY_TO_EXECUTE</TextBlock>-->
+                <TextBlock Text="{Binding WaypointMissionState}"></TextBlock>
             </StackPanel>
         </StackPanel>
 
