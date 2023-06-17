@@ -46,16 +46,9 @@ namespace UAV_App.Drone_Patrol
             activeState.onEnter(); // On enter
         }
 
-        public void run()
+        public void HandleEvent(PatrolEvent patrolEvent)
         {
-            PatrolEvent patrolEvent = PatrolEvent.None;
-
-            if (eventStack.Count > 0)
-            {
-                patrolEvent = eventStack.Pop();
-            }
-
-            IPatrolState returnState = activeState.run(patrolEvent);
+            IPatrolState returnState = activeState.HandleEvent(patrolEvent);
 
             if (returnState != null)
             {
@@ -96,14 +89,14 @@ namespace UAV_App.Drone_Patrol
             return false;
         }
 
-        public void PatrouilleStarted()
+        public void StartScoutPatrol()
         {
-            eventStack.Push(PatrolEvent.PatrolStarted);
+            HandleEvent(PatrolEvent.StartScoutPatrol);
         }
 
         public void PrepareDone()
         {
-            eventStack.Push(PatrolEvent.PrepareDone);
+            HandleEvent(PatrolEvent.PrepareDone);
         }
 
         public void ConnectionLost()
@@ -116,6 +109,16 @@ namespace UAV_App.Drone_Patrol
         {
             if (!History(ParentState.PATROUILLING)) SwitchState(new IdleState());
 
+        }
+
+        public void ExpellAnimals()
+        {
+             HandleEvent(PatrolEvent.ExpellAnimals);
+        }
+
+        internal void MissionDone()
+        {
+            HandleEvent(PatrolEvent.MissionDone);
         }
     }
 }

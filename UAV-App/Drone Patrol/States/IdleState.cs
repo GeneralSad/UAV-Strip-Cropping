@@ -21,9 +21,9 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState run(PatrolEvent patrolEvent)
+        public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
-            if (PatrolEvent.PatrolStarted == patrolEvent)
+            if (PatrolEvent.StartScoutPatrol == patrolEvent)
             {
                 return new PreparingState();
             }

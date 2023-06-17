@@ -15,22 +15,23 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.PATROUILLING;
         }
 
-        public void onEnter()
+        public async void onEnter()
         {
             List<LocationCoordinate2D> harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
 
-            WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots).Wait();
+
+            await WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots);
         }
 
         public void onLeave()
         {
         }
 
-        public IPatrolState run(PatrolEvent patrolEvent)
+        public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
-            if (PatrolEvent.ExpellDone == patrolEvent)
+            if (PatrolEvent.StartScoutPatrol == patrolEvent)
             {
-                return new FollowingRouteState();
+                return new ScoutPatrolState();
             }
 
             return null;

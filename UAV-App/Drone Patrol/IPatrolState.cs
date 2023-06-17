@@ -9,10 +9,10 @@ namespace UAV_App.Drone_Patrol
     public enum PatrolEvent
     {
         None = 0,
-        PatrolStarted = 1,
-        PatrolDone = 2,
+        StartScoutPatrol = 1,
+        MissionDone = 2,
         PrepareDone = 3,
-        ArrivedAtPoint = 4,
+        ExpellAnimals = 4,
         NoHarmfullAnimalsFound = 5,
         HarmfullAnimalsFound = 6,
         ExpellDone = 7,
@@ -30,7 +30,7 @@ namespace UAV_App.Drone_Patrol
     public interface IPatrolState
     {
         ParentState getParent();
-        IPatrolState run(PatrolEvent patrolEvent);
+        IPatrolState HandleEvent(PatrolEvent patrolEvent);
         void onEnter();
         void onLeave();
     }

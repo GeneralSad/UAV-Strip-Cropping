@@ -21,11 +21,11 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState run(PatrolEvent patrolEvent)
+        public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
             if (PatrolEvent.PrepareDone == patrolEvent)
             {
-                return new FollowingRouteState();
+                return new ScoutPatrolState();
             }
 
             return null;

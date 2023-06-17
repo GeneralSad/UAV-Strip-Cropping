@@ -84,9 +84,20 @@ namespace UAV_App.Drone_Manager
             throw new NotImplementedException();
         }
 
-        public void startRouteEvent()
+        public void startScoutRouteEvent()
         {
-            this.patrolStateMachine.PatrouilleStarted();
+            this.patrolStateMachine.StartScoutPatrol();
+        }
+
+
+        public void harmfullAnimalsFound()
+        {
+            this.patrolStateMachine.ExpellAnimals();
+        }
+
+        public void MissionDone()
+        {
+            this.patrolStateMachine.MissionDone();
         }
     }
 }

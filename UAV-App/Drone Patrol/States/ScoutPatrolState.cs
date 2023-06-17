@@ -1,32 +1,37 @@
-﻿using System;
+﻿using DJI.WindowsSDK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UAV_App.Pages;
 
 namespace UAV_App.Drone_Patrol.States
 {
-    public class FollowingRouteState : IPatrolState
+    public class ScoutPatrolState : IPatrolState
     {
         public ParentState getParent()
         {
             return ParentState.PATROUILLING;
         }
 
-        public void onEnter()
+        public async void onEnter()
         {
+            List<LocationCoordinate2D> spots = WaypointMissionViewModel.Instance.getFirstLocations();
+
+            await WaypointMissionViewModel.Instance.startScoutMission(spots);
         }
 
         public void onLeave()
         {
         }
 
-        public IPatrolState run(PatrolEvent patrolEvent)
+        public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
-            if (PatrolEvent.ArrivedAtPoint == patrolEvent)
+            if (PatrolEvent.ExpellAnimals == patrolEvent)
             {
                 return new DetectingAnimalsState();
-            } else if (PatrolEvent.PatrolDone == patrolEvent)
+            } else if (PatrolEvent.MissionDone == patrolEvent)
             {
                 return new IdleState();
             }

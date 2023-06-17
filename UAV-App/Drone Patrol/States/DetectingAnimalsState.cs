@@ -21,7 +21,7 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState run(PatrolEvent patrolEvent)
+        public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
             if (PatrolEvent.HarmfullAnimalsFound == patrolEvent)
             {
@@ -29,7 +29,7 @@ namespace UAV_App.Drone_Patrol.States
 
             } else if (PatrolEvent.NoHarmfullAnimalsFound == patrolEvent)
             {
-                return new FollowingRouteState();
+                return new ScoutPatrolState();
 
             }
 
