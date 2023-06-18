@@ -279,7 +279,7 @@ PatrolController.Instance.MissionDone();
             }
         }
 
-        private LocationCoordinate2D _aircraftLocation = new LocationCoordinate2D() { latitude = 0, longitude = 0 };
+        private LocationCoordinate2D _aircraftLocation;
         public LocationCoordinate2D AircraftLocation
         {
             get

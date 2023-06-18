@@ -41,6 +41,7 @@ namespace UAV_App.Pages
         MapElementsLayer waypointLayer = new MapElementsLayer();
         MapElementsLayer locationLayer = new MapElementsLayer();
 
+
         public RoutePage()
         {
             this.InitializeComponent();
@@ -68,6 +69,7 @@ namespace UAV_App.Pages
                // routeLayer.MapElements.RemoveAt(routeLayer.MapElements.Count-1);
                 
             };
+
         }
 
         private void ChangeMapTypeClick(object sender, RoutedEventArgs e)
@@ -96,6 +98,8 @@ namespace UAV_App.Pages
 
         private void AircraftLocationChange(LocationCoordinate2D value)
         {
+            var aircraftLocation = new BasicGeoposition() { Latitude = value.latitude, Longitude = value.longitude };
+
             if (aircraftMapIcon == null)
             {
                 aircraftMapIcon = new MapIcon()
@@ -105,8 +109,9 @@ namespace UAV_App.Pages
                     Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/phantom.svg")),
                 };
                 locationLayer.MapElements.Add(aircraftMapIcon);
+                WaypointMap.Center = new Geopoint(aircraftLocation);
             }
-            aircraftMapIcon.Location = new Geopoint(new BasicGeoposition() { Latitude = value.latitude, Longitude = value.longitude });
+            aircraftMapIcon.Location = new Geopoint(aircraftLocation);
         }
 
         ~RoutePage()
@@ -117,16 +122,12 @@ namespace UAV_App.Pages
         {
             DataContext = WaypointMissionViewModel.Instance;
             base.OnNavigatedTo(e);
-            InitMap();
         }
 
         private void InitMap()
         {
 
-           var aircraftLocaton = new LocationCoordinate2D() { latitude = 51.6077955, longitude = 4.7625830};
-            
-           WaypointMap.Center = new Geopoint((new BasicGeoposition() { Latitude = aircraftLocaton.latitude, Longitude = aircraftLocaton.longitude }));
-           AircraftLocationChange(aircraftLocaton);
+
         }
 
        
@@ -141,9 +142,10 @@ namespace UAV_App.Pages
                 {
                     MapIcon waypointIcon = new MapIcon()
                     {
-                        Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/waypoint.png")),
+                        Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/Zone.png")),
                         NormalizedAnchorPoint = new Point(0.5, 0.5),
                         ZIndex = 0,
+                        
                     };
                     waypointLayer.MapElements.Add(waypointIcon);
                 }
