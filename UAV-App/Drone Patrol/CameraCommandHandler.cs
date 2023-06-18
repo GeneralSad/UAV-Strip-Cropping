@@ -42,6 +42,8 @@ namespace UAV_App.Drone_Patrol
         private readonly CameraHandler cameraHandler = DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0);
         private readonly MediaTaskManager taskManager = new MediaTaskManager(0, 0);
 
+        private bool isDownloadAll = false;
+
         //Make the gimbal rotate a certain amount of degrees
         public async void SetGimbal(double pitch, double speed = defaultSpeed)
         {
@@ -158,21 +160,7 @@ namespace UAV_App.Drone_Patrol
         //Wait for response, then download most recent files
         public async void GetMostRecentPhoto()
         {
-            Debug.WriteLine("Loading");
             await LoadFiles(MediaFileListLocation.SD_CARD);
-
-            DateTime time = DateTime.Now;
-            while (files.Count == 0)
-            {
-                if (DateTime.Now >= time.AddSeconds(downloadTimeout))
-                {
-                    Debug.WriteLine("Photo load timeout");
-                    return;
-                }
-            }
-
-            Debug.WriteLine("Downloading");
-            DownloadRecentFile();
         }
 
         //Request list of downloadable items from drone.
@@ -180,34 +168,24 @@ namespace UAV_App.Drone_Patrol
         public async void GetPhotos()
         {
             await LoadFiles(MediaFileListLocation.SD_CARD);
-
-            DateTime time = DateTime.Now;
-            while (files.Count == 0)
-            {
-                if (DateTime.Now >= time.AddSeconds(downloadTimeout))
-                {
-                    Debug.WriteLine("Photo load timeout");
-                    return;
-                }
-            }
-
-            DownloadAllFiles();
         }
 
         //Download all files from the list
         private void DownloadAllFiles()
         {
+            isDownloadAll = true;
             foreach (var file in files)
             {
-                this.DownloadSingle(file);
+                DownloadSingle(file);
             }
         }
 
         //Download most recent file
         private void DownloadRecentFile()
         {
+            isDownloadAll = false;
             MediaFile file = files.Last();
-            this.DownloadSingle(file);
+            DownloadSingle(file);
         }
 
         //Request files from drone
@@ -241,7 +219,21 @@ namespace UAV_App.Drone_Patrol
 
             fileListTask.OnListReqResponse += (fileSender, files) =>
             {
-                files.ForEach(obj => this.files.Add(obj));
+                
+                files.ForEach(obj => {
+                    this.files.Add(obj);
+                });
+
+                if (files.Count != 0)
+                {
+                    if (isDownloadAll)
+                    {
+                        DownloadAllFiles();
+                    } else
+                    {
+                        DownloadRecentFile();
+                    }
+                }
             };
 
             fileListTask.OnRequestTearDown += (fileSender, retCode, response) =>
@@ -250,13 +242,13 @@ namespace UAV_App.Drone_Patrol
                 {
                     return;
                 }
+                Debug.WriteLine(String.Format("LaunchFileDataTask get files : {0}. Switch Mode or try again", retCode));
             };
 
             taskManager.PushBack(fileListTask);
 
             return true;
         }
-
 
         //Download a single file
         private async void DownloadSingle(MediaFile file)
