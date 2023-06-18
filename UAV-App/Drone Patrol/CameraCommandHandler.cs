@@ -29,9 +29,6 @@ namespace UAV_App.Drone_Patrol
         private const double defaultPitch = -90;
         private const double defaultSpeed = 1;
 
-        //Amount of seconds to wait on receiving the list of images from the drone
-        private const double downloadTimeout = 10;
-
         //Amount of seconds to wait on the movement of the gimval
         private const double gimbalTimeout = 1.5;
 
@@ -278,6 +275,7 @@ namespace UAV_App.Drone_Patrol
 
             task.OnRequestTearDown += (sender, retCode, res) =>
             {
+                SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
             };
 
             taskManager.PushBack(task);

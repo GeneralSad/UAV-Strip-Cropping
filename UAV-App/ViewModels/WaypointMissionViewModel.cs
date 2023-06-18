@@ -268,6 +268,26 @@ PatrolController.Instance.MissionDone();
             }
         }
 
+        public ICommand _startTakeOff;
+        public ICommand StartTakeOff
+        {
+            get
+            {
+                if (_startTakeOff == null)
+                {
+                    _startTakeOff = new RelayCommand(async delegate ()
+                    {
+                        var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartTakeoffAsync();
+                        var messageDialog = new MessageDialog(String.Format("Start take off: {0}.", err.ToString()));
+                        await messageDialog.ShowAsync();
+
+
+                    }, delegate () { return true; });
+                }
+                return _startTakeOff;
+            }
+        }
+
         private WaypointMission _waypointMission;
         public WaypointMission WaypointMission
         {

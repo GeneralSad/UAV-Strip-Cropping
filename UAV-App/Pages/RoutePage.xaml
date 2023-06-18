@@ -27,12 +27,13 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <Button Command="{Binding SetGroundStationModeEnabled}" >Set Mode</Button>
+                <Button Command="{Binding SetGroundStationModeEnabled}" >GSM On</Button>
                 <Button Command="{Binding StartMission}" >Start Mission</Button>
                 <Button Command="{Binding PauseResumeMission}" >(Un)pause Mission</Button>
                 <Button Command="{Binding EmergencyStop}" >Emergency</Button>
                 <Button Command="{Binding GoHome}" >Go Home</Button>
                 <Button Command="{Binding StartLanding}" >Land</Button>
+                <Button Command="{Binding StartTakeOff}" >Take off</Button>
                 <Button Command="{Binding StartAttackMission}" >attackMission</Button>
                 <Button Command="{Binding DownloadMedia}" >Download</Button>
                 <Button Click="ChangeMapTypeClick" >Change Map</Button>
