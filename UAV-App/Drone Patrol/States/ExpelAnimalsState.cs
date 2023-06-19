@@ -15,12 +15,13 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.PATROUILLING;
         }
 
+        private List<LocationCoordinate2D> harmfullAnimalSpots;
+        private bool missionStarted;
+
         public async void onEnter()
         {
-            List<LocationCoordinate2D> harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
-
-
-            await WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots);
+           harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
+           missionStarted = false;
         }
 
         public void onLeave()
@@ -35,6 +36,29 @@ namespace UAV_App.Drone_Patrol.States
             }
 
             return null;
+        }
+
+        System.DateTime lastRanTime;
+        TimeSpan timeout = TimeSpan.FromSeconds(1);
+
+        public async Task run()
+        {
+            if (!missionStarted)
+            {
+              missionStarted = await WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots);
+
+            } 
+            else if (System.DateTime.UtcNow - lastRanTime > timeout)
+            {
+                lastRanTime = System.DateTime.UtcNow;
+
+                WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
+
+                if (mission == null) // get loaded mission returns null when the mission is done
+                {
+                    WaypointMissionViewModel.Instance.WaypointMissionDone();
+                }
+            }
         }
     }
 }

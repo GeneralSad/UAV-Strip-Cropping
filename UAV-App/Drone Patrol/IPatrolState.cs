@@ -33,5 +33,6 @@ namespace UAV_App.Drone_Patrol
         IPatrolState HandleEvent(PatrolEvent patrolEvent);
         void onEnter();
         void onLeave();
+        Task run();
     }
 }

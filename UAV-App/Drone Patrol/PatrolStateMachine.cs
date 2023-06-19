@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using UAV_App.Drone_Movement;
 using UAV_App.Drone_Patrol.States;
 
 namespace UAV_App.Drone_Patrol
@@ -120,6 +118,11 @@ namespace UAV_App.Drone_Patrol
         internal void MissionDone()
         {
             HandleEvent(PatrolEvent.MissionDone);
+        }
+
+        internal async Task run()
+        {
+            await this.activeState.run();
         }
     }
 }

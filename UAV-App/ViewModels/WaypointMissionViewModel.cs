@@ -257,6 +257,12 @@ namespace UAV_App.Pages
             }
         }
 
+        
+        /// <summary>
+        /// Uploads the stored mission to the drone
+        /// </summary>
+        /// <param name="mission"> the waypointmission to be loaded</param>
+        /// <returns> boolean indicating if the task was succesfull</returns>
          private async Task<bool> UploadWaypointMission()
         {
             SDKError err = SDKError.UNKNOWN;
@@ -367,15 +373,9 @@ namespace UAV_App.Pages
                 WaypointMissionExecuteState = value.HasValue ? value.Value.state : WaypointMissionExecuteState.UNKNOWN;
 
             });
-
-            if (value.HasValue && value.Value.isExecutionFinish)
-            {
-                missionDone();
-            }
-
         }
 
-        private void missionDone()
+        public void WaypointMissionDone()
         {
 
             if (chaseAwayGeoPoints.Count == 0)
@@ -594,7 +594,7 @@ namespace UAV_App.Pages
                 {
                     _missionDone = new RelayCommand(async delegate ()
                     {
-                        missionDone();
+                        WaypointMissionDone();
                     }, delegate () { return true; });
                 }
                 return _missionDone;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using UAV_App.Database;
 using UAV_App.Dialogs;
 using Windows.Foundation;
@@ -22,7 +24,12 @@ namespace UAV_App.Pages
         public SDKPage()
         {
             this.InitializeComponent();
+
+
+
         }
+
+   
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {

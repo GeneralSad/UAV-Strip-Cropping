@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using System.Threading.Tasks;
 using DJI.WindowsSDK;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
@@ -27,7 +29,7 @@ namespace UAV_App.Pages
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-   public sealed class OperationException : Exception
+    public sealed class OperationException : Exception
     {
         public OperationException(String message, SDKError error) : base(String.Format(message))
         {
@@ -35,7 +37,7 @@ namespace UAV_App.Pages
     }
     public sealed partial class RoutePage : Page
     {
-       
+
         private MapIcon aircraftMapIcon = null;
         MapElementsLayer routeLayer = new MapElementsLayer();
         MapElementsLayer waypointLayer = new MapElementsLayer();
@@ -53,31 +55,59 @@ namespace UAV_App.Pages
             WaypointMissionViewModel.Instance.PropertyChanged += ViewModel_PropertyChanged;
 
             WaypointMap.Style = MapStyle.Terrain;
-            WaypointMap.MapTapped += (MapControl sender, MapInputEventArgs args) => {
-            var loc = args.Location;
+            WaypointMap.MapTapped += (MapControl sender, MapInputEventArgs args) =>
+            {
+                var loc = args.Location;
 
-            WaypointMissionViewModel.Instance.AddWaypoint(loc.Position.Latitude, loc.Position.Longitude);
+                WaypointMissionViewModel.Instance.AddWaypoint(loc.Position.Latitude, loc.Position.Longitude);
                 RedrawWaypoint();
             };
 
-            WaypointMap.MapRightTapped  += (MapControl sender, MapRightTappedEventArgs args) => {
-            //var loc = args.Location;
+            WaypointMap.MapRightTapped += (MapControl sender, MapRightTappedEventArgs args) =>
+            {
+                //var loc = args.Location;
 
-            WaypointMissionViewModel.Instance.RemoveLastWaypoint();
+                WaypointMissionViewModel.Instance.RemoveLastWaypoint();
                 RedrawWaypoint();
-            
-               // routeLayer.MapElements.RemoveAt(routeLayer.MapElements.Count-1);
-                
+
+                // routeLayer.MapElements.RemoveAt(routeLayer.MapElements.Count-1);
+
             };
 
+            Task runLoop = PeriodicAsync(async () =>
+                {
+                    try
+                    {
+                         await Drone_Manager.PatrolController.Instance.run();
+                    }
+                    catch (Exception ex)
+                    {
+                    Console.WriteLine(ex);
+                    }
+                }, TimeSpan.FromMilliseconds(100));
+
+
+        }
+
+        public static async Task PeriodicAsync(Func<Task> action, TimeSpan interval,
+CancellationToken cancellationToken = default)
+        {
+            while (true)
+            {
+                var delayTask = Task.Delay(interval, cancellationToken);
+                await action();
+                await delayTask;
+
+            }
         }
 
         private void ChangeMapTypeClick(object sender, RoutedEventArgs e)
         {
-            if ( WaypointMap.Style == MapStyle.Aerial)
+            if (WaypointMap.Style == MapStyle.Aerial)
             {
                 WaypointMap.Style = MapStyle.Terrain;
-            } else
+            }
+            else
             {
                 WaypointMap.Style = MapStyle.Aerial;
             }
@@ -130,12 +160,12 @@ namespace UAV_App.Pages
 
         }
 
-       
+
         private void RedrawWaypoint()
         {
             List<BasicGeoposition> waypointPositions = new List<BasicGeoposition>();
             List<LocationCoordinate2D> geoPoints = WaypointMissionViewModel.Instance.geoPoints;
-            for (int i= 0; i < geoPoints.Count(); ++i)
+            for (int i = 0; i < geoPoints.Count(); ++i)
             {
 
                 if (waypointLayer.MapElements.Count == i)
@@ -145,7 +175,7 @@ namespace UAV_App.Pages
                         Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/Zone.png")),
                         NormalizedAnchorPoint = new Point(0.5, 0.5),
                         ZIndex = 0,
-                        
+
                     };
                     waypointLayer.MapElements.Add(waypointIcon);
                 }
@@ -159,7 +189,7 @@ namespace UAV_App.Pages
             {
                 for (int i = waypointLayer.MapElements.Count; i > geoPoints.Count; i--)
                 {
-                    waypointLayer.MapElements.RemoveAt(i -1);
+                    waypointLayer.MapElements.RemoveAt(i - 1);
                 }
 
             }
@@ -176,15 +206,16 @@ namespace UAV_App.Pages
             }
             else
             {
-                if (routeLayer.MapElements.Count != 0) {
+                if (routeLayer.MapElements.Count != 0)
+                {
                     if (waypointPositions.Count == 0)
                     {
                         routeLayer.MapElements.RemoveAt(0);
                         return;
                     }
 
-                var waypointPolyline = routeLayer.MapElements[0] as MapPolyline;
-                waypointPolyline.Path = new Geopath(waypointPositions);
+                    var waypointPolyline = routeLayer.MapElements[0] as MapPolyline;
+                    waypointPolyline.Path = new Geopath(waypointPositions);
                 }
             }
 

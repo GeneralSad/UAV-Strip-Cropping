@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UAV_App.Drone_Movement;
 using UAV_App.Drone_Patrol;
 using UAV_App.Pages;
 
@@ -13,7 +12,6 @@ namespace UAV_App.Drone_Manager
     public class PatrolController : IPatrolMessage
     {
         private PatrolStateMachine patrolStateMachine;
-        private DroneMovementStateMachine droneMovementStateMachine;
 
         private static readonly PatrolController _singleton = new PatrolController();
         public static PatrolController Instance
@@ -100,6 +98,11 @@ namespace UAV_App.Drone_Manager
         public void MissionDone()
         {
             this.patrolStateMachine.MissionDone();
+        }
+
+        public async Task run()
+        {
+            await this.patrolStateMachine.run();
         }
     }
 }

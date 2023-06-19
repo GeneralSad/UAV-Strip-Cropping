@@ -15,11 +15,14 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.PATROUILLING;
         }
 
+        private bool missionStarted;
+        List<LocationCoordinate2D> spots;
         public async void onEnter()
         {
-            List<LocationCoordinate2D> spots = WaypointMissionViewModel.Instance.getFirstLocations();
+            spots = WaypointMissionViewModel.Instance.getFirstLocations();
+            missionStarted = false;
 
-            await WaypointMissionViewModel.Instance.startScoutMission(spots);
+
         }
 
         public void onLeave()
@@ -39,6 +42,29 @@ namespace UAV_App.Drone_Patrol.States
             }
 
             return null;
+        }
+
+        System.DateTime lastRanTime;
+        TimeSpan timeout = TimeSpan.FromSeconds(1);
+
+
+        public async Task run()
+        {
+
+            if (!missionStarted)
+            {
+              missionStarted = await WaypointMissionViewModel.Instance.startScoutMission(spots);
+            } else if (System.DateTime.UtcNow - lastRanTime > timeout)
+            {
+                lastRanTime = System.DateTime.UtcNow;
+
+                WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
+
+                if (mission == null) // get loaded mission returns null when the mission is done
+                {
+                    WaypointMissionViewModel.Instance.WaypointMissionDone();
+                }
+            }
         }
     }
 }

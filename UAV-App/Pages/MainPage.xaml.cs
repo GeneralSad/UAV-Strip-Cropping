@@ -2,9 +2,11 @@ using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using UAV_App.Database;
 using UAV_App.Dialogs;
+using UAV_App.Drone_Manager;
 using UAV_App.Pages;
 using UAV_App.ViewModels;
 using Windows.ApplicationModel.Core;
@@ -40,7 +42,11 @@ namespace UAV_App
 
             ContentFrame.Navigate(typeof(Pages.OverlayPage));
             setContentFrameContent(typeof(Pages.SDKPage));
+
+
         }
+
+
 
         private void setContentFrameContent(Type contentType)
         {

@@ -25,5 +25,10 @@ namespace UAV_App.Drone_Patrol.States
         {
             return null;
         }
+
+        Task IPatrolState.run()
+        {
+           return Task.FromResult(0);
+        }
     }
 }
