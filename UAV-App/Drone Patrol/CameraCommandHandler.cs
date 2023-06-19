@@ -117,7 +117,7 @@ namespace UAV_App.Drone_Patrol
                     return;
                 }
                 gimbalPitch = await GetGimbalPitch();
-                Debug.WriteLine(gimbalPitch - defaultPitch);
+                
             }
         }
 

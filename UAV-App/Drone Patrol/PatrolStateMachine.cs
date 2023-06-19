@@ -20,6 +20,7 @@ namespace UAV_App.Drone_Patrol
         {
             parentStateHistory = new Dictionary<ParentState, IPatrolState>();
             eventStack = new Stack<PatrolEvent>();
+            this.activeState = new IdleState();
         }
 
         public void SwitchState(IPatrolState state)
