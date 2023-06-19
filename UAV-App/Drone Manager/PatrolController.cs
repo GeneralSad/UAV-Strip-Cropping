@@ -24,7 +24,7 @@ namespace UAV_App.Drone_Manager
             }
         }
 
-        private PatrolController() 
+        private PatrolController()
         {
             init();
 
@@ -35,7 +35,7 @@ namespace UAV_App.Drone_Manager
 
         private void init()
         {
-              DJISDKManager.Instance.ComponentManager.GetWiFiHandler(0, 0).ConnectionChanged += ConnectionChanged;
+            DJISDKManager.Instance.ComponentManager.GetWiFiHandler(0, 0).ConnectionChanged += ConnectionChanged;
         }
 
         public void droneResponseHandler()
@@ -43,23 +43,25 @@ namespace UAV_App.Drone_Manager
 
         }
 
-        public async void ConnectionChanged(object sender, BoolMsg ?changed)
+        public async void ConnectionChanged(object sender, BoolMsg? changed)
         {
-            if (changed != null && changed.HasValue && changed.Value.value) {
-                ResultValue <BoolMsg?> result = await DJISDKManager.Instance.ComponentManager.GetWiFiHandler(0, 0).GetConnectionAsync().ConfigureAwait(false);
+            if (changed != null && changed.HasValue && changed.Value.value)
+            {
+                ResultValue<BoolMsg?> result = await DJISDKManager.Instance.ComponentManager.GetWiFiHandler(0, 0).GetConnectionAsync().ConfigureAwait(false);
 
-                if ( result.value != null && result.value.HasValue)
+                if (result.value != null && result.value.HasValue)
                 {
                     if (result.value.Value.value)
                     {
                         // WIFI CONNECTION
                         this.patrolStateMachine.ConnectionGained();
-                    } else
+                    }
+                    else
                     {
                         // NO CONNECTION
                         this.patrolStateMachine.ConnectionLost();
                     }
-                } 
+                }
             }
 
         }

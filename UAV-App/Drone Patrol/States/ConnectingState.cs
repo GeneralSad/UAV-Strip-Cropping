@@ -21,7 +21,7 @@ namespace UAV_App.Drone_Patrol.States
         {
         }
 
-        public IPatrolState HandleEvent(PatrolEvent patrolEvent)
+        public IPatrolState HandleEvent(PatrolEvent patrolEvent) // logic is currently handled at patrolstatemachine, should be refactored
         {
             return null;
         }

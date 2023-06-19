@@ -113,7 +113,7 @@ namespace UAV_App.Pages
                     PatrolController.Instance.startScoutRouteEvent();
                 }
                 {
-PatrolController.Instance.MissionDone();
+                    PatrolController.Instance.MissionDone();
                 }
                 
             }

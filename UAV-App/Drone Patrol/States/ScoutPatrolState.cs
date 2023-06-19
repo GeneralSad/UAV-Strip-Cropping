@@ -28,12 +28,14 @@ namespace UAV_App.Drone_Patrol.States
 
         public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
-            if (PatrolEvent.ExpellAnimals == patrolEvent)
+            switch (patrolEvent)
             {
-                return new DetectingAnimalsState();
-            } else if (PatrolEvent.MissionDone == patrolEvent)
-            {
-                return new IdleState();
+                case PatrolEvent.StartScoutPatrol: 
+                    return new ScoutPatrolState();
+                      case PatrolEvent.ExpellAnimals: 
+                    return new ExpelAnimalsState();
+                      case PatrolEvent.MissionDone: 
+                    return new IdleState();
             }
 
             return null;

@@ -25,7 +25,7 @@ namespace UAV_App.Drone_Patrol.States
         {
             if (PatrolEvent.StartScoutPatrol == patrolEvent)
             {
-                return new PreparingState();
+                return new ScoutPatrolState();
             }
             
             return null;
