@@ -19,14 +19,13 @@ namespace UAV_App.Drone_Patrol.States
         List<LocationCoordinate2D> spots;
         public async void onEnter()
         {
-            spots = WaypointMissionViewModel.Instance.getFirstLocations();
+            spots = WaypointMissionViewModel.Instance.getFirstLocations(3);
             missionStarted = false;
-
-
         }
 
         public void onLeave()
         {
+            WaypointMissionViewModel.Instance.removeFirstLocations(3);
         }
 
         public IPatrolState HandleEvent(PatrolEvent patrolEvent)
@@ -38,7 +37,7 @@ namespace UAV_App.Drone_Patrol.States
                       case PatrolEvent.ExpellAnimals: 
                     return new ExpelAnimalsState();
                       case PatrolEvent.MissionDone: 
-                    return new IdleState();
+                    return new HomeState();
             }
 
             return null;
@@ -58,9 +57,10 @@ namespace UAV_App.Drone_Patrol.States
             {
                 lastRanTime = System.DateTime.UtcNow;
 
-                WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
-
-                if (mission == null) // get loaded mission returns null when the mission is done
+//                WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
+                WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
+                
+                if (missionState.HasValue && missionState.Value.isExecutionFinish) // get loaded mission returns null when the mission is done
                 {
                     WaypointMissionViewModel.Instance.WaypointMissionDone();
                 }

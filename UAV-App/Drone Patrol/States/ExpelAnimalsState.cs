@@ -35,7 +35,7 @@ namespace UAV_App.Drone_Patrol.States
                 return new ScoutPatrolState();
             } else if (PatrolEvent.MissionDone == patrolEvent)
             {
-                return new IdleState();
+                return new HomeState();
             }
 
             return null;
@@ -55,9 +55,10 @@ namespace UAV_App.Drone_Patrol.States
             {
                 lastRanTime = System.DateTime.UtcNow;
 
-                WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
-
-                if (mission == null) // get loaded mission returns null when the mission is done
+//                WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
+                WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
+                
+                if (missionState.HasValue && missionState.Value.isExecutionFinish) // get loaded mission returns null when the mission is done
                 {
                     WaypointMissionViewModel.Instance.WaypointMissionDone();
                 }

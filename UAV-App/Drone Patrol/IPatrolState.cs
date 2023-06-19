@@ -18,7 +18,7 @@ namespace UAV_App.Drone_Patrol
         ExpellDone = 7,
         StopRoute = 8,
         ContinueRoute = 9,
-
+        LandingDone = 10,
     }
 
     public enum ParentState

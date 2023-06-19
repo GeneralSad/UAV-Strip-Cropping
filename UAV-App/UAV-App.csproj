@@ -125,6 +125,7 @@
     <Compile Include="Drone Patrol\States\DetectingAnimalsState.cs" />
     <Compile Include="Drone Patrol\States\EmergencyStopState.cs" />
     <Compile Include="Drone Patrol\States\ExpelAnimalsState.cs" />
+    <Compile Include="Drone Patrol\States\HomeState.cs" />
     <Compile Include="Drone Patrol\States\ScoutPatrolState.cs" />
     <Compile Include="Drone Patrol\States\IdleState.cs" />
     <Compile Include="Drone Patrol\States\PreparingState.cs" />

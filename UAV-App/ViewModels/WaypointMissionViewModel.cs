@@ -103,6 +103,42 @@ namespace UAV_App.Pages
         }
 
         /// <summary>
+        /// Retreives the first few locations of the mission geopoints.
+        /// </summary>
+        /// <returns> the first few locations of mission geopoints</returns>
+        public List<LocationCoordinate2D> getFirstLocations(int amount)
+        {
+            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
+
+            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
+            for (int i = 0; i < itemAmount; i++)
+            {
+                locations.Add(missionGeoPoints[0]);
+            }
+
+            chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
+
+            return locations;
+        }
+
+                /// <summary>
+        /// Retreives the first few locations of the mission geopoints.
+        /// </summary>
+        /// <returns> the first few locations of mission geopoints</returns>
+        public List<LocationCoordinate2D> removeFirstLocations(int amount)
+        {
+            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
+
+            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
+            for (int i = 0; i < itemAmount; i++)
+            {
+                missionGeoPoints.RemoveAt(0);
+            }
+
+            return locations;
+        }
+
+        /// <summary>
         /// returns all found locations of harmfull animals
         /// </summary>
         /// <returns>all found locations of harmfull animals</returns>
@@ -127,6 +163,7 @@ namespace UAV_App.Pages
                 new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO },
                 new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 5000 },
             };
+
 
             foreach (LocationCoordinate2D loc in geoPoints)
             {
@@ -157,7 +194,7 @@ namespace UAV_App.Pages
             };
 
             bool result;
-            
+
             result = await LoadWaypointMission(scoutMission);
 
             if (!result) return false; // did the mission load correctly? if not return false
@@ -213,7 +250,7 @@ namespace UAV_App.Pages
             };
 
             bool result;
-            
+
             result = await LoadWaypointMission(attackMission);
             if (!result) return false; // did the mission load correctly? if not return false
 
@@ -258,13 +295,13 @@ namespace UAV_App.Pages
             }
         }
 
-        
+
         /// <summary>
         /// Uploads the stored mission to the drone
         /// </summary>
         /// <param name="mission"> the waypointmission to be loaded</param>
         /// <returns> boolean indicating if the task was succesfull</returns>
-         private async Task<bool> UploadWaypointMission()
+        private async Task<bool> UploadWaypointMission()
         {
             SDKError err = SDKError.UNKNOWN;
 
@@ -296,7 +333,7 @@ namespace UAV_App.Pages
         /// function that calls the startmission method of the drone and retriest it if it fails
         /// </summary>
         /// <returns></returns>
-         private async Task<bool> StartWaypointMission()
+        private async Task<bool> StartWaypointMission()
         {
             SDKError err = SDKError.UNKNOWN;
 
@@ -323,27 +360,21 @@ namespace UAV_App.Pages
             }
         }
 
-        /// <summary>
-        /// Retreives the first few locations of the mission geopoints.
-        /// </summary>
-        /// <returns> the first few locations of mission geopoints</returns>
-        public List<LocationCoordinate2D> getFirstLocations()
+        public async Task<bool> goHome()
         {
-            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
+            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
 
-            int itemAmount = missionGeoPoints.Count < 3 ? missionGeoPoints.Count : 3;
-            for (int i = 0; i < itemAmount; i++)
+            if (err == SDKError.NO_ERROR)
             {
-                locations.Add(missionGeoPoints[0]);
-                missionGeoPoints.RemoveAt(0);
-
+                return true;
             }
-
-            chaseAwayGeoPoints = missionGeoPoints;
-
-            return locations;
-
+            else
+            {
+                Console.WriteLine($"go home error: {err}");
+                return false;
+            }
         }
+
 
 
         public async void WaypointMission_AircraftLocationChanged(object sender, LocationCoordinate2D? value)
@@ -497,6 +528,7 @@ namespace UAV_App.Pages
             }
         }
 
+
         public ICommand _goHome;
         public ICommand GoHome
         {
@@ -508,7 +540,7 @@ namespace UAV_App.Pages
                     {
                         var err1 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).SetGoHomeHeightAsync(new IntMsg() { value = 40 });
 
-                        var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync(); ;
+                        var err2 = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
 
                         var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err1.ToString() + " go home async result" + err2.ToString()));
                         await messageDialog.ShowAsync();
