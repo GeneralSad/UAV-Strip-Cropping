@@ -5,6 +5,7 @@ using DJIUWPSample.ViewModels;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -252,7 +253,7 @@ namespace UAV_App.Pages
             }
             else
             {                
-                Console.WriteLine($"load mission error: {err.ToString()}");
+                Debug.WriteLine($"load mission error: {err}");
                 return false;
             }
         }
@@ -284,8 +285,8 @@ namespace UAV_App.Pages
                 return true;
             }
             else
-            {                
-                Console.WriteLine($"upload mission error: {err.ToString()}");
+            {
+                Debug.WriteLine($"upload mission error: {err.ToString()} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
                 return false;
             }
         }
@@ -317,7 +318,7 @@ namespace UAV_App.Pages
             }
             else
             {                
-                Console.WriteLine($"start mission error: {err.ToString()}");
+                Debug.WriteLine($"start mission error: {err.ToString()}");
                 return false;
             }
         }

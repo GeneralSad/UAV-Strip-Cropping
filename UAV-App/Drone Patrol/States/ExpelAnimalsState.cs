@@ -33,6 +33,9 @@ namespace UAV_App.Drone_Patrol.States
             if (PatrolEvent.StartScoutPatrol == patrolEvent)
             {
                 return new ScoutPatrolState();
+            } else if (PatrolEvent.MissionDone == patrolEvent)
+            {
+                return new IdleState();
             }
 
             return null;
