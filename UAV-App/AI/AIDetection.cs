@@ -6,6 +6,7 @@ using System.Linq;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Threading.Tasks;
 
 namespace UAV_App.AI
 {
@@ -46,7 +47,7 @@ namespace UAV_App.AI
         {
             Debug.WriteLine("Starting DownscaleResolution...");
 
-            string imagePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\Image4K.JPG";
+            string imagePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\Image4K.JPG"; //TODO: change name of Image4K to correct imagename of Leon's image
             string savePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\ImageDownscale.jpg";
 
             Bitmap b = new Bitmap(Image.FromFile(imagePath));
@@ -170,7 +171,7 @@ namespace UAV_App.AI
             return birds;
         }
 
-        public void ProcessPrediction()
+        public bool ProcessPrediction()
         {
             Debug.WriteLine("Starting ProcessPrediction...");
 
@@ -206,12 +207,21 @@ namespace UAV_App.AI
                     else
                         birdsOnTheBottomRightCounter++;
                 }
-
+                
                 Debug.WriteLine("Top Left detected: " + birdsOnTheTopLeftCounter + "\n" +
                                                    "Top Right detected: " + birdsOnTheTopRightCounter + "\n" +
                                                    "Bottom Left detected: " + birdsOnTheBottomLeftCounter + "\n" +
                                                    "Bottom Right detected: " + birdsOnTheBottomRightCounter + "\n" +
                                                    "Total birds detected: " + allBirds.Count);
+
+                if(allBirds.Count > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -221,14 +231,14 @@ namespace UAV_App.AI
             Debug.WriteLine("Ending ProcessPrediction...");
         }
 
-        private void RunFullDetection()
+        public async Task<bool> RunFullDetection()
         {
             Debug.WriteLine("Starting AI...");
 
             DownscaleResolution();
             ConvertImageToTiles();
             RunDetectionScript(this.process);
-            ProcessPrediction();
+            return ProcessPrediction();
 
             Debug.WriteLine("Ending AI...");
         }

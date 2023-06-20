@@ -9,11 +9,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.AI;
 using UAV_App.Drone_Manager;
 using UAV_App.Drone_Patrol;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Popups;
+
 
 namespace UAV_App.Pages
 {
@@ -108,6 +110,8 @@ namespace UAV_App.Pages
         /// <returns>all found locations of harmfull animals</returns>
         public List<LocationCoordinate2D> getFoundAnimalPoints()
         {
+            AIDetection.RunFullDetection();
+            await RunFullDetection();
             //TESTCODE
             var TempChaseAwayLoc = new List<LocationCoordinate2D>(chaseAwayGeoPoints);
             chaseAwayGeoPoints.Clear();
