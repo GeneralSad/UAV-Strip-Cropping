@@ -137,7 +137,6 @@ namespace UAV_App.Pages
             { // if there are is only one geopoint the drone location is the first waypoint
 
                 scoutMissionWaypoints.Insert(0, NewWaypoint(AircraftLocation.latitude, AircraftLocation.longitude, 40, actions));
-
             };
 
             WaypointMission scoutMission = new WaypointMission()
@@ -341,6 +340,21 @@ namespace UAV_App.Pages
             chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
 
             return locations;
+
+        }
+
+        public void donwloadPhoto(int waypoint)
+        {
+            getWaypontLocation(waypoint);
+
+
+            
+            var photo = await getLatestPhoto();
+
+
+            <photo, latlong>
+
+
 
         }
 

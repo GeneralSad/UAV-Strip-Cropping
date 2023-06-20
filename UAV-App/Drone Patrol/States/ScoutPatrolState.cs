@@ -38,7 +38,7 @@ namespace UAV_App.Drone_Patrol.States
                       case PatrolEvent.ExpellAnimals: 
                     return new ExpelAnimalsState();
                       case PatrolEvent.MissionDone: 
-                    return new IdleState();
+                    return new HomeState();
             }
 
             return null;
