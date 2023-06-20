@@ -51,6 +51,7 @@ namespace UAV_App
             }
         }
 
+        //Throw exception if for some reason, a page failed to load
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);

@@ -36,7 +36,7 @@
                 <Button Command="{Binding StartTakeOff}" >Take off</Button>
                 <Button Command="{Binding StartAttackMission}" >attackMission</Button>
                 <Button Command="{Binding DownloadMedia}" >Download</Button>
-                <Button Command="{Binding MissionDone}" >Download</Button>
+                <Button Command="{Binding MissionDone}" >Mission done</Button>
                 <Button Click="ChangeMapTypeClick" >Change Map</Button>
 
             </StackPanel>

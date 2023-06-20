@@ -20,13 +20,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace UAV_App.Pages
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
    public sealed class OperationException : Exception
     {
         public OperationException(String message, SDKError error) : base(String.Format(message))
@@ -126,11 +121,8 @@ namespace UAV_App.Pages
 
         private void InitMap()
         {
-
-
         }
 
-       
         private void RedrawWaypoint()
         {
             List<BasicGeoposition> waypointPositions = new List<BasicGeoposition>();

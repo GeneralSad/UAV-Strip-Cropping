@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UAV_App.Pages;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
@@ -35,10 +36,19 @@ namespace UAV_App.Drone_Patrol
         //Amount of degrees of accuracy for the gimbal to take a photo
         private const double gimbalAccuracy = 2.5;
 
+        //Default file name for downloading all photos
+        private const string defaultFileName = "Photo.jpg";
+        private string fileName = "Photo.jpg";
+
+        //Counter to keep track with how many images have to be downloaded
+        //When 0 is reached the camera is set to SHOOT_PHOTO
+        private int filesRemaining = 0;
+
         public ObservableCollection<MediaFile> files = new ObservableCollection<MediaFile>();
         private readonly CameraHandler cameraHandler = DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0);
         private readonly MediaTaskManager taskManager = new MediaTaskManager(0, 0);
 
+        //Boolean to see if all files are being downloaded, or just one
         private bool isDownloadAll = false;
 
         //Make the gimbal rotate a certain amount of degrees
@@ -49,10 +59,8 @@ namespace UAV_App.Drone_Patrol
             GimbalAngleRotation gimbalAngleRotation = new GimbalAngleRotation
             {
                 mode = GimbalAngleRotationMode.ABSOLUTE_ANGLE,
-
                 pitch = pitch,
                 pitchIgnored = false,
-
                 duration = speed
             };
 
@@ -64,7 +72,8 @@ namespace UAV_App.Drone_Patrol
         {
             GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
             var attitude = await gimbalHandler.GetGimbalAttitudeAsync();
-            return attitude.value.Value.pitch;
+            if (attitude.value.HasValue) return attitude.value.Value.pitch;
+            else return 0;
         }
 
         //Set gimbal to default gimbal postion
@@ -109,7 +118,7 @@ namespace UAV_App.Drone_Patrol
             double gimbalPitch = await GetGimbalPitch();
 
             DateTime time = DateTime.Now;
-            while (gimbalPitch - defaultPitch > gimbalAccuracy)
+            while (Math.Abs(gimbalPitch - defaultPitch) > gimbalAccuracy)
             {
                 if (DateTime.Now >= time.AddSeconds(gimbalTimeout))
                 {
@@ -117,11 +126,10 @@ namespace UAV_App.Drone_Patrol
                     return;
                 }
                 gimbalPitch = await GetGimbalPitch();
-                
             }
         }
 
-        //Make the drone take a photo and 
+        //Make the drone take a photo
         public async void TakePhoto()
         {
             await ResetCamera();
@@ -138,6 +146,7 @@ namespace UAV_App.Drone_Patrol
 
         }
 
+        //Set the camera to the given work mode
         private async Task<bool> SetCameraWorkMode(CameraWorkMode mode)
         {
             CameraWorkModeMsg workMode = new CameraWorkModeMsg
@@ -155,34 +164,62 @@ namespace UAV_App.Drone_Patrol
 
         //Request list of downloadable items from drone.
         //Wait for response, then download most recent files
-        public async void GetMostRecentPhoto()
+        public async void DownloadMostRecentPhoto(string name)
         {
+            fileName = name;
+            isDownloadAll = false;
             await LoadFiles(MediaFileListLocation.SD_CARD);
         }
 
         //Request list of downloadable items from drone.
         //Wait for response, then download all files
-        public async void GetPhotos()
+        public async void DownloadAllPhotos()
         {
+            fileName = defaultFileName;
+            isDownloadAll = true;
             await LoadFiles(MediaFileListLocation.SD_CARD);
         }
 
+        //Clear all images to limit disk usage
+        //Needs to be called a the start of every missions
+        public async void ClearImageCache()
+        {
+            StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Pictures", CreationCollisionOption.OpenIfExists);
+            var files = await storageFolder.GetFilesAsync();
+            foreach (var file in files)
+            {
+                _ = file.DeleteAsync();
+            };
+        }
+
         //Download all files from the list
-        private void DownloadAllFiles()
+        private async Task DownloadAllFilesAsync()
         {
             isDownloadAll = true;
             foreach (var file in files)
             {
-                DownloadSingle(file);
+                //Check file type so no videos will be downloaded
+                //This will make the downloading of all files a lot faster
+                if (file.fileType == MediaFileType.JPEG)
+                {
+                    filesRemaining++;
+                    await DownloadSingle(file);
+                }
             }
         }
 
         //Download most recent file
-        private void DownloadRecentFile()
+        private async Task DownloadRecentFileAsync()
         {
+            //We are not downloading all files, just one
             isDownloadAll = false;
+
+            //Add 1 to the files remaining
+            filesRemaining++;
+
+            //Get the last item in the list and download it
             MediaFile file = files.Last();
-            DownloadSingle(file);
+            await DownloadSingle(file);
         }
 
         //Request files from drone
@@ -190,19 +227,23 @@ namespace UAV_App.Drone_Patrol
         {
             var result = await cameraHandler.GetCameraWorkModeAsync();
 
+            //Check if the drone is connected
+            //If the drone is not connected or if there is an error it will return null
             if (result.value == null)
             {
                 Debug.WriteLine("No result from workmode");
                 return false;
             }
 
+            //Check if the camera is in the correct workmode
             var mode = result.value?.value;
             if (mode != CameraWorkMode.TRANSCODE && mode != CameraWorkMode.PLAYBACK)
             {
-                Debug.WriteLine("Set mode");
+                Debug.WriteLine("Set camera workmode");
                 await SetCameraWorkMode(CameraWorkMode.TRANSCODE);
             }
 
+            //Clear all files from last load request
             this.files.Clear();
 
             var fileListTask = MediaTask.FromRequest(new MediaFileListRequest
@@ -214,25 +255,29 @@ namespace UAV_App.Drone_Patrol
                 location = fileLocation,
             });
 
+            //Gets called when there is a response
             fileListTask.OnListReqResponse += (fileSender, files) =>
             {
-                
+                //Add all files to the file list
                 files.ForEach(obj => {
                     this.files.Add(obj);
                 });
 
+                //If the list is not empty download the files
+                //Go to the correct method based on the download mode
                 if (files.Count != 0)
                 {
                     if (isDownloadAll)
                     {
-                        DownloadAllFiles();
+                        DownloadAllFilesAsync();
                     } else
                     {
-                        DownloadRecentFile();
+                        DownloadRecentFileAsync();
                     }
                 }
             };
 
+            //Gets called when the task is done
             fileListTask.OnRequestTearDown += (fileSender, retCode, response) =>
             {
                 if (retCode == SDKError.NO_ERROR)
@@ -248,7 +293,7 @@ namespace UAV_App.Drone_Patrol
         }
 
         //Download a single file
-        private async void DownloadSingle(MediaFile file)
+        private async Task DownloadSingle(MediaFile file)
         {
             var request = new MediaFileDownloadRequest
             {
@@ -262,20 +307,34 @@ namespace UAV_App.Drone_Patrol
             };
 
             var task = MediaTask.FromRequest(request);
-            var storageFile = await DownloadsFolder.CreateFileAsync(file.fileName, CreationCollisionOption.GenerateUniqueName);
+
+            //Create folder and file for downloading
+            StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Pictures", CreationCollisionOption.OpenIfExists);
+            var storageFile = await storageFolder.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
             var stream = await storageFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
             var outputStream = stream.GetOutputStreamAt(0);
             var fileWriter = new DataWriter(outputStream);
             task.OnDataReqResponse += async (sender, req, data, speed) =>
             {
+                //Write to file and close writer when done
                 fileWriter.WriteBytes(data);
                 await fileWriter.StoreAsync();
                 await outputStream.FlushAsync();
             };
 
+            //Gets called when the file is done downloading
             task.OnRequestTearDown += (sender, retCode, res) =>
             {
-                SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
+                filesRemaining--;
+                //Set camera work mode to SHOOT_PHOTO when finished with downloading
+                if (filesRemaining == 0)
+                {
+                    //Debug.WriteLine("Remaining: FINISHED");
+                    _ = SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
+                } else
+                {
+                    //Debug.WriteLine("Remaining:" + filesRemaining);
+                }
             };
 
             taskManager.PushBack(task);

@@ -273,7 +273,7 @@ namespace UAV_App.Pages
                 await Task.Delay(500);
             }
 
-            if (err == SDKError.NO_ERROR)
+             if (err == SDKError.NO_ERROR)
             {
                 return true;
             }
@@ -434,7 +434,9 @@ namespace UAV_App.Pages
                     _downloadMedia = new RelayCommand(delegate ()
                     {
                         CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
-                        cameraCommandHandler.GetMostRecentPhoto();
+                        // TODO: File name
+                        var name = "Photo.jpg";
+                        cameraCommandHandler.DownloadMostRecentPhoto(name);
                     }, delegate () { return true; });
                 }
                 return _downloadMedia;
