@@ -17,22 +17,37 @@ namespace UAV_App.AI
             InitProcess();
         }
 
-        private void DownscaleResolution_Click(object sender, EventArgs e)
+        public void InitProcess()
         {
-            DownscaleResolution();
-        }
+            this.process = new Process();
 
-        private void tileImage_Click(object sender, EventArgs e)
-        {
-            ConvertImageToTiles();
+            // Set the Python script path
+            string scriptPath = @"..\..\Assets\AI_Assets\yolov5\detect.py";
+
+            // Set the command-line arguments for the script
+            double confidenceThreshold = 0.5;
+            string name = "prediction"; //TODO: change name to varying directory name so it doesnt overwrite
+            int imageSize = 672;
+            string weightsPath = @"..\..\Assets\AI_Assets\yolov5\runs\train\best\best.pt";
+            string sourcePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\TileImages";
+
+            string arguments = $"--weights {weightsPath} --img {imageSize} --conf {confidenceThreshold} --source {sourcePath} --name {name} --save-txt --hide-conf --hide-labels --save-conf --nosave";
+
+            // Configure the process start info
+            this.process.StartInfo.FileName = "python";
+            this.process.StartInfo.Arguments = $"{scriptPath} {arguments}"; // Include arguments in the script path
+            this.process.StartInfo.UseShellExecute = false;
+            this.process.StartInfo.CreateNoWindow = true;
+            this.process.StartInfo.RedirectStandardOutput = true;
+            this.process.StartInfo.RedirectStandardError = true;
         }
 
         public void DownscaleResolution()
         {
             Debug.WriteLine("Starting DownscaleResolution...");
 
-            string imagePath = @"C:/School/Jaar_3/Project_UAV/AI/Image_Preprocessing/Test4k.JPG";
-            string savePath = @"C:/School/Jaar_3/Project_UAV/AI/Image_Preprocessing/TestDownscale.jpg";
+            string imagePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\Image4K.JPG";
+            string savePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\ImageDownscale.jpg";
 
             Bitmap b = new Bitmap(Image.FromFile(imagePath));
             Size size = new Size(2720, 1530);
@@ -70,8 +85,8 @@ namespace UAV_App.AI
         {
             Debug.WriteLine("Starting ConvertImageToTiles...");
 
-            string imagePath = @"C:/School/Jaar_3/Project_UAV/AI/Image_Preprocessing/TestDownscale.JPG";
-            string savePath = @"C:/School/Jaar_3/Project_UAV/AI/Image_Preprocessing/TileImages/TestTileImage";
+            string imagePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\ImageDownscale.JPG";
+            string savePath = @"..\..\Assets\AI_Assets\Image_Preprocessing\TileImages/TileImage";
 
             Image[] imgarray = new Image[16];
             Bitmap img = new Bitmap(Image.FromFile(imagePath));
@@ -94,31 +109,6 @@ namespace UAV_App.AI
             }
 
             Debug.WriteLine("Ending ConvertImageToTiles...");
-        }
-
-        public void InitProcess()
-        {
-            this.process = new Process();
-
-            // Set the Python script path
-            string scriptPath = @"C:/School/Jaar_3/Project_UAV/AI/AI_Training_Code/yolov5/detect.py";
-
-            // Set the command-line arguments for the script
-            double confidenceThreshold = 0.5;
-            string name = "prediction"; //TODO: change name to varying directory name so it doesnt overwrite
-            int imageSize = 672;
-            string weightsPath = @"C:/School/Jaar_3/Project_UAV/AI/AI_Training_Code/yolov5/runs/train/exp11/weights/best.pt";
-            string sourcePath = @"C:/School/Jaar_3/Project_UAV/AI/Image_Preprocessing/TileImages";
-
-            string arguments = $"--weights {weightsPath} --img {imageSize} --conf {confidenceThreshold} --source {sourcePath} --name {name} --save-txt --hide-conf --hide-labels --save-conf --nosave";
-
-            // Configure the process start info
-            this.process.StartInfo.FileName = "python";
-            this.process.StartInfo.Arguments = $"{scriptPath} {arguments}"; // Include arguments in the script path
-            this.process.StartInfo.UseShellExecute = false;
-            this.process.StartInfo.CreateNoWindow = true;
-            this.process.StartInfo.RedirectStandardOutput = true;
-            this.process.StartInfo.RedirectStandardError = true;
         }
 
         public static void RunDetectionScript(Process process)
@@ -156,52 +146,6 @@ namespace UAV_App.AI
             Debug.WriteLine("Ending RunDetectionScript...");
         }
 
-        /*public static void RunDetectionScript(Process process) 
-        {
-            Debug.WriteLine("Starting RunDetectionScript...");
-
-            // Set the Python script path
-            string scriptPath = @"C:/School/Jaar_3/Project_UAV/AI/AI_Training_Code/yolov5/detect.py";
-
-            // Set the command-line arguments for the script
-            double confidenceThreshold = 0.5;
-            string name = "prediction";
-            int imageSize = 672;
-            string weightsPath = @"C:/School/Jaar_3/Project_UAV/AI/AI_Training_Code/yolov5/runs/train/exp11/weights/best.pt";
-            string sourcePath = @"C:/School/Jaar_3/Project_UAV/AI/Image_Preprocessing/TileImages";
-
-            string arguments = $"--weights {weightsPath} --img {imageSize} --conf {confidenceThreshold} --source {sourcePath} --name {name} --save-txt --hide-conf --hide-labels --save-conf --nosave";
-
-
-            using (Py.GIL())  // Acquire the Python Global Interpreter Lock (GIL)
-            {
-                *//*dynamic sys = Py.Import("sys");
-                dynamic scriptScope = Py.CreateScope();
-
-                // Import the script as a module
-                dynamic scriptModule = Py.Import(scriptPath);
-
-                // Set the command-line arguments
-                sys.argv = new[] { "", "--weights", weightsPath, "--img", imageSize.ToString(), "--conf", confidenceThreshold.ToString(), "--source", sourcePath, "--name", name, "--save-txt", "--hide-conf", "--hide-labels", "--save-conf", "--nosave" };
-
-                // Execute the script within the script scope
-                scriptModule.Execute(scriptScope);
-
-                // Access the variables or functions from the script if needed
-                dynamic result = scriptScope.Get("result");*//*
-
-
-                dynamic detectModule = Py.Import("detect");  // Import the detect module
-                dynamic mainFunc = detectModule.main;  // Get the reference to the main function
-
-                // Execute the detect module's main function
-                mainFunc(weightsPath, imageSize, confidenceThreshold, sourcePath, name);
-
-            }
-
-            Debug.WriteLine("Ending RunDetectionScript...");
-        }*/
-
         public List<Bird> SplitObjectsFromData(string data)
         {
             string[] values = data.Trim().Split("\r\n");
@@ -230,7 +174,7 @@ namespace UAV_App.AI
         {
             Debug.WriteLine("Starting ProcessPrediction...");
 
-            string directoryPath = @"C:\School\Jaar_3\Project_UAV\AI\AI_Training_Code\yolov5\runs\detect\prediction\labels\";
+            string directoryPath = @"..\..\Assets\AI_Assets\yolov5\runs\detect\prediction\labels\";
             try
             {
                 string[] filePaths = Directory.GetFiles(directoryPath, "*.txt");
@@ -277,46 +221,16 @@ namespace UAV_App.AI
             Debug.WriteLine("Ending ProcessPrediction...");
         }
 
-        private void fullTestButton_Click(object sender, EventArgs e)
+        private void RunFullDetection()
         {
-            /*if (this.process != null && !this.process.HasExited)
-            {
-                Debug.WriteLine("Process is already running");
-                return;
-            }*/
-            Stopwatch stopwatch = new Stopwatch();
-
-
             Debug.WriteLine("Starting AI...");
-            stopwatch.Start();
+
             DownscaleResolution();
-            stopwatch.Stop();
-            TimeSpan elapsedTimeDownscale = stopwatch.Elapsed;
-            stopwatch.Reset();
-
-            stopwatch.Start();
             ConvertImageToTiles();
-            stopwatch.Stop();
-            TimeSpan elapsedTimeTiles = stopwatch.Elapsed;
-            stopwatch.Reset();
-
-            stopwatch.Start();
             RunDetectionScript(this.process);
-            stopwatch.Stop();
-            TimeSpan elapsedTimeDetection = stopwatch.Elapsed;
-            stopwatch.Reset();
-
-            stopwatch.Start();
             ProcessPrediction();
-            stopwatch.Stop();
-            TimeSpan elapsedTimePredictions = stopwatch.Elapsed;
-            stopwatch.Reset();
-            Debug.WriteLine("Ending AI...");
 
-            Debug.WriteLine($"Elapsed time Dowscale: {elapsedTimeDownscale.TotalMilliseconds} milliseconds");
-            Debug.WriteLine($"Elapsed time Tiles: {elapsedTimeTiles.TotalMilliseconds} milliseconds");
-            Debug.WriteLine($"Elapsed time Detections: {elapsedTimeDetection.TotalMilliseconds} milliseconds");
-            Debug.WriteLine($"Elapsed time Predictions: {elapsedTimePredictions.TotalMilliseconds} milliseconds");
+            Debug.WriteLine("Ending AI...");
         }
     }
 }
