@@ -183,7 +183,6 @@ namespace UAV_App.Pages
         {
             List<Waypoint> attackMissionWaypoints = new List<Waypoint>();
 
-
             foreach (LocationCoordinate2D loc in geoPoints)
             {
                 attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40));
@@ -338,6 +337,7 @@ namespace UAV_App.Pages
                 missionGeoPoints.RemoveAt(0);
             }
 
+            // Testcode for chase away geopoints
             chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
 
             return locations;
