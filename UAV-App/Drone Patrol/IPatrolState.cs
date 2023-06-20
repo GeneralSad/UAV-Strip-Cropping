@@ -13,12 +13,10 @@ namespace UAV_App.Drone_Patrol
         MissionDone = 2,
         PrepareDone = 3,
         ExpellAnimals = 4,
-        NoHarmfullAnimalsFound = 5,
-        HarmfullAnimalsFound = 6,
-        ExpellDone = 7,
-        StopRoute = 8,
-        ContinueRoute = 9,
-        LandingDone = 10,
+        ExpellDone = 5,
+        StopRoute = 6,
+        ContinueRoute = 7,
+        LandingDone = 8,
     }
 
     public enum ParentState

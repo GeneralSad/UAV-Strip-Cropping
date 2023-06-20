@@ -328,6 +328,37 @@ namespace UAV_App.Pages
             }
         }
 
+                /// <summary>
+        /// function that calls the stopmission method of the drone and retriest it if it fails
+        /// </summary>
+        /// <returns> bool indicating if cancel was succesfull</returns>
+         public async Task<bool> StopMission()
+        {
+            SDKError err = SDKError.UNKNOWN;
+
+            for (int i = 0; i < RETRY_AMOUNT; i++)
+            {
+                err =  await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {                
+                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                return false;
+            }
+        }
+
 /*        /// <summary>
         /// Retreives the first few locations of the mission geopoints.
         /// </summary>
@@ -368,6 +399,8 @@ namespace UAV_App.Pages
 
             return locations;
         }
+
+
 
          /// <summary>
         /// Retreives the first few locations of the mission geopoints.
@@ -524,8 +557,6 @@ namespace UAV_App.Pages
                         }
                         ShouldPause = !ShouldPause;
 
-
-
                     }, delegate () { return true; });
                 }
                 return _pauseResumeMission;
@@ -541,11 +572,9 @@ namespace UAV_App.Pages
                 {
                     _emergencyStop = new RelayCommand(async delegate ()
                     {
-
-                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
-                        var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err.ToString()));
+                        var err =  await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
+                        var messageDialog = new MessageDialog(String.Format("Emergency Result: {0}.", err.ToString()));
                         await messageDialog.ShowAsync();
-
 
                     }, delegate () { return true; });
                 }

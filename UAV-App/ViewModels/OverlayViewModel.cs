@@ -159,7 +159,7 @@ namespace UAV_App.ViewModels
                 {
                     _emergencyStop = new RelayCommand(delegate ()
                     {
-                        //PatrolController.Instance.emergencyStopEvent();
+                        PatrolController.Instance.emergencyStopEvent();
                         Debug.WriteLine("Emergency");
                     }, delegate () { return true; });
                 }

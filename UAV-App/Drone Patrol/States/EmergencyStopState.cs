@@ -1,8 +1,10 @@
-﻿using System;
+﻿using DJI.WindowsSDK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UAV_App.Pages;
 
 namespace UAV_App.Drone_Patrol.States
 {
@@ -15,6 +17,7 @@ namespace UAV_App.Drone_Patrol.States
 
         public void onEnter()
         {
+
         }
 
         public void onLeave()
@@ -23,18 +26,27 @@ namespace UAV_App.Drone_Patrol.States
 
         public IPatrolState HandleEvent(PatrolEvent patrolEvent)
         {
-            if (PatrolEvent.ExpellDone == patrolEvent)
+            if (PatrolEvent.MissionStopped == patrolEvent)
             {
-                return new ScoutPatrolState();
+                return new IdleState();
             }
 
             return null;
         }
 
 
-        Task IPatrolState.run()
+        public async Task run()
         {
-         return Task.FromResult(0);
+             
+            await WaypointMissionViewModel.Instance.StopMission();
+
+            WaypointMissionState state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
+
+            if (WaypointMissionState.READY_TO_UPLOAD == state || WaypointMissionState.READY_TO_EXECUTE == state)
+            {
+                HandleEvent(PatrolEvent.MissionStopped);
+            }
         }
+
     }
 }
