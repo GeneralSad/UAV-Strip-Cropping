@@ -339,7 +339,7 @@ namespace UAV_App.Pages
 
             }
 
-            chaseAwayGeoPoints = missionGeoPoints;
+            chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
 
             return locations;
 
