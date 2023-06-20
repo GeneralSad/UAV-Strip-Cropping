@@ -100,9 +100,8 @@
     <Compile Include="..\DJISampleSources\ViewModels\ViewModelBase.cs">
       <Link>ViewModels\ViewModelBase.cs</Link>
     </Compile>
-    <Compile Include="AI\AnimalDetection.cs" />
-    <Compile Include="AI\IAICallback.cs" />
-    <Compile Include="AI\IAIReceiverCallback.cs" />
+    <Compile Include="AI\AIDetection.cs" />
+    <Compile Include="AI\Bird.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -220,6 +219,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
       <Version>2.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Drawing.Common">
+      <Version>7.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
