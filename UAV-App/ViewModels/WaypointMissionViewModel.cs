@@ -253,7 +253,7 @@ namespace UAV_App.Pages
             }
             else
             {                
-                Debug.WriteLine($"load mission error: {err}");
+                Debug.WriteLine($"load mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
                 return false;
             }
         }
@@ -286,7 +286,7 @@ namespace UAV_App.Pages
             }
             else
             {
-                Debug.WriteLine($"upload mission error: {err.ToString()} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                Debug.WriteLine($"upload mission error: {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
                 return false;
             }
         }
@@ -318,7 +318,7 @@ namespace UAV_App.Pages
             }
             else
             {                
-                Debug.WriteLine($"start mission error: {err.ToString()}");
+                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
                 return false;
             }
         }
@@ -336,12 +336,32 @@ namespace UAV_App.Pages
             {
                 locations.Add(missionGeoPoints[0]);
                 missionGeoPoints.RemoveAt(0);
-
             }
 
             chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
 
             return locations;
+
+        }
+
+        
+        public void WaypointMissionDone()
+        {
+            if (chaseAwayGeoPoints.Count == 0)
+            {
+                if (missionGeoPoints.Count > 0)
+                {
+                    PatrolController.Instance.startScoutRouteEvent();
+                } else 
+                {
+                    PatrolController.Instance.MissionDone();
+                }
+
+            }
+            else
+            {
+                PatrolController.Instance.harmfullAnimalsFound();
+            }
 
         }
 
@@ -374,27 +394,6 @@ namespace UAV_App.Pages
                 WaypointMissionExecuteState = value.HasValue ? value.Value.state : WaypointMissionExecuteState.UNKNOWN;
 
             });
-        }
-
-        public void WaypointMissionDone()
-        {
-
-            if (chaseAwayGeoPoints.Count == 0)
-            {
-                if (missionGeoPoints.Count > 0)
-                {
-                    PatrolController.Instance.startScoutRouteEvent();
-                }
-                {
-                    PatrolController.Instance.MissionDone();
-                }
-
-            }
-            else
-            {
-                PatrolController.Instance.harmfullAnimalsFound();
-            }
-
         }
 
         private WaypointMissionState _waypointMissionState;
