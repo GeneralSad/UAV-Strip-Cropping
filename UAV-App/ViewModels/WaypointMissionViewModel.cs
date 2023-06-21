@@ -8,12 +8,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.AI;
 using UAV_App.Drone_Communication;
 using UAV_App.Drone_Manager;
 using UAV_App.Drone_Patrol;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Popups;
+
 
 namespace UAV_App.Pages
 {
@@ -77,10 +79,14 @@ namespace UAV_App.Pages
         /// returns all found locations of harmfull animals
         /// </summary>
         /// <returns>all found locations of harmfull animals</returns>
-        public List<LocationCoordinate2D> getFoundAnimalPoints()
+        public async Task<List<LocationCoordinate2D>> getFoundAnimalPoints()
         {
+
+
+            var TempChaseAwayLoc = new List<LocationCoordinate2D>();
+            TempChaseAwayLoc.Add(new LocationCoordinate2D());
+
             //TESTCODE
-            var TempChaseAwayLoc = new List<LocationCoordinate2D>(chaseAwayGeoPoints);
             chaseAwayGeoPoints.Clear();
             return TempChaseAwayLoc;
         }
@@ -200,7 +206,7 @@ namespace UAV_App.Pages
                 {
                     _downloadMedia = new RelayCommand(delegate ()
                     {
-                        MediaHandler mediaHandler = new MediaHandler();
+                        MediaHandler mediaHandler = MediaHandler.Instance;
                         // TODO: File name
                         LocationCoordinate2D location = new LocationCoordinate2D
                         {

@@ -100,7 +100,7 @@ namespace UAV_App.Drone_Patrol.States
 
                         if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint)
                         {
-                            MediaHandler mediaHandler = new MediaHandler();
+                            MediaHandler mediaHandler = MediaHandler.Instance;
                             mediaHandler.DownloadMostRecentPhoto(WaypointMissionViewModel.Instance.AircraftLocation);
                             Debug.WriteLine(spots[photoTargetWaypoint]);
                             photoTargetWaypoint++;

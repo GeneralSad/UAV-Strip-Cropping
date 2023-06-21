@@ -30,7 +30,7 @@ namespace UAV_App.Drone_Patrol.States
 
         public async void onEnter()
         {
-            harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
+            harmfullAnimalSpots = await WaypointMissionViewModel.Instance.getFoundAnimalPoints();
             missionStarted = false;
             missionExecuting = false;
         }
