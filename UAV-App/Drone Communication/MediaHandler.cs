@@ -6,40 +6,18 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using UAV_App.Pages;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
-using DateTime = System.DateTime;
 
-namespace UAV_App.Drone_Patrol
+namespace UAV_App.Drone_Communication
 {
-    public class CameraCommandHandler
+    internal class MediaHandler
     {
-
-        //Default values for camera
-        private const double defaultPitch = -90;
-        private const double defaultSpeed = 1;
-
-        //Amount of seconds to wait on the movement of the gimval
-        private const double gimbalTimeout = 1.5;
-
-        //Amount of degrees of accuracy for the gimbal to take a photo
-        private const double gimbalAccuracy = 2.5;
-
-        //Default file name for downloading all photos
-        private const string defaultFileName = "Photo.jpg";
-        private string fileName = "Photo.jpg";
-
         //Counter to keep track with how many images have to be downloaded
         //When 0 is reached the camera is set to SHOOT_PHOTO
         private int filesRemaining = 0;
@@ -48,103 +26,11 @@ namespace UAV_App.Drone_Patrol
         private readonly CameraHandler cameraHandler = DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0);
         private readonly MediaTaskManager taskManager = new MediaTaskManager(0, 0);
 
+        private Dictionary<string, LocationCoordinate2D> locationDictionary = new Dictionary<string, LocationCoordinate2D>();
+        private Queue<LocationCoordinate2D> locationQueue = new Queue<LocationCoordinate2D>();
+
         //Boolean to see if all files are being downloaded, or just one
         private bool isDownloadAll = false;
-
-        //Make the gimbal rotate a certain amount of degrees
-        public async void SetGimbal(double pitch, double speed = defaultSpeed)
-        {
-            GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
-
-            GimbalAngleRotation gimbalAngleRotation = new GimbalAngleRotation
-            {
-                mode = GimbalAngleRotationMode.ABSOLUTE_ANGLE,
-                pitch = pitch,
-                pitchIgnored = false,
-                duration = speed
-            };
-
-            await gimbalHandler.RotateByAngleAsync(gimbalAngleRotation);
-        }
-
-        //Get the pitch value of the gimbal
-        public async Task<double> GetGimbalPitch()
-        {
-            GimbalHandler gimbalHandler = DJISDKManager.Instance.ComponentManager.GetGimbalHandler(0, 0);
-            var attitude = await gimbalHandler.GetGimbalAttitudeAsync();
-            if (attitude.value.HasValue) return attitude.value.Value.pitch;
-            else return 0;
-        }
-
-        //Set gimbal to default gimbal postion
-        public void ResetGimbal()
-        {
-            SetGimbal(defaultPitch);
-        }
-
-        //Reset camera settings and rotate gimbal to default position
-        public async Task ResetCamera()
-        {
-            await SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
-
-            PhotoRatioMsg photoRatioMsg = new PhotoRatioMsg
-            {
-                value = PhotoRatio.RATIO_16COLON9
-            };
-
-            CameraISOMsg cameraISOMsg = new CameraISOMsg
-            {
-                value = CameraISO.ISO_AUTO
-            };
-
-            PhotoStorageFormatMsg photoStorageFormatMsg = new PhotoStorageFormatMsg
-            {
-                value = PhotoStorageFormat.JPEG
-            };
-
-            CameraStorageLocationMsg cameraStorageLocationMsg = new CameraStorageLocationMsg
-            {
-                value = CameraStorageLocation.SDCARD
-            };
-
-            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).ResetCameraSettingAsync();
-            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetPhotoRatioAsync(photoRatioMsg);
-            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetISOAsync(cameraISOMsg);
-            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetPhotoStorageFormatAsync(photoStorageFormatMsg);
-            await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraStorageLocationAsync(cameraStorageLocationMsg);
-
-            ResetGimbal();
-
-            double gimbalPitch = await GetGimbalPitch();
-
-            DateTime time = DateTime.Now;
-            while (Math.Abs(gimbalPitch - defaultPitch) > gimbalAccuracy)
-            {
-                if (DateTime.Now >= time.AddSeconds(gimbalTimeout))
-                {
-                    Debug.WriteLine("Gimbal move timeout");
-                    return;
-                }
-                gimbalPitch = await GetGimbalPitch();
-            }
-        }
-
-        //Make the drone take a photo
-        public async void TakePhoto()
-        {
-            await ResetCamera();
-
-            var retCode = await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).StartShootPhotoAsync();
-            if (retCode != SDKError.NO_ERROR)
-            {
-                Debug.WriteLine("Failed to shoot photo, result code is " + retCode.ToString());
-            }
-            else
-            {
-                Debug.WriteLine("Shoot photo successfully");
-            }
-
-        }
 
         //Set the camera to the given work mode
         private async Task<bool> SetCameraWorkMode(CameraWorkMode mode)
@@ -164,18 +50,35 @@ namespace UAV_App.Drone_Patrol
 
         //Request list of downloadable items from drone.
         //Wait for response, then download most recent files
-        public async void DownloadMostRecentPhoto(string name)
+        public async void DownloadMostRecentPhoto(LocationCoordinate2D location)
         {
-            fileName = name;
+            locationQueue.Enqueue(location);
             isDownloadAll = false;
             await LoadFiles(MediaFileListLocation.SD_CARD);
+        }
+
+        //Get the last item in the list and return the location
+        public LocationCoordinate2D GetMostRecentPhotoLocation()
+        {
+            MediaFile file = files.Last();
+
+            LocationCoordinate2D location;
+            locationDictionary.TryGetValue(file.fileName, out location);
+            return location;
+        }
+
+        //Get location from filename
+        public LocationCoordinate2D GetLocationFromFileName(string fileName)
+        {
+            LocationCoordinate2D location;
+            locationDictionary.TryGetValue(fileName, out location);
+            return location;
         }
 
         //Request list of downloadable items from drone.
         //Wait for response, then download all files
         public async void DownloadAllPhotos()
         {
-            fileName = defaultFileName;
             isDownloadAll = true;
             await LoadFiles(MediaFileListLocation.SD_CARD);
         }
@@ -260,6 +163,7 @@ namespace UAV_App.Drone_Patrol
             {
                 //Add all files to the file list
                 files.ForEach(obj => {
+                    locationDictionary.Add(obj.fileName, locationQueue.Dequeue());
                     this.files.Add(obj);
                 });
 
@@ -270,7 +174,8 @@ namespace UAV_App.Drone_Patrol
                     if (isDownloadAll)
                     {
                         DownloadAllFilesAsync();
-                    } else
+                    }
+                    else
                     {
                         DownloadRecentFileAsync();
                     }
@@ -310,7 +215,7 @@ namespace UAV_App.Drone_Patrol
 
             //Create folder and file for downloading
             StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Pictures", CreationCollisionOption.OpenIfExists);
-            var storageFile = await storageFolder.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
+            var storageFile = await storageFolder.CreateFileAsync(file.fileName, CreationCollisionOption.GenerateUniqueName);
             var stream = await storageFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
             var outputStream = stream.GetOutputStreamAt(0);
             var fileWriter = new DataWriter(outputStream);
@@ -331,7 +236,8 @@ namespace UAV_App.Drone_Patrol
                 {
                     //Debug.WriteLine("Remaining: FINISHED");
                     _ = SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
-                } else
+                }
+                else
                 {
                     //Debug.WriteLine("Remaining:" + filesRemaining);
                 }
@@ -352,7 +258,7 @@ namespace UAV_App.Drone_Patrol
                 SuggestedStartLocation = PickerLocationId.Downloads
             };
             savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
-            savePicker.SuggestedFileName = "Card" + DateTime.Now.ToString("yyyyMMddhhmmss");
+            savePicker.SuggestedFileName = "Card" + System.DateTime.Now.ToString("yyyyMMddhhmmss");
             StorageFile savefile = await savePicker.PickSaveFileAsync();
 
             if (savefile == null)
@@ -379,5 +285,6 @@ namespace UAV_App.Drone_Patrol
                 await encoder.FlushAsync();
             }
         }
+
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.Drone_Communication;
 using UAV_App.Drone_Manager;
 using UAV_App.Drone_Patrol;
 using Windows.ApplicationModel.Core;
@@ -433,10 +434,10 @@ namespace UAV_App.Pages
                 {
                     _downloadMedia = new RelayCommand(delegate ()
                     {
-                        CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
+                        MediaHandler mediaHandler = new MediaHandler();
                         // TODO: File name
                         var name = "Photo.jpg";
-                        cameraCommandHandler.DownloadMostRecentPhoto(name);
+                        mediaHandler.DownloadMostRecentPhoto(name);
                     }, delegate () { return true; });
                 }
                 return _downloadMedia;

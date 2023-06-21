@@ -116,6 +116,7 @@
     <Compile Include="Drone Communication\DroneCommunicationSender.cs" />
     <Compile Include="Drone Communication\DroneStreamReceiver.cs" />
     <Compile Include="Drone Communication\IStreamCommands.cs" />
+    <Compile Include="Drone Communication\MediaHandler.cs" />
     <Compile Include="Drone Manager\IPatrolMessage.cs" />
     <Compile Include="Drone Manager\PatrolController.cs" />
     <Compile Include="Drone Movement\DroneMovementStateMachine.cs" />
@@ -127,7 +128,7 @@
     <Compile Include="Drone Movement\States\IdleState.cs" />
     <Compile Include="Drone Movement\States\HoverState.cs" />
     <Compile Include="Drone Movement\States\PreparingState.cs" />
-    <Compile Include="Drone Patrol\CameraCommandHandler.cs" />
+    <Compile Include="Drone Manager\CameraCommandHandler.cs" />
     <Compile Include="Drone Patrol\IPatrolState.cs" />
     <Compile Include="Drone Patrol\PatrolStateMachine.cs" />
     <Compile Include="Drone Patrol\States\ConnectingState.cs" />
