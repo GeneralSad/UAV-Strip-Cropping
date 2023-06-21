@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UAV_App.Drone_Communication;
 using UAV_App.Drone_Manager;
 using UAV_App.Pages;
 
@@ -22,7 +23,7 @@ namespace UAV_App.Drone_Patrol.States
         /// State responsible for scouting an area. this is moving from waypoint to waypoint to take pictures of each waypoint
         /// </summary>
         public ScoutPatrolState()
-        {}
+        { }
 
         private bool missionStarted;
         private bool missionExecuting;
@@ -49,7 +50,7 @@ namespace UAV_App.Drone_Patrol.States
                     return new ScoutPatrolState();
                 case PatrolEvent.ExpellAnimals:
                     return new ExpelAnimalsState();
-                      case PatrolEvent.MissionDone: 
+                case PatrolEvent.MissionDone:
                     return new HomeState();
             }
 
@@ -64,9 +65,10 @@ namespace UAV_App.Drone_Patrol.States
 
             if (!missionStarted)
             {
-  missionStarted = await startScoutMission(spots);
-            } else
-            
+                missionStarted = await startScoutMission(spots);
+            }
+            else
+
             {
                 if (!missionExecuting)
                 {
@@ -94,23 +96,21 @@ namespace UAV_App.Drone_Patrol.States
                         {
                             Debug.WriteLine("scout mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
-                            photoTargetWaypoint++;
                         }
 
-                        if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint) 
-                    {
-                        Debug.WriteLine(spots[photoTargetWaypoint]);
-                        photoTargetWaypoint++;
+                        if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint)
+                        {
+                            MediaHandler mediaHandler = new MediaHandler();
+                            mediaHandler.DownloadMostRecentPhoto(WaypointMissionViewModel.Instance.AircraftLocation);
+                            Debug.WriteLine(spots[photoTargetWaypoint]);
+                            photoTargetWaypoint++;
+                        }
                     }
-
-                    
-                        
                 }
             }
         }
-        }
 
-                /// <summary>
+        /// <summary>
         /// creates, loads, uploads and starts a scout mission. 
         /// A scout mission is a mission with waypoints at 40m high, where pictures are taken at every location
         /// </summary>
@@ -129,7 +129,7 @@ namespace UAV_App.Drone_Patrol.States
                 scoutMissionWaypoints.Add(PatrolController.NewWaypoint(loc.latitude, loc.longitude, 40, actions));
             }
 
-            if (geoPoints.Count <= 0)
+            if (geoPoints.Count == 1)
             { // if there are is only one geopoint the drone location is the first waypoint
                 var aircraftLocation = WaypointMissionViewModel.Instance.AircraftLocation;
                 scoutMissionWaypoints.Insert(0, PatrolController.NewWaypoint(aircraftLocation.latitude, aircraftLocation.longitude, 40, actions));
@@ -152,7 +152,7 @@ namespace UAV_App.Drone_Patrol.States
             };
 
             bool result;
-            
+
             result = await PatrolController.LoadWaypointMission(scoutMission);
 
             if (!result) return false; // did the mission load correctly? if not return false

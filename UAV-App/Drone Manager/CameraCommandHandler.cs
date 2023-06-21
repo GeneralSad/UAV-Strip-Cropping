@@ -14,12 +14,6 @@ namespace UAV_App.Drone_Patrol
         private const double defaultPitch = -90;
         private const double defaultSpeed = 1;
 
-        //Amount of seconds to wait on the movement of the gimval
-        private const double gimbalTimeout = 1.5;
-
-        //Amount of degrees of accuracy for the gimbal to take a photo
-        private const double gimbalAccuracy = 2.5;
-
         //Make the gimbal rotate a certain amount of degrees
         public async void SetGimbal(double pitch, double speed = defaultSpeed)
         {
@@ -83,19 +77,6 @@ namespace UAV_App.Drone_Patrol
             await DJISDKManager.Instance.ComponentManager.GetCameraHandler(0, 0).SetCameraStorageLocationAsync(cameraStorageLocationMsg);
 
             ResetGimbal();
-
-            double gimbalPitch = await GetGimbalPitch();
-
-            DateTime time = DateTime.Now;
-            while (Math.Abs(gimbalPitch - defaultPitch) > gimbalAccuracy)
-            {
-                if (DateTime.Now >= time.AddSeconds(gimbalTimeout))
-                {
-                    Debug.WriteLine("Gimbal move timeout");
-                    return;
-                }
-                gimbalPitch = await GetGimbalPitch();
-            }
         }
 
         //Make the drone take a photo
