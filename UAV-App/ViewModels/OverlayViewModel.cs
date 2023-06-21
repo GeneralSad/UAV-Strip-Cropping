@@ -48,21 +48,23 @@ namespace UAV_App.ViewModels
             DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).IsHomeLocationSetChanged += AircraftHomeLocationChanged;
             DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).VelocityChanged += AircraftVelocityChanged;
 
-            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).ConnectionChanged += ConnectionChanged;
+            DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).ConnectionChanged += ConnectionChangedAsync;
         }
 
-        private void ConnectionChanged(object sender, BoolMsg? value)
+        //If the drone has connected, reset camera settings for taking pictures
+        private async void ConnectionChangedAsync(object sender, BoolMsg? value)
         {
             if (value.HasValue)
             {
                 if (value.Value.value)
                 {
                     CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
-                    cameraCommandHandler.ResetCamera();
+                    await cameraCommandHandler.ResetCamera();
                 }
             }
         }
 
+        //Update batterylevel on the GUI
         public async void BatteryPercentageChanged(object sender, IntMsg? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -74,6 +76,7 @@ namespace UAV_App.ViewModels
             });
         }
 
+        //Update satellite count on the GUI
         public async void SatelliteCountChanged(object sender, IntMsg? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -85,6 +88,7 @@ namespace UAV_App.ViewModels
             });
         }
 
+        //Update altitude on the GUI
         public async void AircraftAltitudeChanged(object sender, DoubleMsg? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -110,6 +114,8 @@ namespace UAV_App.ViewModels
         }
 
         //Update Set Home button color to signify if a home point has been set
+        //Red = No home point set
+        //Green = Home point set
         public async void AircraftHomeLocationChanged(object sender, BoolMsg? value)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -149,7 +155,7 @@ namespace UAV_App.ViewModels
             });
         }
 
-        //Emergency stop logic
+        //Emergency stop, call emergency stop of patrolcontroller to stop mission
         public ICommand _emergencyStop;
         public ICommand EmergencyStop
         {
@@ -159,7 +165,7 @@ namespace UAV_App.ViewModels
                 {
                     _emergencyStop = new RelayCommand(delegate ()
                     {
-                        //PatrolController.Instance.emergencyStopEvent();
+                        PatrolController.Instance.emergencyStopEvent();
                         Debug.WriteLine("Emergency");
                     }, delegate () { return true; });
                 }
@@ -214,6 +220,9 @@ namespace UAV_App.ViewModels
                 return _feedTapped;
             }
         }
+
+        //-------------------------------------------------------------//
+        //Default values and getters/setters for values
 
         private SolidColorBrush _setHomeColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 204, 204));
         public SolidColorBrush SetHomeColor

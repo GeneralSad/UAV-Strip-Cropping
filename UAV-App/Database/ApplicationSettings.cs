@@ -22,10 +22,12 @@ namespace UAV_App.Database
 
             if (storedAppKey != null)
             {
+                //Register SDK
                 DJISDKManager.Instance.RegisterApp(storedAppKey);
             }
             else
             {
+                //Ask for the app key, and try to registet the app
                 var appKeyDialog = new AppKeyDialog();
                 var result = await appKeyDialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)

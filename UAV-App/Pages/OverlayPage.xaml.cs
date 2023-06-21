@@ -30,6 +30,7 @@ namespace UAV_App.Pages
             }
         }
 
+        //Boolean to check if feed is active and needs te be started or not
         public bool IsVideoFeedActive = false;
 
         private Parser videoParser;
@@ -80,6 +81,7 @@ namespace UAV_App.Pages
             IsVideoFeedActive = false;
         }
 
+        //Start teh video feed module
         private async void InitializeVideoFeedModule()
         {
             //Must run in UI thread

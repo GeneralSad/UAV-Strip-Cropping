@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,6 +21,8 @@ namespace UAV_App.Pages
 {
     public sealed partial class SDKPage : Page
     {
+        //Page for when no app key has been set and the user clicked on cancel
+        //This way the user won't have to start up the application again to see the popup
         public SDKPage()
         {
             this.InitializeComponent();
@@ -29,8 +31,7 @@ namespace UAV_App.Pages
 
         }
 
-   
-
+        //Load the settings when button has been clicked
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ApplicationSettings applicationSettings = new ApplicationSettings();

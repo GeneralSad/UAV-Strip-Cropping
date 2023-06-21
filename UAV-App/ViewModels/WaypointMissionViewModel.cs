@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using UAV_App.Drone_Communication;
 using UAV_App.Drone_Manager;
 using UAV_App.Drone_Patrol;
 using Windows.ApplicationModel.Core;
@@ -285,7 +286,7 @@ namespace UAV_App.Pages
                 await Task.Delay(500);
             }
 
-            if (err == SDKError.NO_ERROR)
+             if (err == SDKError.NO_ERROR)
             {
                 return true;
             }
@@ -493,8 +494,14 @@ namespace UAV_App.Pages
                 {
                     _downloadMedia = new RelayCommand(delegate ()
                     {
-                        CameraCommandHandler cameraCommandHandler = new CameraCommandHandler();
-                        cameraCommandHandler.GetMostRecentPhoto();
+                        MediaHandler mediaHandler = new MediaHandler();
+                        // TODO: File name
+                        LocationCoordinate2D location = new LocationCoordinate2D
+                        {
+                            latitude = 0.0,
+                            longitude = 0.0
+                        };
+                        mediaHandler.DownloadMostRecentPhoto(location);
                     }, delegate () { return true; });
                 }
                 return _downloadMedia;

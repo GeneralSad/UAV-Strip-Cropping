@@ -4,11 +4,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:UAV_App.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="using:UAV_App.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:InformationRapportViewModel}"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid Background="#FF3BA01E">
+    <Grid>
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Margin" Value="10"/>
+                </Style>
+            </StackPanel.Resources>
 
+            <Button Command="{Binding OpenLog}">Open Last log</Button>
+            <Button Command="{Binding OpenLogLocation}">Open Log location</Button>
+        </StackPanel>
     </Grid>
 </Page>

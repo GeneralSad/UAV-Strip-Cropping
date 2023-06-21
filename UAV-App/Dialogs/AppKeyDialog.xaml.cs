@@ -19,6 +19,7 @@ namespace UAV_App.Dialogs
     {
         public static readonly DependencyProperty appKeyProperty = DependencyProperty.Register("AppKey", typeof(string), typeof(AppKeyDialog), new PropertyMetadata(default(string)));
 
+        //Dialog to enter the app key when starting the application for the first time
         public AppKeyDialog()
         {
             InitializeComponent();
@@ -38,7 +39,6 @@ namespace UAV_App.Dialogs
 
         private void AppKeyDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-
         }
 
         private void AppKeyDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
