@@ -1,4 +1,4 @@
-﻿using DJI.WindowsSDK;
+using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,16 +18,19 @@ namespace UAV_App.Drone_Patrol.States
         private bool missionStarted;
         private bool missionExecuting;
         List<LocationCoordinate2D> spots;
+        private int photoTargetWaypoint;
         public async void onEnter()
         {
-            spots = WaypointMissionViewModel.Instance.getFirstLocations();
+            spots = WaypointMissionViewModel.Instance.getFirstLocations(3);
             missionStarted = false;
             missionExecuting = false;
 
+            photoTargetWaypoint = 0;
         }
 
         public void onLeave()
         {
+            WaypointMissionViewModel.Instance.removeFirstLocations(3);
         }
 
         public IPatrolState HandleEvent(PatrolEvent patrolEvent)
@@ -38,8 +41,8 @@ namespace UAV_App.Drone_Patrol.States
                     return new ScoutPatrolState();
                 case PatrolEvent.ExpellAnimals:
                     return new ExpelAnimalsState();
-                case PatrolEvent.MissionDone:
-                    return new IdleState();
+                      case PatrolEvent.MissionDone: 
+                    return new HomeState();
             }
 
             return null;
@@ -80,8 +83,10 @@ namespace UAV_App.Drone_Patrol.States
                         if (!missionState.HasValue)
                         {
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
+                            photoTargetWaypoint++;
                         }
                     }
+                        
                 }
             }
         }

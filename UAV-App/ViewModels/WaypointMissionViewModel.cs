@@ -45,6 +45,13 @@ namespace UAV_App.Pages
             geoPoints = new List<LocationCoordinate2D>();
         }
 
+        
+        public void DownloadWaypointFoto(int currentWaypoint)
+        {
+           LocationCoordinate2D waypoint = missionGeoPoints[currentWaypoint];
+            
+        }
+
         /// <summary>
         /// returns a new waypoint with all of the correct settings
         /// </summary>
@@ -137,7 +144,6 @@ namespace UAV_App.Pages
             { // if there are is only one geopoint the drone location is the first waypoint
 
                 scoutMissionWaypoints.Insert(0, NewWaypoint(AircraftLocation.latitude, AircraftLocation.longitude, 40, actions));
-
             };
 
             WaypointMission scoutMission = new WaypointMission()
@@ -322,7 +328,7 @@ namespace UAV_App.Pages
             }
         }
 
-        /// <summary>
+/*        /// <summary>
         /// Retreives the first few locations of the mission geopoints.
         /// </summary>
         /// <returns> the first few locations of mission geopoints</returns>
@@ -342,8 +348,43 @@ namespace UAV_App.Pages
 
             return locations;
 
+        }*/
+
+        /// <summary>
+        /// Retreives the first few locations of the mission geopoints.
+        /// </summary>
+        /// <returns> the first few locations of mission geopoints</returns>
+        public List<LocationCoordinate2D> getFirstLocations(int amount)
+        {
+            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
+
+            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
+            for (int i = 0; i < itemAmount; i++)
+            {
+                locations.Add(missionGeoPoints[0]);
+            }
+
+            chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
+
+            return locations;
         }
 
+         /// <summary>
+        /// Retreives the first few locations of the mission geopoints.
+        /// </summary>
+        /// <returns> the first few locations of mission geopoints</returns>
+        public List<LocationCoordinate2D> removeFirstLocations(int amount)
+        {
+            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
+
+            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
+            for (int i = 0; i < itemAmount; i++)
+            {
+                missionGeoPoints.RemoveAt(0);
+            }
+
+            return locations;
+        }
         
         public void WaypointMissionDone()
         {
@@ -363,6 +404,21 @@ namespace UAV_App.Pages
                 PatrolController.Instance.harmfullAnimalsFound();
             }
 
+        }
+
+        public async Task<bool> goHome()
+        {
+            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"go home error: {err}");
+                return false;
+            }
         }
 
 
@@ -395,6 +451,7 @@ namespace UAV_App.Pages
 
             });
         }
+
 
         private WaypointMissionState _waypointMissionState;
         public WaypointMissionState WaypointMissionState
