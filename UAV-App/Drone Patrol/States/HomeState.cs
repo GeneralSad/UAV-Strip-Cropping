@@ -37,7 +37,6 @@ namespace UAV_App.Drone_Patrol.States
         {
             switch (patrolEvent)
             {
-                case PatrolEvent.StartScoutPatrol: 
                       case PatrolEvent.LandingDone: 
                     return new IdleState();
             }
@@ -55,23 +54,9 @@ namespace UAV_App.Drone_Patrol.States
             if (!landingStarted)
             {
               landingStarted = await goHome();
-            } else if (System.DateTime.UtcNow - lastRanTime > timeout)
-            {
-                lastRanTime = System.DateTime.UtcNow;
 
-                ResultValue<FCGoHomeStateMsg?> resultValue = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).GetGoHomeStateAsync();
-                FCGoHomeStateMsg? homeState = resultValue.value;
-
-                if (homeState == null && homeState.HasValue) // get loaded mission returns null when the mission is done
-                {
-                    Debug.WriteLine(homeState.Value.ToString());
-                   if (FCGoHomeState.COMPLETED ==  homeState.Value.value)
-                    {
-                        PatrolController.Instance.landDoneEvent(); 
-                    }
-                    
-                }
-            }
+                PatrolController.Instance.landDoneEvent();
+            } 
         }
 
         
