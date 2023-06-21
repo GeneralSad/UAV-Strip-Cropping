@@ -9,6 +9,10 @@ using UAV_App.Pages;
 
 namespace UAV_App.Drone_Manager
 {
+
+    /// <summary>
+    /// State machine responsible for handling all of the logic of the code
+    /// </summary>
     public class PatrolController : IPatrolMessage
     {
         private PatrolStateMachine patrolStateMachine;
@@ -64,38 +68,22 @@ namespace UAV_App.Drone_Manager
 
         }
 
-        public void cancelAndReturnToStartingPointEvent()
+        internal void EmergencyStopEvent()
         {
-            throw new NotImplementedException();
+            this.patrolStateMachine.EmergencyStop();
         }
 
-        public void continueRouteEvent()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void emergencyStopEvent()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void landEvent()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void startScoutRouteEvent()
+        internal void startScoutRouteEvent()
         {
             this.patrolStateMachine.StartScoutPatrol();
         }
 
-
-        public void harmfullAnimalsFound()
+        internal void harmfullAnimalsFound()
         {
             this.patrolStateMachine.ExpellAnimals();
         }
 
-        public void MissionDone()
+        internal void MissionDone()
         {
             this.patrolStateMachine.MissionDone();
         }
@@ -103,6 +91,11 @@ namespace UAV_App.Drone_Manager
         public async Task run()
         {
             await this.patrolStateMachine.run();
+        }
+
+        internal void landDoneEvent()
+        {
+          this.patrolStateMachine.LandDone();
         }
     }
 }

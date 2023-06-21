@@ -8,12 +8,19 @@ using UAV_App.Pages;
 
 namespace UAV_App.Drone_Patrol.States
 {
+
     public class ScoutPatrolState : IPatrolState
     {
         public ParentState getParent()
         {
             return ParentState.PATROUILLING;
         }
+
+        /// <summary>
+        /// State responsible for scouting an area. this is moving from waypoint to waypoint to take pictures of each waypoint
+        /// </summary>
+        public ScoutPatrolState()
+        {}
 
         private bool missionStarted;
         List<LocationCoordinate2D> spots;

@@ -112,17 +112,12 @@
     <Compile Include="Dialogs\AppKeyDialog.xaml.cs">
       <DependentUpon>AppKeyDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Drone Communication\DroneCommunicationReceiver.cs" />
-    <Compile Include="Drone Communication\DroneCommunicationSender.cs" />
-    <Compile Include="Drone Communication\DroneStreamReceiver.cs" />
-    <Compile Include="Drone Communication\IStreamCommands.cs" />
     <Compile Include="Drone Manager\IPatrolMessage.cs" />
     <Compile Include="Drone Manager\PatrolController.cs" />
     <Compile Include="Drone Patrol\CameraCommandHandler.cs" />
     <Compile Include="Drone Patrol\IPatrolState.cs" />
     <Compile Include="Drone Patrol\PatrolStateMachine.cs" />
     <Compile Include="Drone Patrol\States\ConnectingState.cs" />
-    <Compile Include="Drone Patrol\States\DetectingAnimalsState.cs" />
     <Compile Include="Drone Patrol\States\EmergencyStopState.cs" />
     <Compile Include="Drone Patrol\States\ExpelAnimalsState.cs" />
     <Compile Include="Drone Patrol\States\HomeState.cs" />

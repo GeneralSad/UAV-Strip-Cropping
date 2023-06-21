@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UAV_App.Drone_Manager;
 using UAV_App.Pages;
 
 namespace UAV_App.Drone_Patrol.States
@@ -14,6 +15,11 @@ namespace UAV_App.Drone_Patrol.States
         {
             return ParentState.PATROUILLING;
         }
+
+        /// <summary>
+        /// State returns the drone to the home position. Upon completion transfers active state to idle state.
+        /// </summary>
+        public HomeState() {}
 
         private bool landingStarted;
         List<LocationCoordinate2D> spots;
@@ -59,7 +65,7 @@ namespace UAV_App.Drone_Patrol.States
                 {
                    if (FCGoHomeState.COMPLETED ==  homeState.Value.value)
                     {
-                        HandleEvent(PatrolEvent.LandingDone);
+                        PatrolController.Instance.landDoneEvent(); 
                     }
                     
                 }

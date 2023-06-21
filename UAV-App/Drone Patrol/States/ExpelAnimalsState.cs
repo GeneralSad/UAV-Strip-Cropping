@@ -15,6 +15,13 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.PATROUILLING;
         }
 
+        /// <summary>
+        /// this state retreives all currently found harmfull spots. 
+        /// Then it will call the mission responsible for executing the expell methods.
+        /// Currently that means a waypoint mission that will move to the spot at 40m, rapidly descent to 5m and then go back to 40m and repeat
+        /// </summary>
+        public ExpelAnimalsState() {}
+
         private List<LocationCoordinate2D> harmfullAnimalSpots;
         private bool missionStarted;
 

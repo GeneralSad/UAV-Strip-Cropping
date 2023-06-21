@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UAV_App.Drone_Manager;
 using UAV_App.Pages;
 
 namespace UAV_App.Drone_Patrol.States
@@ -44,7 +45,7 @@ namespace UAV_App.Drone_Patrol.States
 
             if (WaypointMissionState.READY_TO_UPLOAD == state || WaypointMissionState.READY_TO_EXECUTE == state)
             {
-                HandleEvent(PatrolEvent.MissionStopped);
+              PatrolController.Instance.MissionDone(); 
             }
         }
 

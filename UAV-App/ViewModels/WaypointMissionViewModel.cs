@@ -418,7 +418,8 @@ namespace UAV_App.Pages
 
             return locations;
         }
-        
+
+                
         public void WaypointMissionDone()
         {
             if (chaseAwayGeoPoints.Count == 0)
@@ -439,6 +440,11 @@ namespace UAV_App.Pages
 
         }
 
+
+        /// <summary>
+        /// Sends the drone home
+        /// </summary>
+        /// <returns> Bool indicating if the home request was succesfully received</returns>
         public async Task<bool> goHome()
         {
             var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
