@@ -58,13 +58,15 @@ namespace UAV_App.Drone_Communication
         }
 
         //Get the last item in the list and return the location
-        public LocationCoordinate2D GetMostRecentPhotoLocation()
+        public async Task<string> GetMostRecentPhotoFilePath()
         {
-            MediaFile file = files.Last();
-
-            LocationCoordinate2D location;
-            locationDictionary.TryGetValue(file.fileName, out location);
-            return location;
+            StorageFolder storageFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Pictures", CreationCollisionOption.OpenIfExists);
+            if (files.Count > 0)
+            {
+                MediaFile file = files.Last();
+                return storageFolder.Path + file.fileName;
+            }
+            return null;
         }
 
         //Get location from filename
