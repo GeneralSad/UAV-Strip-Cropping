@@ -72,6 +72,7 @@ namespace UAV_App.Drone_Patrol.States
                 {
                     var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 
+
                     if (WaypointMissionState.EXECUTING == state)
                     {
                         Debug.WriteLine("scout executing done");
@@ -87,13 +88,16 @@ namespace UAV_App.Drone_Patrol.States
                         /*              WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
                                         if (mission == null) // get loaded mission returns null when the mission is done*/
 
+                        var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
                         WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                        if (!missionState.HasValue)
+                        if (WaypointMissionState.EXECUTING != state)
                         {
                             Debug.WriteLine("scout mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
                             photoTargetWaypoint++;
-                        }else if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint) 
+                        }
+
+                        if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint) 
                     {
                         Debug.WriteLine(spots[photoTargetWaypoint]);
                         photoTargetWaypoint++;

@@ -86,8 +86,9 @@ namespace UAV_App.Drone_Patrol.States
                         // WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
                         // if (mission == null) // get loaded mission returns null when the mission is done
 
+                        var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
                         WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                        if (!missionState.HasValue) // latest execution event is set to null when mission completes
+                        if (WaypointMissionState.EXECUTING != state)
                         {
                             Debug.WriteLine("patrol mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
