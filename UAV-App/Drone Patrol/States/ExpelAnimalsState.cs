@@ -46,20 +46,20 @@ namespace UAV_App.Drone_Patrol.States
 
         public async Task run()
         {
+
             if (!missionStarted)
             {
               missionStarted = await WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots);
-
+                lastRanTime = System.DateTime.UtcNow;
             } 
             else if (System.DateTime.UtcNow - lastRanTime > timeout)
             {
-                lastRanTime = System.DateTime.UtcNow;
 
                // WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
                  // if (mission == null) // get loaded mission returns null when the mission is done
 
                 WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                if (missionState.HasValue && missionState.Value.isExecutionFinish) 
+                if (!missionState.HasValue) 
                 {
                     WaypointMissionViewModel.Instance.WaypointMissionDone();
                 }

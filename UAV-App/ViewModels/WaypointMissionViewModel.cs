@@ -125,7 +125,7 @@ namespace UAV_App.Pages
             List<Waypoint> scoutMissionWaypoints = new List<Waypoint>();
             List<WaypointAction> actions = new List<WaypointAction>() {
                 new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO },
-                new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 5000 },
+                new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 500 },
             };
 
             foreach (LocationCoordinate2D loc in geoPoints)
@@ -133,7 +133,7 @@ namespace UAV_App.Pages
                 scoutMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40, actions));
             }
 
-            if (geoPoints.Count <= 0)
+            if (geoPoints.Count == 1)
             { // if there are is only one geopoint the drone location is the first waypoint
 
                 scoutMissionWaypoints.Insert(0, NewWaypoint(AircraftLocation.latitude, AircraftLocation.longitude, 40, actions));
@@ -194,7 +194,7 @@ namespace UAV_App.Pages
             {
                 waypointCount = 0,
                 maxFlightSpeed = 15,
-                autoFlightSpeed = 10,
+                autoFlightSpeed = 15,
                 finishedAction = WaypointMissionFinishedAction.NO_ACTION,
                 headingMode = WaypointMissionHeadingMode.AUTO,
                 flightPathMode = WaypointMissionFlightPathMode.NORMAL,

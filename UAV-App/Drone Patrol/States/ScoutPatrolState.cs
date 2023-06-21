@@ -54,6 +54,7 @@ namespace UAV_App.Drone_Patrol.States
             if (!missionStarted)
             {
               missionStarted = await WaypointMissionViewModel.Instance.startScoutMission(spots);
+                lastRanTime = System.DateTime.UtcNow;
             } 
             else if (System.DateTime.UtcNow - lastRanTime > timeout)
             {
@@ -63,7 +64,7 @@ namespace UAV_App.Drone_Patrol.States
                 if (mission == null) // get loaded mission returns null when the mission is done*/
                
                 WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                if (missionState.HasValue && missionState.Value.isExecutionFinish) 
+                if (!missionState.HasValue) 
                 {
                     WaypointMissionViewModel.Instance.WaypointMissionDone();
                 }
