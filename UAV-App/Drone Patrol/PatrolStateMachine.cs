@@ -88,12 +88,12 @@ namespace UAV_App.Drone_Patrol
             return false;
         }
 
-        public void StartScoutPatrol()
+        internal void StartScoutPatrol()
         {
             HandleEvent(PatrolEvent.StartScoutPatrol);
         }
 
-        public void PrepareDone()
+        internal void PrepareDone()
         {
             HandleEvent(PatrolEvent.PrepareDone);
         }
@@ -110,7 +110,7 @@ namespace UAV_App.Drone_Patrol
 
         }
 
-        public void ExpellAnimals()
+        internal void ExpellAnimals()
         {
              HandleEvent(PatrolEvent.ExpellAnimals);
         }
@@ -123,6 +123,16 @@ namespace UAV_App.Drone_Patrol
         internal async Task run()
         {
             await this.activeState.run();
+        }
+
+        internal void LandDone()
+        {
+            HandleEvent(PatrolEvent.LandingDone);
+        }
+
+        internal void EmergencyStop()
+        {
+             this.activeState = new EmergencyStopState();
         }
     }
 }

@@ -2,7 +2,6 @@ using DJI.WindowsSDK;
 using DJI.WindowsSDK.Mission.Waypoint;
 using DJIUWPSample.Commands;
 using DJIUWPSample.ViewModels;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,8 +28,6 @@ namespace UAV_App.Pages
             }
         }
 
-        const int RETRY_AMOUNT = 5;
-
         public List<LocationCoordinate2D> geoPoints { get; set; }
 
         public List<LocationCoordinate2D> missionGeoPoints = new List<LocationCoordinate2D>();
@@ -54,46 +51,12 @@ namespace UAV_App.Pages
         }
 
         /// <summary>
-        /// returns a new waypoint with all of the correct settings
-        /// </summary>
-        /// <param name="latitude"> the lattitude of the waypoint</param>
-        /// <param name="longitude"> the longitude of the waypoint</param>
-        /// <param name="altitude"> the altitude of the waypoint</param>
-        /// <param name="waypointActions"> waypoint actions, the default is no actions</param>
-        /// <returns></returns>
-        private Waypoint NewWaypoint(double latitude, double longitude, double altitude, List<WaypointAction> waypointActions = null)
-        {
-            if (waypointActions == null)
-            {
-                waypointActions = new List<WaypointAction>();
-            }
-
-            Waypoint waypoint = new Waypoint()
-            {
-                location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
-                altitude = altitude,
-                gimbalPitch = -90,
-                turnMode = WaypointTurnMode.CLOCKWISE,
-                heading = 0,
-                actionRepeatTimes = 1,
-                actionTimeoutInSeconds = 60,
-                cornerRadiusInMeters = 0.2,
-                speed = 0,
-                shootPhotoTimeInterval = -1,
-                shootPhotoDistanceInterval = -1,
-                waypointActions = waypointActions
-            };
-            return waypoint;
-        }
-
-        /// <summary>
         /// adds a new waypoint
         /// </summary>
         /// <param name="lat"> the latitude of the waypoint </param>
         /// <param name="lon"> the longitude of the waypoint </param>
         public void AddWaypoint(double lat, double lon)
         {
-
             geoPoints.Add(new LocationCoordinate2D() { latitude = lat, longitude = lon });
 
         }
@@ -122,220 +85,14 @@ namespace UAV_App.Pages
             return TempChaseAwayLoc;
         }
 
-        /// <summary>
-        /// creates, loads, uploads and starts a scout mission. 
-        /// A scout mission is a mission with waypoints at 40m high, where pictures are taken at every location
-        /// </summary>
-        /// <param name="geoPoints"> The geopoints where the waypoints for the scout mission will be started</param>
-        /// <returns> a boolean indicating if the operation was succesfull</returns>
-        public async Task<bool> startScoutMission(List<LocationCoordinate2D> geoPoints)
-        {
-            List<Waypoint> scoutMissionWaypoints = new List<Waypoint>();
-            List<WaypointAction> actions = new List<WaypointAction>() {
-                new WaypointAction() { actionType = WaypointActionType.START_TAKE_PHOTO },
-                new WaypointAction() { actionType = WaypointActionType.STAY, actionParam = 500 },
-            };
-
-            foreach (LocationCoordinate2D loc in geoPoints)
-            {
-                scoutMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40, actions));
-            }
-
-            if (geoPoints.Count == 1)
-            { // if there are is only one geopoint the drone location is the first waypoint
-
-                scoutMissionWaypoints.Insert(0, NewWaypoint(AircraftLocation.latitude, AircraftLocation.longitude, 40, actions));
-            };
-
-            WaypointMission scoutMission = new WaypointMission()
-            {
-                waypointCount = 0,
-                maxFlightSpeed = 15,
-                autoFlightSpeed = 10,
-                finishedAction = WaypointMissionFinishedAction.NO_ACTION,
-                headingMode = WaypointMissionHeadingMode.AUTO,
-                flightPathMode = WaypointMissionFlightPathMode.NORMAL,
-                gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
-                exitMissionOnRCSignalLostEnabled = false,
-                gimbalPitchRotationEnabled = true,
-                repeatTimes = 0,
-                missionID = 0,
-                waypoints = scoutMissionWaypoints
-            };
-
-            bool result;
-            
-            result = await LoadWaypointMission(scoutMission);
-
-            if (!result) return false; // did the mission load correctly? if not return false
-
-            result = await UploadWaypointMission();
-
-            if (!result) return false; // did the mission upload correctly? if not return false
-
-            result = await StartWaypointMission();
-
-            if (!result) return false; // did the mission start correctly? if not return false
-
-            return true;
-        }
 
         /// <summary>
-        /// creates, loads, uploads and starts a scout mission. 
-        /// A scout mission is a mission with waypoints at 40m high, where pictures are taken at every location
+        /// Retreives the first few locations of the mission geopoints.
         /// </summary>
-        /// <param name="geoPoints"> The geopoints where the waypoints for the scout mission will be started</param>
-        /// <returns> a boolean indicating if the operation was succesfull</returns>
-        public async Task<bool> startAttackMission(List<LocationCoordinate2D> geoPoints)
+        /// <returns> the first few locations of mission geopoints</returns>
+        public List<LocationCoordinate2D> getFirstLocations()
         {
-            List<Waypoint> attackMissionWaypoints = new List<Waypoint>();
-
-            foreach (LocationCoordinate2D loc in geoPoints)
-            {
-                attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40));
-                attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 10));
-                attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40));
-            }
-
-            WaypointMission attackMission = new WaypointMission()
-            {
-                waypointCount = 0,
-                maxFlightSpeed = 15,
-                autoFlightSpeed = 15,
-                finishedAction = WaypointMissionFinishedAction.NO_ACTION,
-                headingMode = WaypointMissionHeadingMode.AUTO,
-                flightPathMode = WaypointMissionFlightPathMode.NORMAL,
-                gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
-                exitMissionOnRCSignalLostEnabled = false,
-                pointOfInterest = new LocationCoordinate2D()
-                {
-                    latitude = 0,
-                    longitude = 0
-                },
-                gimbalPitchRotationEnabled = true,
-                repeatTimes = 0,
-                missionID = 0,
-                waypoints = attackMissionWaypoints
-            };
-
-            bool result;
-            
-            result = await LoadWaypointMission(attackMission);
-            if (!result) return false; // did the mission load correctly? if not return false
-
-            result = await UploadWaypointMission();
-            if (!result) return false; // did the mission upload correctly? if not return false
-
-            result = await StartWaypointMission();
-            if (!result) return false; // did the mission start correctly? if not return false
-
-            return true;
-        }
-
-        /// <summary>
-        /// loads the mission waypoints into the sdk
-        /// </summary>
-        /// <param name="mission"> the waypointmission to be loaded</param>
-        /// <returns> boolean indicating if the task was succesfull</returns>
-        private async Task<bool> LoadWaypointMission(WaypointMission mission)
-        {
-            SDKError err = SDKError.UNKNOWN;
-
-            for (int i = 0; i < RETRY_AMOUNT; i++)
-            {
-                err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(mission);
-
-                if (err == SDKError.NO_ERROR)
-                {
-                    break;
-                }
-
-                await Task.Delay(500);
-            }
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {                
-                Debug.WriteLine($"load mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
-                return false;
-            }
-        }
-
-        
-        /// <summary>
-        /// Uploads the stored mission to the drone
-        /// </summary>
-        /// <param name="mission"> the waypointmission to be loaded</param>
-        /// <returns> boolean indicating if the task was succesfull</returns>
-         private async Task<bool> UploadWaypointMission()
-        {
-            SDKError err = SDKError.UNKNOWN;
-
-            for (int i = 0; i < RETRY_AMOUNT; i++)
-            {
-                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
-
-                if (err == SDKError.NO_ERROR)
-                {
-                    break;
-                }
-
-                await Task.Delay(500);
-            }
-
-             if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {
-                Debug.WriteLine($"upload mission error: {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
-                return false;
-            }
-        }
-
-
-        /// <summary>
-        /// function that calls the startmission method of the drone and retriest it if it fails
-        /// </summary>
-        /// <returns></returns>
-         private async Task<bool> StartWaypointMission()
-        {
-            SDKError err = SDKError.UNKNOWN;
-
-            for (int i = 0; i < RETRY_AMOUNT; i++)
-            {
-                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
-
-                if (err == SDKError.NO_ERROR)
-                {
-                    break;
-                }
-
-                await Task.Delay(500);
-            }
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {                
-                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
-                return false;
-            }
-        }
-
-        /*        /// <summary>
-                /// Retreives the first few locations of the mission geopoints.
-                /// </summary>
-                /// <returns> the first few locations of mission geopoints</returns>
-                public List<LocationCoordinate2D> getFirstLocations()
-                {
-                    List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
+            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
 
                     int itemAmount = missionGeoPoints.Count < 3 ? missionGeoPoints.Count : 3;
                     for (int i = 0; i < itemAmount; i++)
@@ -349,47 +106,12 @@ namespace UAV_App.Pages
 
                     return locations;
 
-                }*/
-
-        /// <summary>
-        /// Retreives the first few locations of the mission geopoints.
-        /// </summary>
-        /// <returns> the first few locations of mission geopoints</returns>
-        public List<LocationCoordinate2D> getFirstLocations()
-        {
-            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
-
-            int itemAmount = missionGeoPoints.Count < 3 ? missionGeoPoints.Count : 3;
-            for (int i = 0; i < itemAmount; i++)
-            {
-                locations.Add(missionGeoPoints[0]);
-                missionGeoPoints.RemoveAt(0);
-            }
-
-            // Testcode for chase away geopoints
-            chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
-
-            return locations;
-
         }
 
         /// <summary>
-        /// Retreives the first few locations of the mission geopoints.
-        /// </summary>
-        /// <returns> the first few locations of mission geopoints</returns>
-        public List<LocationCoordinate2D> removeFirstLocations(int amount)
-        {
-            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
-
-            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
-            for (int i = 0; i < itemAmount; i++)
-            {
-                missionGeoPoints.RemoveAt(0);
-            }
-
-            return locations;
-        }
-        
+        /// Checks if there are more missions to do, and updates patrolstate to which mission type is neccesary.
+        /// if there are no more waypoints to handle ends the mission
+        /// </summary>        
         public void WaypointMissionDone()
         {
             if (chaseAwayGeoPoints.Count == 0)
@@ -401,28 +123,12 @@ namespace UAV_App.Pages
                 {
                     PatrolController.Instance.MissionDone();
                 }
-
             }
             else
             {
                 PatrolController.Instance.harmfullAnimalsFound();
             }
 
-        }
-
-        public async Task<bool> goHome()
-        {
-            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {
-                Console.WriteLine($"go home error: {err}");
-                return false;
-            }
         }
 
 
@@ -534,8 +240,6 @@ namespace UAV_App.Pages
                         }
                         ShouldPause = !ShouldPause;
 
-
-
                     }, delegate () { return true; });
                 }
                 return _pauseResumeMission;
@@ -551,11 +255,9 @@ namespace UAV_App.Pages
                 {
                     _emergencyStop = new RelayCommand(async delegate ()
                     {
-
-                        var err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
-                        var messageDialog = new MessageDialog(String.Format("stop mission Result: {0}.", err.ToString()));
+                        var err =  await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
+                        var messageDialog = new MessageDialog(String.Format("Emergency Result: {0}.", err.ToString()));
                         await messageDialog.ShowAsync();
-
 
                     }, delegate () { return true; });
                 }
@@ -711,7 +413,7 @@ namespace UAV_App.Pages
                 {
                     _startAttackMission = new RelayCommand(async delegate ()
                     {
-                        await startAttackMission(geoPoints);
+                       // await startAttackMission(geoPoints);
                     }, delegate () { return true; });
                 }
                 return _startAttackMission;

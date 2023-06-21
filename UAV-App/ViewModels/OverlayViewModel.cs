@@ -1,4 +1,4 @@
-﻿using DJI.WindowsSDK;
+using DJI.WindowsSDK;
 using DJIUWPSample.Commands;
 using DJIUWPSample.ViewModels;
 using System;
@@ -165,7 +165,7 @@ namespace UAV_App.ViewModels
                 {
                     _emergencyStop = new RelayCommand(delegate ()
                     {
-                        PatrolController.Instance.emergencyStopEvent();
+                        PatrolController.Instance.EmergencyStopEvent();
                         Debug.WriteLine("Emergency");
                     }, delegate () { return true; });
                 }

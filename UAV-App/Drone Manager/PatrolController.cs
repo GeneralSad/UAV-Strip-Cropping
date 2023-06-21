@@ -1,6 +1,7 @@
 ﻿using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,10 @@ using UAV_App.Pages;
 
 namespace UAV_App.Drone_Manager
 {
+
+    /// <summary>
+    /// State machine responsible for handling all of the logic of the code
+    /// </summary>
     public class PatrolController : IPatrolMessage
     {
         private PatrolStateMachine patrolStateMachine;
@@ -21,6 +26,8 @@ namespace UAV_App.Drone_Manager
                 return _singleton;
             }
         }
+                
+        const int RETRY_AMOUNT = 5;
 
         private PatrolController()
         {
@@ -28,8 +35,6 @@ namespace UAV_App.Drone_Manager
 
             this.patrolStateMachine = new PatrolStateMachine();
         }
-
-
 
         private void init()
         {
@@ -64,40 +69,192 @@ namespace UAV_App.Drone_Manager
 
         }
 
-        public void cancelAndReturnToStartingPointEvent()
+                /// <summary>
+        /// loads the mission waypoints into the sdk
+        /// </summary>
+        /// <param name="mission"> the waypointmission to be loaded</param>
+        /// <returns> boolean indicating if the task was succesfull</returns>
+        public static async Task<bool> LoadWaypointMission(WaypointMission mission)
         {
-            throw new NotImplementedException();
+            SDKError err = SDKError.UNKNOWN;
+
+            for (int i = 0; i < RETRY_AMOUNT; i++)
+            {
+                err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(mission);
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {                
+                Debug.WriteLine($"load mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                return false;
+            }
         }
 
-        public void continueRouteEvent()
+        
+        /// <summary>
+        /// Uploads the stored mission to the drone
+        /// </summary>
+        /// <param name="mission"> the waypointmission to be loaded</param>
+        /// <returns> boolean indicating if the task was succesfull</returns>
+         public static async Task<bool> UploadWaypointMission()
         {
-            throw new NotImplementedException();
+            SDKError err = SDKError.UNKNOWN;
+
+            for (int i = 0; i < RETRY_AMOUNT; i++)
+            {
+                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {
+                Debug.WriteLine($"upload mission error: {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                return false;
+            }
         }
 
-        public void emergencyStopEvent()
+
+        /// <summary>
+        /// function that calls the startmission method of the drone and retriest it if it fails
+        /// </summary>
+        /// <returns></returns>
+         public static async Task<bool> StartWaypointMission()
         {
-            throw new NotImplementedException();
+            SDKError err = SDKError.UNKNOWN;
+
+            for (int i = 0; i < RETRY_AMOUNT; i++)
+            {
+                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {                
+                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                return false;
+            }
         }
 
-        public void landEvent()
+                /// <summary>
+        /// function that calls the stopmission method of the drone and retriest it if it fails
+        /// </summary>
+        /// <returns> bool indicating if cancel was succesfull</returns>
+         public static async Task<bool> StopMission()
         {
-            throw new NotImplementedException();
+            SDKError err = SDKError.UNKNOWN;
+            int retryAmount = 5;
+
+            for (int i = 0; i < retryAmount; i++)
+            {
+                err =  await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {                
+                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                return false;
+            }
         }
 
-        public void startScoutRouteEvent()
+        
+        /// <summary>
+        /// returns a new waypoint with all of the correct settings
+        /// </summary>
+        /// <param name="latitude"> the lattitude of the waypoint</param>
+        /// <param name="longitude"> the longitude of the waypoint</param>
+        /// <param name="altitude"> the altitude of the waypoint</param>
+        /// <param name="waypointActions"> waypoint actions, the default is no actions</param>
+        /// <returns></returns>
+        public static Waypoint NewWaypoint(double latitude, double longitude, double altitude, List<WaypointAction> waypointActions = null)
+        {
+            if (waypointActions == null)
+            {
+                waypointActions = new List<WaypointAction>();
+            }
+
+            Waypoint waypoint = new Waypoint()
+            {
+                location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
+                altitude = altitude,
+                gimbalPitch = -90,
+                turnMode = WaypointTurnMode.CLOCKWISE,
+                heading = 0,
+                actionRepeatTimes = 1,
+                actionTimeoutInSeconds = 60,
+                cornerRadiusInMeters = 0.2,
+                speed = 0,
+                shootPhotoTimeInterval = -1,
+                shootPhotoDistanceInterval = -1,
+                waypointActions = waypointActions
+            };
+            return waypoint;
+        }
+
+        internal void EmergencyStopEvent()
+        {
+            this.patrolStateMachine.EmergencyStop();
+        }
+
+        internal void startScoutRouteEvent()
         {
             this.patrolStateMachine.StartScoutPatrol();
         }
 
-
-        public void harmfullAnimalsFound()
+        internal void harmfullAnimalsFound()
         {
             this.patrolStateMachine.ExpellAnimals();
         }
 
-        public void MissionDone()
+        internal void MissionDone()
         {
             this.patrolStateMachine.MissionDone();
+        }
+
+        internal void landDoneEvent()
+        {
+          this.patrolStateMachine.LandDone();
         }
 
         public async Task run()

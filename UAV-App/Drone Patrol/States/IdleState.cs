@@ -13,6 +13,11 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.READY;
         }
 
+        /// <summary>
+        /// State does nothing except wait for event starting the patrol proces.
+        /// </summary>
+        public IdleState() {}
+
         public void onEnter()
         {
         }
