@@ -19,6 +19,9 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.PATROUILLING;
         }
 
+        WaypointMissionState[] executingStates = { WaypointMissionState.EXECUTING, WaypointMissionState.DISCONNECTED, WaypointMissionState.UPLOADING };
+
+
         /// <summary>
         /// State responsible for scouting an area. this is moving from waypoint to waypoint to take pictures of each waypoint
         /// </summary>
@@ -90,9 +93,9 @@ namespace UAV_App.Drone_Patrol.States
                         /*              WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
                                         if (mission == null) // get loaded mission returns null when the mission is done*/
 
-                        var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
-                        WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                        if (WaypointMissionState.EXECUTING != state)
+                        WaypointMissionState state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
+                        
+                        if (executingStates.Contains(state))
                         {
                             Debug.WriteLine("scout mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();

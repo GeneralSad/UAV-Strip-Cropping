@@ -47,7 +47,6 @@ namespace UAV_App.Drone_Patrol.States
         System.DateTime lastRanTime;
         TimeSpan timeout = TimeSpan.FromSeconds(1);
 
-
         public async Task run()
         {
 

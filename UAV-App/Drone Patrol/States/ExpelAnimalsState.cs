@@ -17,6 +17,8 @@ namespace UAV_App.Drone_Patrol.States
             return ParentState.PATROUILLING;
         }
 
+        WaypointMissionState[] executingStates = { WaypointMissionState.EXECUTING, WaypointMissionState.DISCONNECTED, WaypointMissionState.UPLOADING };
+
         /// <summary>
         /// this state retreives all currently found harmfull spots. 
         /// Then it will call the mission responsible for executing the expell methods.
@@ -61,7 +63,7 @@ namespace UAV_App.Drone_Patrol.States
 
             if (!missionStarted)
             {
-                                missionStarted = await startAttackMission(harmfullAnimalSpots);
+                missionStarted = await startAttackMission(harmfullAnimalSpots);
                 lastRanTime = System.DateTime.UtcNow;
             }
             else
@@ -76,19 +78,16 @@ namespace UAV_App.Drone_Patrol.States
                         Debug.WriteLine("patrol executing done");
                         missionExecuting = true;
                     }
-
                 }
                 else
                 {
-
                     if (System.DateTime.UtcNow - lastRanTime > timeout)
                     {
                         // WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
                         // if (mission == null) // get loaded mission returns null when the mission is done
-
-                        var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
-                        WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                        if (WaypointMissionState.EXECUTING != state)
+                        
+                        WaypointMissionState state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();   
+                        if (executingStates.Contains(state))
                         {
                             Debug.WriteLine("patrol mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
@@ -98,12 +97,9 @@ namespace UAV_App.Drone_Patrol.States
                 }
 
             }
-
-
-
         }
 
-                /// <summary>
+        /// <summary>
         /// creates, loads, uploads and starts a scout mission. 
         /// A scout mission is a mission with waypoints at 40m high, where pictures are taken at every location
         /// </summary>
