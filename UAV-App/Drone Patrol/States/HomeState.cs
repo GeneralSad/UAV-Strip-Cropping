@@ -1,6 +1,7 @@
 ﻿using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,6 +64,7 @@ namespace UAV_App.Drone_Patrol.States
 
                 if (homeState == null && homeState.HasValue) // get loaded mission returns null when the mission is done
                 {
+                    Debug.WriteLine(homeState.Value.ToString());
                    if (FCGoHomeState.COMPLETED ==  homeState.Value.value)
                     {
                         PatrolController.Instance.landDoneEvent(); 

@@ -172,7 +172,7 @@ CancellationToken cancellationToken = default)
                 {
                     MapIcon waypointIcon = new MapIcon()
                     {
-                        Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/Zone.png")),
+                        Image = RandomAccessStreamReference.CreateFromUri(new Uri("ms-appx:///Assets/waypoint.png")),
                         NormalizedAnchorPoint = new Point(0.5, 0.5),
                         ZIndex = 0,
 

@@ -39,7 +39,7 @@ namespace UAV_App.Drone_Patrol.States
         public async Task run()
         {
              
-            await WaypointMissionViewModel.Instance.StopMission();
+            await PatrolController.StopMission();
 
             WaypointMissionState state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 

@@ -36,8 +36,6 @@ namespace UAV_App.Drone_Manager
             this.patrolStateMachine = new PatrolStateMachine();
         }
 
-
-
         private void init()
         {
             DJISDKManager.Instance.ComponentManager.GetWiFiHandler(0, 0).ConnectionChanged += ConnectionChanged;
@@ -76,7 +74,7 @@ namespace UAV_App.Drone_Manager
         /// </summary>
         /// <param name="mission"> the waypointmission to be loaded</param>
         /// <returns> boolean indicating if the task was succesfull</returns>
-        public async Task<bool> LoadWaypointMission(WaypointMission mission)
+        public static async Task<bool> LoadWaypointMission(WaypointMission mission)
         {
             SDKError err = SDKError.UNKNOWN;
 
@@ -109,7 +107,7 @@ namespace UAV_App.Drone_Manager
         /// </summary>
         /// <param name="mission"> the waypointmission to be loaded</param>
         /// <returns> boolean indicating if the task was succesfull</returns>
-         public async Task<bool> UploadWaypointMission()
+         public static async Task<bool> UploadWaypointMission()
         {
             SDKError err = SDKError.UNKNOWN;
 
@@ -141,13 +139,45 @@ namespace UAV_App.Drone_Manager
         /// function that calls the startmission method of the drone and retriest it if it fails
         /// </summary>
         /// <returns></returns>
-         public async Task<bool> StartWaypointMission()
+         public static async Task<bool> StartWaypointMission()
         {
             SDKError err = SDKError.UNKNOWN;
 
             for (int i = 0; i < RETRY_AMOUNT; i++)
             {
                 err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
+
+                if (err == SDKError.NO_ERROR)
+                {
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {                
+                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
+                return false;
+            }
+        }
+
+                /// <summary>
+        /// function that calls the stopmission method of the drone and retriest it if it fails
+        /// </summary>
+        /// <returns> bool indicating if cancel was succesfull</returns>
+         public static async Task<bool> StopMission()
+        {
+            SDKError err = SDKError.UNKNOWN;
+            int retryAmount = 5;
+
+            for (int i = 0; i < retryAmount; i++)
+            {
+                err =  await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StopMission();
 
                 if (err == SDKError.NO_ERROR)
                 {
@@ -222,14 +252,14 @@ namespace UAV_App.Drone_Manager
             this.patrolStateMachine.MissionDone();
         }
 
-        public async Task run()
-        {
-            await this.patrolStateMachine.run();
-        }
-
         internal void landDoneEvent()
         {
           this.patrolStateMachine.LandDone();
+        }
+
+        public async Task run()
+        {
+            await this.patrolStateMachine.run();
         }
     }
 }
