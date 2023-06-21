@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace UAV_App.AI
 {
+    //Datatype to hold information about the AI prediction.
+    public struct AI_Prediction {
+        public int amountOfBirdsDetected;
+    }
+
     public class AIDetection
     {
         private Process process;
@@ -18,6 +23,7 @@ namespace UAV_App.AI
             InitProcess();
         }
 
+        // Initializes the process so that all the arguments of the command are only set once. 
         public void InitProcess()
         {
             this.process = new Process();
@@ -43,6 +49,7 @@ namespace UAV_App.AI
             this.process.StartInfo.RedirectStandardError = true;
         }
 
+        // Takes the image taken by the drone and scales it down to the correst resolution used by the AI model.
         public void DownscaleResolution()
         {
             Debug.WriteLine("Starting DownscaleResolution...");
@@ -82,6 +89,7 @@ namespace UAV_App.AI
             Debug.WriteLine("Ending DownscaleResolution...");
         }
 
+        // Splits the downscaled image into 16 smaller image so they can be processed faster by the AI model.
         public void ConvertImageToTiles()
         {
             Debug.WriteLine("Starting ConvertImageToTiles...");
@@ -112,6 +120,7 @@ namespace UAV_App.AI
             Debug.WriteLine("Ending ConvertImageToTiles...");
         }
 
+        // Runs the detect.py script for all the split-images.
         public static void RunDetectionScript(Process process)
         {
             Debug.WriteLine("Starting RunDetectionScript...");
@@ -147,6 +156,7 @@ namespace UAV_App.AI
             Debug.WriteLine("Ending RunDetectionScript...");
         }
 
+        // Reads the data and splits the data up into Bird objects. This way the data can be read and consumed easily.
         public List<Bird> SplitObjectsFromData(string data)
         {
             string[] values = data.Trim().Split("\r\n");
@@ -171,9 +181,12 @@ namespace UAV_App.AI
             return birds;
         }
 
-        public bool ProcessPrediction()
+        // Reads the raw data and applies logic to it. Inn this function the program counts the mount of birds detected in the images and groups them based on their location.
+        public AI_Prediction ProcessPrediction()
         {
             Debug.WriteLine("Starting ProcessPrediction...");
+
+            AI_Prediction prediction = new AI_Prediction();
 
             string directoryPath = @"..\..\Assets\AI_Assets\yolov5\runs\detect\prediction\labels\";
             try
@@ -213,34 +226,28 @@ namespace UAV_App.AI
                                                    "Bottom Left detected: " + birdsOnTheBottomLeftCounter + "\n" +
                                                    "Bottom Right detected: " + birdsOnTheBottomRightCounter + "\n" +
                                                    "Total birds detected: " + allBirds.Count);
-
-                if(allBirds.Count > 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                prediction.amountOfBirdsDetected = allBirds.Count;
+                return prediction;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred: " + ex.Message);
+                return prediction;
             }
-
             Debug.WriteLine("Ending ProcessPrediction...");
         }
 
-        public async Task<bool> RunFullDetection()
+        // Runs the full detection process from beginning to end.
+        public async Task<AI_Prediction> RunFullDetection()
         {
             Debug.WriteLine("Starting AI...");
 
             DownscaleResolution();
             ConvertImageToTiles();
             RunDetectionScript(this.process);
-            return ProcessPrediction();
 
             Debug.WriteLine("Ending AI...");
+            return ProcessPrediction();
         }
     }
 }

@@ -108,12 +108,22 @@ namespace UAV_App.Pages
         /// returns all found locations of harmfull animals
         /// </summary>
         /// <returns>all found locations of harmfull animals</returns>
-        public List<LocationCoordinate2D> getFoundAnimalPoints()
+        public async Task<List<LocationCoordinate2D>> getFoundAnimalPoints()
         {
-            AIDetection.RunFullDetection();
-            await RunFullDetection();
+            AIDetection ai = new AIDetection();
+            AI_Prediction prediction = await ai.RunFullDetection();
+
+            var TempChaseAwayLoc = new List<LocationCoordinate2D>();
+            if (prediction.amountOfBirdsDetected > 0)
+            {
+                //Bird(s) detected
+                TempChaseAwayLoc.Add(new LocationCoordinate2D());
+            }
+            else
+            {
+                //Nothing detected
+            }
             //TESTCODE
-            var TempChaseAwayLoc = new List<LocationCoordinate2D>(chaseAwayGeoPoints);
             chaseAwayGeoPoints.Clear();
             return TempChaseAwayLoc;
         }
