@@ -1,6 +1,7 @@
 using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace UAV_App.Drone_Patrol.States
         private int photoTargetWaypoint;
         public async void onEnter()
         {
-            spots = WaypointMissionViewModel.Instance.getFirstLocations(3);
+            spots = WaypointMissionViewModel.Instance.getFirstLocations();
             missionStarted = false;
             missionExecuting = false;
 
@@ -30,7 +31,7 @@ namespace UAV_App.Drone_Patrol.States
 
         public void onLeave()
         {
-            WaypointMissionViewModel.Instance.removeFirstLocations(3);
+            //WaypointMissionViewModel.Instance.removeFirstLocations(3);
         }
 
         public IPatrolState HandleEvent(PatrolEvent patrolEvent)
@@ -61,13 +62,14 @@ namespace UAV_App.Drone_Patrol.States
             }
             else
             {
-                if (!missionStarted)
+                if (!missionExecuting)
                 {
                     var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 
                     if (WaypointMissionState.EXECUTING == state)
                     {
-                        missionStarted = true;
+                        Debug.WriteLine("scout executing done");
+                        missionExecuting = true;
                     }
                 }
                 else
@@ -82,6 +84,7 @@ namespace UAV_App.Drone_Patrol.States
                         WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
                         if (!missionState.HasValue)
                         {
+                            Debug.WriteLine("scout mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
                             photoTargetWaypoint++;
                         }

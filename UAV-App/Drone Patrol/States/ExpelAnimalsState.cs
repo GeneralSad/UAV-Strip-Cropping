@@ -1,6 +1,7 @@
 ﻿using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,13 +58,14 @@ namespace UAV_App.Drone_Patrol.States
             }
             else
             {
-                if (!missionStarted)
+                if (!missionExecuting)
                 {
                     var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
 
                     if (WaypointMissionState.EXECUTING == state)
                     {
-                        missionStarted = true;
+                        Debug.WriteLine("patrol executing done");
+                        missionExecuting = true;
                     }
 
                 }
@@ -78,6 +80,7 @@ namespace UAV_App.Drone_Patrol.States
                         WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
                         if (!missionState.HasValue) // latest execution event is set to null when mission completes
                         {
+                            Debug.WriteLine("patrol mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
                         }
                     }
