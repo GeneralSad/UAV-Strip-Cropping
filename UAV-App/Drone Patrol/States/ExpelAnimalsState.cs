@@ -17,11 +17,13 @@ namespace UAV_App.Drone_Patrol.States
 
         private List<LocationCoordinate2D> harmfullAnimalSpots;
         private bool missionStarted;
+        private bool missionExecuting;
 
         public async void onEnter()
         {
-           harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
-           missionStarted = false;
+            harmfullAnimalSpots = WaypointMissionViewModel.Instance.getFoundAnimalPoints();
+            missionStarted = false;
+            missionExecuting = false;
         }
 
         public void onLeave()
@@ -33,7 +35,8 @@ namespace UAV_App.Drone_Patrol.States
             if (PatrolEvent.StartScoutPatrol == patrolEvent)
             {
                 return new ScoutPatrolState();
-            } else if (PatrolEvent.MissionDone == patrolEvent)
+            }
+            else if (PatrolEvent.MissionDone == patrolEvent)
             {
                 return new IdleState();
             }
@@ -49,21 +52,42 @@ namespace UAV_App.Drone_Patrol.States
 
             if (!missionStarted)
             {
-              missionStarted = await WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots);
+                missionStarted = await WaypointMissionViewModel.Instance.startAttackMission(harmfullAnimalSpots);
                 lastRanTime = System.DateTime.UtcNow;
-            } 
-            else if (System.DateTime.UtcNow - lastRanTime > timeout)
-            {
-
-               // WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
-                 // if (mission == null) // get loaded mission returns null when the mission is done
-
-                WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
-                if (!missionState.HasValue) 
-                {
-                    WaypointMissionViewModel.Instance.WaypointMissionDone();
-                }
             }
+            else
+            {
+                if (!missionStarted)
+                {
+                    var state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
+
+                    if (WaypointMissionState.EXECUTING == state)
+                    {
+                        missionStarted = true;
+                    }
+
+                }
+                else
+                {
+
+                    if (System.DateTime.UtcNow - lastRanTime > timeout)
+                    {
+                        // WaypointMission? mission = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLoadedMission();
+                        // if (mission == null) // get loaded mission returns null when the mission is done
+
+                        WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
+                        if (!missionState.HasValue) // latest execution event is set to null when mission completes
+                        {
+                            WaypointMissionViewModel.Instance.WaypointMissionDone();
+                        }
+                    }
+
+                }
+
+            }
+
+
+
         }
     }
 }
