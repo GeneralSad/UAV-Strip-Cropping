@@ -7,6 +7,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using UAV_App.AI;
+using UAV_App.Pages;
+using UAV_App.ViewModels;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -18,6 +21,17 @@ namespace UAV_App.Drone_Communication
 {
     internal class MediaHandler
     {
+
+        //Singleton to acces mediahandler
+        private static readonly MediaHandler _singleton = new MediaHandler();
+        public static MediaHandler Instance
+        {
+            get
+            {
+                return _singleton;
+            }
+        }
+
         //Counter to keep track with how many images have to be downloaded
         //When 0 is reached the camera is set to SHOOT_PHOTO
         private int filesRemaining = 0;
@@ -230,13 +244,27 @@ namespace UAV_App.Drone_Communication
             };
 
             //Gets called when the file is done downloading
-            task.OnRequestTearDown += (sender, retCode, res) =>
+            task.OnRequestTearDown += async (sender, retCode, res) =>
             {
                 filesRemaining--;
                 //Set camera work mode to SHOOT_PHOTO when finished with downloading
                 if (filesRemaining == 0)
                 {
                     //Debug.WriteLine("Remaining: FINISHED");
+                    if (!isDownloadAll)
+                    {
+                        AIDetection ai = new AIDetection();
+                        AI_Prediction prediction = await ai.RunFullDetection();
+                        if (prediction.amountOfBirdsDetected > 0)
+                        {
+                            //Bird(s) detected
+                            WaypointMissionViewModel.Instance.chaseAwayGeoPoints.Add(GetLocationFromFileName(await GetMostRecentPhotoFilePath()));
+                        }
+                        else
+                        {
+                            //Nothing detected
+                        }
+                    }
                     _ = SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
                 }
                 else
