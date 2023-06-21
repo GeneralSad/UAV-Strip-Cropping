@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace UAV_App.Drone_Communication
             if (files.Count > 0)
             {
                 MediaFile file = files.Last();
-                return storageFolder.Path + file.fileName;
+                return Path.Combine(storageFolder.Path, file.fileName);
             }
             return null;
         }
