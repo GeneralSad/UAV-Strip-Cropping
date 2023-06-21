@@ -53,7 +53,7 @@ namespace UAV_App.Drone_Patrol.States
 
             if (!landingStarted)
             {
-              landingStarted = await WaypointMissionViewModel.Instance.goHome();
+              landingStarted = await goHome();
             } else if (System.DateTime.UtcNow - lastRanTime > timeout)
             {
                 lastRanTime = System.DateTime.UtcNow;
@@ -69,6 +69,26 @@ namespace UAV_App.Drone_Patrol.States
                     }
                     
                 }
+            }
+        }
+
+        
+        /// <summary>
+        /// Sends the drone home
+        /// </summary>
+        /// <returns> Bool indicating if the home request was succesfully received</returns>
+        public async Task<bool> goHome()
+        {
+            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
+
+            if (err == SDKError.NO_ERROR)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"go home error: {err}");
+                return false;
             }
         }
     }

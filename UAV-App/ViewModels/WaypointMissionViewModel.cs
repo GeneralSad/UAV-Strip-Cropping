@@ -28,7 +28,7 @@ namespace UAV_App.Pages
             }
         }
 
-        const int RETRY_AMOUNT = 5;
+
 
         public List<LocationCoordinate2D> geoPoints { get; set; }
 
@@ -50,39 +50,6 @@ namespace UAV_App.Pages
         {
            LocationCoordinate2D waypoint = missionGeoPoints[currentWaypoint];
             
-        }
-
-        /// <summary>
-        /// returns a new waypoint with all of the correct settings
-        /// </summary>
-        /// <param name="latitude"> the lattitude of the waypoint</param>
-        /// <param name="longitude"> the longitude of the waypoint</param>
-        /// <param name="altitude"> the altitude of the waypoint</param>
-        /// <param name="waypointActions"> waypoint actions, the default is no actions</param>
-        /// <returns></returns>
-        private Waypoint NewWaypoint(double latitude, double longitude, double altitude, List<WaypointAction> waypointActions = null)
-        {
-            if (waypointActions == null)
-            {
-                waypointActions = new List<WaypointAction>();
-            }
-
-            Waypoint waypoint = new Waypoint()
-            {
-                location = new LocationCoordinate2D() { latitude = latitude, longitude = longitude },
-                altitude = altitude,
-                gimbalPitch = -90,
-                turnMode = WaypointTurnMode.CLOCKWISE,
-                heading = 0,
-                actionRepeatTimes = 1,
-                actionTimeoutInSeconds = 60,
-                cornerRadiusInMeters = 0.2,
-                speed = 0,
-                shootPhotoTimeInterval = -1,
-                shootPhotoDistanceInterval = -1,
-                waypointActions = waypointActions
-            };
-            return waypoint;
         }
 
         /// <summary>
@@ -179,156 +146,9 @@ namespace UAV_App.Pages
             return true;
         }
 
-        /// <summary>
-        /// creates, loads, uploads and starts a scout mission. 
-        /// A scout mission is a mission with waypoints at 40m high, where pictures are taken at every location
-        /// </summary>
-        /// <param name="geoPoints"> The geopoints where the waypoints for the scout mission will be started</param>
-        /// <returns> a boolean indicating if the operation was succesfull</returns>
-        public async Task<bool> startAttackMission(List<LocationCoordinate2D> geoPoints)
-        {
-            List<Waypoint> attackMissionWaypoints = new List<Waypoint>();
-
-            foreach (LocationCoordinate2D loc in geoPoints)
-            {
-                attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40));
-                attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 10));
-                attackMissionWaypoints.Add(NewWaypoint(loc.latitude, loc.longitude, 40));
-            }
-
-            WaypointMission attackMission = new WaypointMission()
-            {
-                waypointCount = 0,
-                maxFlightSpeed = 15,
-                autoFlightSpeed = 10,
-                finishedAction = WaypointMissionFinishedAction.NO_ACTION,
-                headingMode = WaypointMissionHeadingMode.AUTO,
-                flightPathMode = WaypointMissionFlightPathMode.NORMAL,
-                gotoFirstWaypointMode = WaypointMissionGotoFirstWaypointMode.SAFELY,
-                exitMissionOnRCSignalLostEnabled = false,
-                pointOfInterest = new LocationCoordinate2D()
-                {
-                    latitude = 0,
-                    longitude = 0
-                },
-                gimbalPitchRotationEnabled = true,
-                repeatTimes = 0,
-                missionID = 0,
-                waypoints = attackMissionWaypoints
-            };
-
-            bool result;
-            
-            result = await LoadWaypointMission(attackMission);
-            if (!result) return false; // did the mission load correctly? if not return false
-
-            result = await UploadWaypointMission();
-            if (!result) return false; // did the mission upload correctly? if not return false
-
-            result = await StartWaypointMission();
-            if (!result) return false; // did the mission start correctly? if not return false
-
-            return true;
-        }
-
-        /// <summary>
-        /// loads the mission waypoints into the sdk
-        /// </summary>
-        /// <param name="mission"> the waypointmission to be loaded</param>
-        /// <returns> boolean indicating if the task was succesfull</returns>
-        private async Task<bool> LoadWaypointMission(WaypointMission mission)
-        {
-            SDKError err = SDKError.UNKNOWN;
-
-            for (int i = 0; i < RETRY_AMOUNT; i++)
-            {
-                err = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).LoadMission(mission);
-
-                if (err == SDKError.NO_ERROR)
-                {
-                    break;
-                }
-
-                await Task.Delay(500);
-            }
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {                
-                Debug.WriteLine($"load mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
-                return false;
-            }
-        }
-
-        
-        /// <summary>
-        /// Uploads the stored mission to the drone
-        /// </summary>
-        /// <param name="mission"> the waypointmission to be loaded</param>
-        /// <returns> boolean indicating if the task was succesfull</returns>
-         private async Task<bool> UploadWaypointMission()
-        {
-            SDKError err = SDKError.UNKNOWN;
-
-            for (int i = 0; i < RETRY_AMOUNT; i++)
-            {
-                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).UploadMission();
-
-                if (err == SDKError.NO_ERROR)
-                {
-                    break;
-                }
-
-                await Task.Delay(500);
-            }
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {
-                Debug.WriteLine($"upload mission error: {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
-                return false;
-            }
-        }
 
 
         /// <summary>
-        /// function that calls the startmission method of the drone and retriest it if it fails
-        /// </summary>
-        /// <returns></returns>
-         private async Task<bool> StartWaypointMission()
-        {
-            SDKError err = SDKError.UNKNOWN;
-
-            for (int i = 0; i < RETRY_AMOUNT; i++)
-            {
-                err = await DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).StartMission();
-
-                if (err == SDKError.NO_ERROR)
-                {
-                    break;
-                }
-
-                await Task.Delay(500);
-            }
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {                
-                Debug.WriteLine($"start mission error:  {err} + state {DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState()}");
-                return false;
-            }
-        }
-
-                /// <summary>
         /// function that calls the stopmission method of the drone and retriest it if it fails
         /// </summary>
         /// <returns> bool indicating if cancel was succesfull</returns>
@@ -438,26 +258,6 @@ namespace UAV_App.Pages
                 PatrolController.Instance.harmfullAnimalsFound();
             }
 
-        }
-
-
-        /// <summary>
-        /// Sends the drone home
-        /// </summary>
-        /// <returns> Bool indicating if the home request was succesfully received</returns>
-        public async Task<bool> goHome()
-        {
-            var err = await DJISDKManager.Instance.ComponentManager.GetFlightControllerHandler(0, 0).StartGoHomeAsync();
-
-            if (err == SDKError.NO_ERROR)
-            {
-                return true;
-            }
-            else
-            {
-                Console.WriteLine($"go home error: {err}");
-                return false;
-            }
         }
 
 
