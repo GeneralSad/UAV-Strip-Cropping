@@ -1,6 +1,7 @@
 ﻿using DJI.WindowsSDK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace UAV_App.Drone_Patrol.States
         private int photoTargetWaypoint;
         public async void onEnter()
         {
-            spots = WaypointMissionViewModel.Instance.getFirstLocations(3);
+            spots = WaypointMissionViewModel.Instance.getFirstLocations();
             missionStarted = false;
 
             photoTargetWaypoint = 0;
@@ -36,7 +37,6 @@ namespace UAV_App.Drone_Patrol.States
 
         public void onLeave()
         {
-            WaypointMissionViewModel.Instance.removeFirstLocations(3);
         }
 
         public IPatrolState HandleEvent(PatrolEvent patrolEvent)
@@ -82,8 +82,7 @@ namespace UAV_App.Drone_Patrol.States
 
                     if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint)
                     {
-                        WaypointMissionViewModel.Instance.DownloadWaypointFoto(photoTargetWaypoint);
-
+                        Debug.WriteLine(spots[photoTargetWaypoint]);
                         photoTargetWaypoint++;
                     }
 
@@ -134,15 +133,15 @@ namespace UAV_App.Drone_Patrol.States
 
             bool result;
             
-            result = await PatrolController.Instance.LoadWaypointMission(scoutMission);
+            result = await PatrolController.LoadWaypointMission(scoutMission);
 
             if (!result) return false; // did the mission load correctly? if not return false
 
-            result = await PatrolController.Instance.UploadWaypointMission();
+            result = await PatrolController.UploadWaypointMission();
 
             if (!result) return false; // did the mission upload correctly? if not return false
 
-            result = await PatrolController.Instance.StartWaypointMission();
+            result = await PatrolController.StartWaypointMission();
 
             if (!result) return false; // did the mission start correctly? if not return false
 

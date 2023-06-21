@@ -86,7 +86,7 @@ namespace UAV_App.Pages
         }
 
 
-/*        /// <summary>
+        /// <summary>
         /// Retreives the first few locations of the mission geopoints.
         /// </summary>
         /// <returns> the first few locations of mission geopoints</returns>
@@ -106,42 +106,6 @@ namespace UAV_App.Pages
 
             return locations;
 
-        }*/
-
-        /// <summary>
-        /// Retreives the first few locations of the mission geopoints.
-        /// </summary>
-        /// <returns> the first few locations of mission geopoints</returns>
-        public List<LocationCoordinate2D> getFirstLocations(int amount)
-        {
-            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
-
-            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
-            for (int i = 0; i < itemAmount; i++)
-            {
-                locations.Add(missionGeoPoints[0]);
-            }
-
-            chaseAwayGeoPoints = new List<LocationCoordinate2D>(locations);
-
-            return locations;
-        }
-
-         /// <summary>
-        /// Retreives the first few locations of the mission geopoints.
-        /// </summary>
-        /// <returns> the first few locations of mission geopoints</returns>
-        public List<LocationCoordinate2D> removeFirstLocations(int amount)
-        {
-            List<LocationCoordinate2D> locations = new List<LocationCoordinate2D>();
-
-            int itemAmount = missionGeoPoints.Count < amount ? missionGeoPoints.Count : amount;
-            for (int i = 0; i < itemAmount; i++)
-            {
-                missionGeoPoints.RemoveAt(0);
-            }
-
-            return locations;
         }
 
         /// <summary>
