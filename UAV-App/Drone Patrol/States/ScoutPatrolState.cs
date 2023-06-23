@@ -94,11 +94,13 @@ namespace UAV_App.Drone_Patrol.States
                                         if (mission == null) // get loaded mission returns null when the mission is done*/
 
                         WaypointMissionState state = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetCurrentState();
-                        
+                        WaypointMissionExecutionState? missionState = DJISDKManager.Instance.WaypointMissionManager.GetWaypointMissionHandler(0).GetLatestExecutionEvent();
+
                         if (executingStates.Contains(state))
                         {
                             Debug.WriteLine("scout mission done");
                             WaypointMissionViewModel.Instance.WaypointMissionDone();
+                            //TODO: State switch happens too early
                         }
 
                         if (missionState.Value.isWaypointReached && missionState.Value.targetWaypointIndex == photoTargetWaypoint)

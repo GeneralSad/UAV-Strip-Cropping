@@ -33,7 +33,7 @@ namespace UAV_App.Pages
         public List<LocationCoordinate2D> geoPoints { get; set; }
 
         public List<LocationCoordinate2D> missionGeoPoints = new List<LocationCoordinate2D>();
-        private List<LocationCoordinate2D> chaseAwayGeoPoints = new List<LocationCoordinate2D>();
+        public List<LocationCoordinate2D> chaseAwayGeoPoints = new List<LocationCoordinate2D>();
 
         private WaypointMissionViewModel()
         {
@@ -83,9 +83,7 @@ namespace UAV_App.Pages
         {
 
 
-            var TempChaseAwayLoc = new List<LocationCoordinate2D>();
-            TempChaseAwayLoc.Add(new LocationCoordinate2D());
-
+            var TempChaseAwayLoc = new List<LocationCoordinate2D>(chaseAwayGeoPoints);
             //TESTCODE
             chaseAwayGeoPoints.Clear();
             return TempChaseAwayLoc;

@@ -9,6 +9,8 @@ using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using UAV_App.Drone_Communication;
 
+//TODO: Make sure the AI code is in the project (Assets/AI_Assets/yolov5)
+
 namespace UAV_App.AI
 {
     //Datatype to hold information about the AI prediction.

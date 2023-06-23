@@ -179,6 +179,7 @@ namespace UAV_App.Drone_Communication
             {
                 //Add all files to the file list
                 files.ForEach(obj => {
+                    //TODO: Dequeue is empty at download
                     locationDictionary.Add(obj.fileName, locationQueue.Dequeue());
                     this.files.Add(obj);
                 });
@@ -253,17 +254,19 @@ namespace UAV_App.Drone_Communication
                     //Debug.WriteLine("Remaining: FINISHED");
                     if (!isDownloadAll)
                     {
-                        AIDetection ai = new AIDetection();
+/*                        AIDetection ai = new AIDetection();
                         AI_Prediction prediction = await ai.RunFullDetection();
                         if (prediction.amountOfBirdsDetected > 0)
                         {
                             //Bird(s) detected
-                            WaypointMissionViewModel.Instance.chaseAwayGeoPoints.Add(GetLocationFromFileName(await GetMostRecentPhotoFilePath()));
+                            //WaypointMissionViewModel.Instance.chaseAwayGeoPoints.Add(GetLocationFromFileName(await GetMostRecentPhotoFilePath()));
+
+                            Debug.WriteLine($"bird found at {prediction}");
                         }
                         else
                         {
                             //Nothing detected
-                        }
+                        }*/
                     }
                     _ = SetCameraWorkMode(CameraWorkMode.SHOOT_PHOTO);
                 }
